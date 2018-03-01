@@ -1094,17 +1094,17 @@ class HTMLImageElement extends HTMLSrcableElement {
     return 0; // XXX
   }
   set width(width) {}
-  
+
   get height() {
     return 0; // XXX
   }
   set height(height) {}
-  
+
   get naturalWidth() {
     return this.width;
   }
   set naturalWidth(naturalWidth) {}
-  
+
   get naturalHeight() {
     return this.height;
   }
@@ -1806,7 +1806,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
         }
       }
     }
-    
+
     get width() {
       return this.image.width;
     }
@@ -1816,12 +1816,12 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       return this.image.height;
     }
     set height(height) {}
-    
+
     get naturalWidth() {
       return this.width;
     }
     set naturalWidth(naturalWidth) {}
-    
+
     get naturalHeight() {
       return this.height;
     }
