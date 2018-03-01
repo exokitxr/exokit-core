@@ -1,5 +1,5 @@
 {
-  "name": "exokit",
+  "name": "exokit-core",
   "version": "0.0.72",
   "main": "index.js",
   "dependencies": {
