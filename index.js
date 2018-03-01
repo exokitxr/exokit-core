@@ -515,20 +515,10 @@ class ARDisplay extends MRDisplay {
     frameData.rightProjectionMatrix.set(this._projectionMatrix);
   }
 }
-class AudioNode {}
-class AudioParam {
-  constructor() {
-    this.value = 0;
-    this.minValue = 0;
-    this.maxValue = 0;
-    this.defaultValue = 0;
-  }
-
-  setValueAtTime() {}
-}
-class GainNode extends AudioNode {
+class AudioNode {
   connect() {}
 }
+class AudioDestinationNode extends AudioNode {}
 class AudioListener extends AudioNode {
   constructor() {
     super();
@@ -544,6 +534,20 @@ class AudioListener extends AudioNode {
     this.upZ = new AudioParam();
   }
 }
+class AudioParam {
+  constructor() {
+    this.value = 0;
+    this.minValue = 0;
+    this.maxValue = 0;
+    this.defaultValue = 0;
+  }
+
+  setValueAtTime() {}
+}
+class GainNode extends AudioNode {}
+class AnalyserNode extends AudioNode {}
+class PannerNode extends AudioNode {}
+class StereoPannerNode extends AudioNode {}
 class AudioContext {
   constructor() {
     this.listener = new AudioListener();
