@@ -922,31 +922,17 @@ class HTMLLoadableElement extends HTMLElement {
   }
 
   get onload() {
-    return this.listeners('load')[0];
+    return _elementGetter(this, 'load');
   }
   set onload(onload) {
-    if (typeof onload === 'function') {
-      this.addEventListener('load', onload);
-    } else {
-      const listeners = this.listeners('load');
-      for (let i = 0; i < listeners.length; i++) {
-        this.removeEventListener('load', listeners[i]);
-      }
-    }
+    _elementSetter(this, 'load', onload);
   }
 
   get onerror() {
-    return this.listeners('error')[0];
+    return _elementGetter(this, 'error');
   }
   set onerror(onerror) {
-    if (typeof onerror === 'function') {
-      this.addEventListener('error', onerror);
-    } else {
-      const listeners = this.listeners('error');
-      for (let i = 0; i < listeners.length; i++) {
-        this.removeEventListener('error', listeners[i]);
-      }
-    }
+    _elementSetter(this, 'error', onerror);
   }
 }
 class HTMLWindowElement extends HTMLLoadableElement {
@@ -959,17 +945,10 @@ class HTMLWindowElement extends HTMLLoadableElement {
   }
 
   get onmessage() {
-    return this.listeners('load')[0];
+    return _elementGetter(this, 'message');
   }
   set onmessage(onmessage) {
-    if (typeof onmessage === 'function') {
-      this.addEventListener('message', onmessage);
-    } else {
-      const listeners = this.listeners('message');
-      for (let i = 0; i < listeners.length; i++) {
-        this.removeEventListener('message', listeners[i]);
-      }
-    }
+    _elementSetter(this, 'message', onmessage);
   }
 }
 class HTMLScriptElement extends HTMLLoadableElement {
@@ -1129,31 +1108,17 @@ class HTMLAudioElement extends HTMLMediaElement {
   }
 
   get oncanplay() {
-    return this.listeners('canplay')[0];
+    return _elementGetter(this, 'canplay');
   }
   set oncanplay(oncanplay) {
-    if (typeof oncanplay === 'function') {
-      this.addEventListener('canplay', oncanplay);
-    } else {
-      const listeners = this.listeners('canplay');
-      for (let i = 0; i < listeners.length; i++) {
-        this.removeEventListener('canplay', listeners[i]);
-      }
-    }
+    _elementSetter(this, 'canplay', oncanplay);
   }
 
   get oncanplaythrough() {
-    return this.listeners('canplaythrough')[0];
+    return _elementGetter(this, 'canplaythrough');
   }
   set oncanplaythrough(oncanplaythrough) {
-    if (typeof oncanplaythrough === 'function') {
-      this.addEventListener('canplaythrough', oncanplaythrough);
-    } else {
-      const listeners = this.listeners('canplaythrough');
-      for (let i = 0; i < listeners.length; i++) {
-        this.removeEventListener('canplaythrough', listeners[i]);
-      }
-    }
+    _elementSetter(this, 'canplaythrough', oncanplaythrough);
   }
 }
 class HTMLVideoElement extends HTMLMediaElement {
@@ -1351,6 +1316,17 @@ const _hash = s => {
     result += s.codePointAt(i);
   }
   return result;
+};
+const _elementGetter = (self, attribute) => self.listeners(attribute)[0];
+const _elementSetter = (self, attribute, cb) => {
+  if (typeof cb === 'function') {
+    self.addEventListener(attribute, cb);
+  } else {
+    const listeners = self.listeners(attribute);
+    for (let i = 0; i < listeners.length; i++) {
+      self.removeEventListener(attribute, listeners[i]);
+    }
+  }
 };
 const _promiseSerial = async promiseFns => {
   for (let i = 0; i < promiseFns.length; i++) {
@@ -1783,31 +1759,17 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     }
 
     get onload() {
-      return this.listeners('load')[0];
+      return _elementGetter(this, 'load');
     }
     set onload(onload) {
-      if (typeof onload === 'function') {
-        this.addEventListener('load', onload);
-      } else {
-        const listeners = this.listeners('load');
-        for (let i = 0; i < listeners.length; i++) {
-          this.removeEventListener('load', listeners[i]);
-        }
-      }
+      _elementSetter(this, 'load', onload);
     }
 
     get onerror() {
-      return this.listeners('error')[0];
+      return _elementGetter(this, 'error');
     }
     set onerror(onerror) {
-      if (typeof onerror === 'function') {
-        this.addEventListener('error', onerror);
-      } else {
-        const listeners = this.listeners('error');
-        for (let i = 0; i < listeners.length; i++) {
-          this.removeEventListener('error', listeners[i]);
-        }
-      }
+      _elementSetter(this, 'error', onerror);
     }
 
     get width() {
