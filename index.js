@@ -1753,7 +1753,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     set src(src) {
       this._src = src;
 
-      const srcError = new Error();
+      // const srcError = new Error();
 
       this[windowSymbol].fetch(src)
         .then(res => {
@@ -1765,9 +1765,8 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
         })
         .then(arrayBuffer => {
           if (this.image.load(arrayBuffer)) {
-            return Promise.resolve();
+            // nothing
           } else {
-            console.warn('failed to decode image src', srcError.stack);
             return Promise.reject(new Error(`failed to decode image (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`));
           }
         })
