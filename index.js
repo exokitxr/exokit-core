@@ -1690,6 +1690,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   nativeWorker.bind({
     ImageBitmap: bindings.nativeImageBitmap,
   });
+
   ImageData = bindings.nativeImageData;
   ImageBitmap = bindings.nativeImageBitmap;
   Path2D = bindings.nativePath2D;
@@ -1710,6 +1711,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       }
     });
   }; */
+
   HTMLImageElement = class extends HTMLSrcableElement {
     constructor(attrs = [], value = '') {
       super('IMG', attrs, value);
@@ -1805,7 +1807,75 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     }
     set data(data) {}
   };
+
+  /* const {nativeAudio} = bindings;
+  AudioContext = nativeAudio.AudioContext;
+  AudioNode = nativeAudio.AudioNode;
+  AudioDestinationNode = nativeAudio.AudioDestinationNode;
+  AudioParam = nativeAudio.AudioParam;
+  AudioListener = nativeAudio.AudioListener;
+  GainNode = nativeAudio.GainNode;
+  AnalyserNode = nativeAudio.AnalyserNode;
+  PannerNode = nativeAudio.PannerNode;
+  StereoPannerNode = nativeAudio.StereoPannerNode;
+  HTMLAudioElement = class extends HTMLMediaElement {
+    constructor(attrs = [], value = '') {
+      super('AUDIO', attrs, value);
+
+      this._src = '';
+      this.audio = new nativeAudio.Audio();
+    }
+
+    get src() {
+      return this._src;
+    }
+    set src(src) {
+      this._src = src;
+
+      // const srcError = new Error();
+
+      this[windowSymbol].fetch(src)
+        .then(res => {
+          if (res.status >= 200 && res.status < 300) {
+            return res.arrayBuffer();
+          } else {
+            return Promise.reject(new Error(`img src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
+          }
+        })
+        .then(arrayBuffer => {
+          if (this.audio.load(arrayBuffer)) {
+            // nothing
+          } else {
+            // console.warn('failed to decode audio src', srcError.stack);
+            return Promise.reject(new Error(`failed to decode audio (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`));
+          }
+        })
+        .then(() => {
+          this.emit('canplay');
+          this.emit('canplaythrough');
+        })
+        .catch(err => {
+          this.emit('error', err);
+        });
+    }
+
+    get oncanplay() {
+      return _elementGetter(this, 'canplay');
+    }
+    set oncanplay(oncanplay) {
+      _elementSetter(this, 'canplay', oncanplay);
+    }
+
+    get oncanplaythrough() {
+      return _elementGetter(this, 'canplaythrough');
+    }
+    set oncanplaythrough(oncanplaythrough) {
+      _elementSetter(this, 'canplaythrough', oncanplaythrough);
+    }
+  }; */
+
   nativeVr = bindings.nativeVr;
+
   nativeWindow = bindings.nativeWindow;
 };
 module.exports = exokit;
