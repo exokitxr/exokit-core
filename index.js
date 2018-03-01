@@ -1561,6 +1561,14 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   };
   window.Blob = Blob;
   window.AudioContext = AudioContext;
+  window.AudioNode = AudioNode;
+  window.AudioDestinationNode = AudioDestinationNode;
+  window.AudioParam = AudioParam;
+  window.AudioListener = AudioListener;
+  window.GainNode = GainNode;
+  window.AnalyserNode = AnalyserNode;
+  window.PannerNode = PannerNode;
+  window.StereoPannerNode = StereoPannerNode;
   window.Path2D = Path2D;
   window.createImageBitmap = function() {
     return Promise.resolve(ImageBitmap.createImageBitmap.apply(ImageBitmap, arguments));
