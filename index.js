@@ -1843,11 +1843,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           }
         })
         .then(arrayBuffer => {
-          if (this.audio.load(arrayBuffer)) {
-            // nothing
-          } else {
-            // console.warn('failed to decode audio src', srcError.stack);
-            return Promise.reject(new Error(`failed to decode audio (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`));
+          try {
+            this.audio.load(arrayBuffer);
+          } catch(err) {
+            throw new Error(`failed to decode audio: ${err.message} (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`);
           }
         })
         .then(() => {
