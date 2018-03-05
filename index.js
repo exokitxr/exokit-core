@@ -1754,10 +1754,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           }
         })
         .then(arrayBuffer => {
-          if (this.image.load(arrayBuffer)) {
-            // nothing
-          } else {
-            return Promise.reject(new Error(`failed to decode image (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`));
+          try {
+            this.image.load(arrayBuffer);
+          } catch(err) {
+            throw new Error(`failed to decode image: ${err.message} (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`);
           }
         })
         .then(() => {
