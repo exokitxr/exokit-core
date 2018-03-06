@@ -1928,7 +1928,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       super('VIDEO', attrs, value);
 
       this._src = '';
-      this.video = new nativeAudio.Video();
+      this.video = new nativeVideo.Video();
     }
 
     get src() {
