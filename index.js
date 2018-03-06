@@ -554,7 +554,15 @@ class AudioContext {
   constructor() {
     this.listener = new AudioListener();
   }
-
+  
+  createMediaElementSource() {
+    return new AudioNode();
+  }
+  
+  createMediaStreamSource() {
+    return new AudioNode();
+  }
+  
   createGain() {
     return new GainNode();
   }
