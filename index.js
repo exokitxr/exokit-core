@@ -546,7 +546,9 @@ class AudioParam {
 }
 class GainNode extends AudioNode {}
 class AnalyserNode extends AudioNode {}
-class PannerNode extends AudioNode {}
+class PannerNode extends AudioNode {
+  setPosition() {}
+}
 class StereoPannerNode extends AudioNode {}
 class AudioContext {
   constructor() {
