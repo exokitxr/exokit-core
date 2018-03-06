@@ -1088,7 +1088,8 @@ class HTMLImageElement extends HTMLSrcableElement {
   constructor(attrs = [], value = '') {
     super('IMG', attrs, value);
 
-    this.stack = new Error().stack;
+    this.data = new Uint8Array(0);
+    // this.stack = new Error().stack;
 
     this.on('attribute', (name, value) => {
       if (name === 'src') {
