@@ -1100,12 +1100,12 @@ class HTMLImageElement extends HTMLSrcableElement {
   }
 
   get width() {
-    return 0; // XXX
+    return 0;
   }
   set width(width) {}
 
   get height() {
-    return 0; // XXX
+    return 0;
   }
   set height(height) {}
 
