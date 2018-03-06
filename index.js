@@ -1879,6 +1879,13 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     set oncanplaythrough(oncanplaythrough) {
       _elementSetter(this, 'canplaythrough', oncanplaythrough);
     }
+
+    get onerror() {
+      return _elementGetter(this, 'error');
+    }
+    set onerror(onerror) {
+      _elementSetter(this, 'error', onerror);
+    }
   }; */
 
   nativeVr = bindings.nativeVr;
