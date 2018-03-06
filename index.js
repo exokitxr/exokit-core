@@ -1986,6 +1986,11 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     set height(height) {
       this.video.height = height;
     }
+    
+    get data() {
+      return this.video.data;
+    }
+    set data(data) {}
 
     play() {
       this.video.play();
