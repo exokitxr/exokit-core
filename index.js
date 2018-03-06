@@ -556,6 +556,14 @@ class AudioContext {
   createGain() {
     return new GainNode();
   }
+  
+  createAnalyser() {
+    return new AnalyserNode();
+  }
+  
+  createPanner() {
+    return new PannerNode();
+  }
 }
 
 class Node extends EventEmitter {
