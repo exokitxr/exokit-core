@@ -807,6 +807,14 @@ class HTMLElement extends Node {
     return _recurse(this);
   }
 
+  cloneNode(deep = false) {
+    const el = new this.constructor(this.attrs, this.value);
+    if (deep) {
+      el.childNodes = this.childNodes.map(childNode => childNode.cloneNode(true));
+    }
+    return el;
+  }
+
   addEventListener() {
     this.on.apply(this, arguments);
   }
