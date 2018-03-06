@@ -1922,6 +1922,109 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     }
   }; */
 
+  /* const {nativeVideo} = bindings;
+  HTMLVideoElement = class extends HTMLMediaElement {
+    constructor(attrs = [], value = '') {
+      super('VIDEO', attrs, value);
+
+      this._src = '';
+      this.video = new nativeAudio.Video();
+    }
+
+    get src() {
+      return this._src;
+    }
+    set src(src) {
+      this._src = src;
+
+      // const srcError = new Error();
+
+      this[windowSymbol].fetch(src)
+        .then(res => {
+          if (res.status >= 200 && res.status < 300) {
+            return res.arrayBuffer();
+          } else {
+            return Promise.reject(new Error(`video src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
+          }
+        })
+        .then(arrayBuffer => {
+          try {
+            this.video.load(arrayBuffer);
+          } catch(err) {
+            throw new Error(`failed to decode video: ${err.message} (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`);
+          }
+        })
+        .then(() => {
+          this.emit('canplay');
+          this.emit('canplaythrough');
+        })
+        .catch(err => {
+          this.emit('error', err);
+        });
+    }
+
+    get width() {
+      return this.video.width;
+    }
+    set width(width) {
+      this.video.width = width;
+    }
+
+    get height() {
+      return this.video.height;
+    }
+    set height(height) {
+      this.video.height = height;
+    }
+
+    play() {
+      this.video.play();
+    }
+
+    pause() {
+      this.video.pause();
+    }
+
+    get currentTime() {
+      return this.video && this.video.currentTime;
+    }
+    set currentTime(currentTime) {
+      if (this.video) {
+        this.video.currentTime = currentTime;
+      }
+    }
+
+    get duration() {
+      return this.video && this.video.duration;
+    }
+    set duration(duration) {
+      if (this.video) {
+        this.video.duration = duration;
+      }
+    }
+
+    get oncanplay() {
+      return _elementGetter(this, 'canplay');
+    }
+    set oncanplay(oncanplay) {
+      _elementSetter(this, 'canplay', oncanplay);
+    }
+
+    get oncanplaythrough() {
+      return _elementGetter(this, 'canplaythrough');
+    }
+    set oncanplaythrough(oncanplaythrough) {
+      _elementSetter(this, 'canplaythrough', oncanplaythrough);
+    }
+
+    get onerror() {
+      return _elementGetter(this, 'error');
+    }
+    set onerror(onerror) {
+      _elementSetter(this, 'error', onerror);
+    }
+  }; */
+
   nativeVr = bindings.nativeVr;
 
   nativeWindow = bindings.nativeWindow;
