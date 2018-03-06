@@ -1855,7 +1855,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           if (res.status >= 200 && res.status < 300) {
             return res.arrayBuffer();
           } else {
-            return Promise.reject(new Error(`img src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
+            return Promise.reject(new Error(`audio src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
           }
         })
         .then(arrayBuffer => {
