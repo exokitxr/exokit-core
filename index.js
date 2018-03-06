@@ -1866,6 +1866,32 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
         });
     }
 
+    play() {
+      this.audio.play();
+    }
+
+    pause() {
+      this.audio.pause();
+    }
+
+    get currentTime() {
+      return this.audio && this.audio.currentTime;
+    }
+    set currentTime(currentTime) {
+      if (this.audio) {
+        this.audio.currentTime = currentTime;
+      }
+    }
+
+    get duration() {
+      return this.audio && this.audio.duration;
+    }
+    set duration(duration) {
+      if (this.audio) {
+        this.audio.duration = duration;
+      }
+    }
+
     get oncanplay() {
       return _elementGetter(this, 'canplay');
     }
