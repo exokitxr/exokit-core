@@ -1152,6 +1152,8 @@ class HTMLVideoElement extends HTMLMediaElement {
   constructor(attrs = [], value = '') {
     super('VIDEO', attrs, value);
 
+    this.data = new Uint8Array(0);
+    
     this.on('attribute', (name, value) => {
       if (name === 'src') {
         process.nextTick(() => { // XXX
@@ -1160,6 +1162,16 @@ class HTMLVideoElement extends HTMLMediaElement {
       }
     });
   }
+  
+  get width() {
+    return 0;
+  }
+  set width(width) {}
+
+  get height() {
+    return 0;
+  }
+  set height(height) {}
 }
 class HTMLIframeElement extends HTMLSrcableElement {
   constructor(attrs = [], value = '') {
