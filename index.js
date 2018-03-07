@@ -1485,6 +1485,15 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   let vrTextures = [];
   window.navigator = {
     userAgent: 'exokit',
+    mediaDevices: {
+      getUserMedia(constraints) {
+        if (constraints.audio) {
+          return Promise.resolve(new MicrophoneMediaStream());
+        } else {
+          return Promise.reject(new Error('constraints not met'));
+        }
+      },
+    },
     getVRDisplays: () => vrDisplays,
     getGamepads: () => localGamepads,
     getVRMode: () => vrMode,
