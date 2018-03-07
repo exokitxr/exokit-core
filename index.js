@@ -1148,6 +1148,7 @@ class HTMLAudioElement extends HTMLMediaElement {
     _elementSetter(this, 'canplaythrough', oncanplaythrough);
   }
 }
+class MicrophoneMediaStream {}
 class HTMLVideoElement extends HTMLMediaElement {
   constructor(attrs = [], value = '') {
     super('VIDEO', attrs, value);
@@ -1943,7 +1944,8 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     set onerror(onerror) {
       _elementSetter(this, 'error', onerror);
     }
-  }; */
+  };
+  MicrophoneMediaStream = nativeAudio.MicrophoneMediaStream; */
 
   /* const {nativeVideo} = bindings;
   HTMLVideoElement = class extends HTMLMediaElement {
