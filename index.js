@@ -1255,7 +1255,7 @@ class HTMLCanvasElement extends HTMLElement {
       if (contextType === '2d') {
         this._context = new CanvasRenderingContext2D(this.width, this.height);
       } else if (contextType === 'webgl') {
-        this._context = new WebGLContext();
+        this._context = new WebGLContext(this);
       }
     }
     return this._context;
