@@ -33,6 +33,38 @@ URL.revokeObjectURL = blob => {
   urls.delete(url);
 };
 
+class Location extends EventEmitter {
+  constructor(u) {
+    super();
+    this._url = new url.URL(u);
+  }
+  get href() { return this._url.href; }
+  set href(href) { this._url.href = href; this.update(); }
+  get protocol() { return this._url.protocol; }
+  set protocol(protocol) { this._url.protocol = protocol; this.update(); }
+  get host() { return this._url.host; }
+  set host(host) { this._url.host = host; this.update(); }
+  get hostname() { return this._url.hostname; }
+  set hostname(hostname) { this._url.hostname = hostname; this.update(); }
+  get port() { return this._url.port; }
+  set port(port) { this._url.port = port; this.update(); }
+  get pathname() { return this._url.pathname; }
+  set pathname(pathname) { this._url.pathname = pathname; this.update(); }
+  get search() { return this._url.search; }
+  set search(search) { this._url.search = search; this.update(); }
+  get hash() { return this._url.hash; }
+  set hash(hash) { this._url.hash = hash; this.update(); }
+  get username() { return this._url.username; }
+  set username(username) { this._url.username = username; this.update(); }
+  get password() { return this._url.password; }
+  set password(password) { this._url.password = password; this.update(); }
+  get origin() { return this._url.origin; }
+  set origin(origin) { this._url.origin = origin; this.update(); }
+  update() {
+    this.emit('update', this.href);
+  }
+}
+
 class MessageEvent {
   constructor(data) {
     this.data = data;
@@ -1452,7 +1484,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.setInterval = setInterval;
   window.clearInterval = clearInterval;
   window.performance = performance;
-  window.location = url.parse(options.url);
+  window.location = new Location(options.url);
 
   let vrDisplays = [];
 
