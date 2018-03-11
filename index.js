@@ -1485,6 +1485,22 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.clearInterval = clearInterval;
   window.performance = performance;
   window.location = new Location(options.url);
+  let loading = false;
+  window.location.on('update', href => {
+    if (!loading) {
+      exokit.load(href)
+        .then(newWindow => {
+          window.emit('beforeunload');
+          window.emit('unload');
+          window.emit('navigate', newWindow);
+        })
+        .catch(err => {
+          loading = false;
+          window.emit('error', err);
+        });
+      loading = true;
+    }
+  });
 
   let vrDisplays = [];
 
