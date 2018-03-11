@@ -647,6 +647,16 @@ class HTMLElement extends Node {
     this._innerHTML = '';
   }
 
+  inspect() {
+    let result = '<' + this.tagName.toLowerCase();
+    for (let i = 0; i < this.attrs.length; i++) {
+      const attr = this.attrs[i];
+      result += ' ' + attr.name + '=' + JSON.stringify(attr.value);
+    }
+    result += '>';
+    return result;
+  }
+
   get nodeType() {
     return Node.ELEMENT_NODE;
   }
