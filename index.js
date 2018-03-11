@@ -1742,7 +1742,7 @@ const exokit = (s = '', options = {}) => {
   options.dataPath = options.dataPath || __dirname;
   return _parseWindow(s, options);
 };
-exokit.fetch = (src, options = {}) => fetch(src)
+exokit.load = (src, options = {}) => fetch(src)
   .then(res => {
     if (res.status >= 200 && res.status < 300) {
       return res.text();
@@ -2103,6 +2103,6 @@ module.exports = exokit;
 
 if (require.main === module) {
   if (process.argv.length === 3) {
-    exokit.fetch(process.argv[2]);
+    exokit.load(process.argv[2]);
   }
 }
