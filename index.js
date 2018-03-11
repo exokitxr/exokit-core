@@ -1210,6 +1210,7 @@ class HTMLIframeElement extends HTMLSrcableElement {
     });
   }
 }
+const defaultCanvasSize = [1280, 1024];
 class HTMLCanvasElement extends HTMLElement {
   constructor(attrs = [], value = '') {
     super('CANVAS', attrs, value);
@@ -1228,7 +1229,7 @@ class HTMLCanvasElement extends HTMLElement {
   }
 
   get width() {
-     return this.getAttribute('width') || 1;
+     return this.getAttribute('width') || defaultCanvasSize[0];
   }
   set width(value) {
     if (typeof value === 'number' && isFinite(value)) {
@@ -1237,7 +1238,7 @@ class HTMLCanvasElement extends HTMLElement {
   }
 
   get height() {
-    return this.getAttribute('height') || 1;
+    return this.getAttribute('height') || defaultCanvasSize[1];
   }
   set height(value) {
     if (typeof value === 'number' && isFinite(value)) {
