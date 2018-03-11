@@ -236,7 +236,6 @@ class WebGLContext {
   viewport() {}
 }
 let nativeVr = null;
-let nativeWindow = null;
 class VRFrameData {
   constructor() {
     this.leftProjectionMatrix = new Float32Array(16);
@@ -915,10 +914,6 @@ class HTMLElement extends Node {
     if (document.pointerLockElement === null) {
       document.pointerLockElement = this;
 
-      if (nativeWindow !== null) {
-        nativeWindow.setCursorMode(false);
-      }
-
       process.nextTick(() => {
         document.emit('pointerlockchange');
       });
@@ -929,10 +924,6 @@ class HTMLElement extends Node {
 
     if (document.pointerLockElement !== null) {
       document.pointerLockElement = null;
-
-      if (nativeWindow !== null) {
-        nativeWindow.setCursorMode(true);
-      }
 
       process.nextTick(() => {
         document.emit('pointerlockchange');
@@ -2075,8 +2066,6 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   }; */
 
   nativeVr = bindings.nativeVr;
-
-  nativeWindow = bindings.nativeWindow;
 };
 module.exports = exokit;
 
