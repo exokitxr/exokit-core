@@ -1813,6 +1813,7 @@ const _parseDocument = (s, options, window) => {
   document.createTextNode = text => new TextNode(text);
   document.createComment = comment => new CommentNode(comment);
   document.styleSheets = [];
+  document.activeElement = null;
   document.open = () => {
     document.innerHTML = '';
   };
