@@ -1316,6 +1316,10 @@ class TextNode extends Node {
     this.value = value;
   }
 
+  inspect() {
+    return `[TextNode ${JSON.stringify(this.value)}]`;
+  }
+
   get nodeType() {
     return Node.TEXT_NODE;
   }
@@ -1326,6 +1330,10 @@ class CommentNode extends Node {
     super('#comment');
 
     this.value = value;
+  }
+
+  inspect() {
+    return `[CommentNode ${JSON.stringify(this.value)}]`;
   }
 
   get nodeType() {
