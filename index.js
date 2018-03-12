@@ -681,12 +681,13 @@ const autoClosingTags = {
   track: true,
 };
 class HTMLElement extends Node {
-  constructor(tagName = 'DIV', attrs = [], value = '') {
+  constructor(tagName = 'DIV', attrs = [], value = '', location = null) {
     super(null);
 
     this.tagName = tagName;
     this.attrs = attrs;
     this.value = value;
+    this.location = location;
 
     this.attributes = _makeAttributesProxy(attrs);
     this.childNodes = [];
@@ -983,7 +984,9 @@ class HTMLElement extends Node {
   }
   set innerHTML(innerHTML) {
     const oldChildNodes = this.childNodes;
-    const newChildNodes = parse5.parseFragment(innerHTML).childNodes.map(childNode => _fromAST(childNode, this[windowSymbol], this));
+    const newChildNodes = parse5.parseFragment(innerHTML, {
+      locationInfo: true,
+    }).childNodes.map(childNode => _fromAST(childNode, this[windowSymbol], this));
     this.childNodes = newChildNodes;
 
     if (oldChildNodes.length > 0) {
@@ -1025,8 +1028,8 @@ class HTMLElement extends Node {
   }
 }
 class HTMLAnchorElement extends HTMLElement {
-  constructor(attrs = [], value = '') {
-    super('A', attrs, value);
+  constructor(attrs = [], value = '', location = null) {
+    super('A', attrs, value, location);
   }
 
   get href() {
@@ -1037,8 +1040,8 @@ class HTMLAnchorElement extends HTMLElement {
   }
 }
 class HTMLLoadableElement extends HTMLElement {
-  constructor(tagName, attrs = [], value = '') {
-    super(tagName, attrs, value);
+  constructor(tagName, attrs = [], value = '', location = null) {
+    super(tagName, attrs, value, location);
   }
 
   get onload() {
@@ -1072,8 +1075,8 @@ class HTMLWindowElement extends HTMLLoadableElement {
   }
 }
 class HTMLScriptElement extends HTMLLoadableElement {
-  constructor(attrs = [], value = '') {
-    super('SCRIPT', attrs, value);
+  constructor(attrs = [], value = '', location = null) {
+    super('SCRIPT', attrs, value, location);
 
     this.readyState = null;
 
@@ -1105,7 +1108,8 @@ class HTMLScriptElement extends HTMLLoadableElement {
       }
     });
     this.on('innerHTML', innerHTML => {
-      _runJavascript(innerHTML, this[windowSymbol]);
+      const window = this[windowSymbol];
+      _runJavascript(innerHTML, window, window.location.href, this.location.line !== null ? this.location.line - 1 : 0, this.location.col !== null ? this.location.col - 1 : 0);
 
       this.readyState = 'complete';
 
@@ -1140,8 +1144,8 @@ class HTMLScriptElement extends HTMLLoadableElement {
   }
 }
 class HTMLSrcableElement extends HTMLLoadableElement {
-  constructor(tagName = null, attrs = [], value = '') {
-    super(tagName, attrs, value);
+  constructor(tagName = null, attrs = [], value = '', location = null) {
+    super(tagName, attrs, value, location);
   }
 
   get src() {
@@ -1161,8 +1165,8 @@ class HTMLSrcableElement extends HTMLLoadableElement {
   }
 }
 class HTMLMediaElement extends HTMLSrcableElement {
-  constructor(tagName = null, attrs = [], value = '') {
-    super(tagName, attrs, value);
+  constructor(tagName = null, attrs = [], value = '', location = null) {
+    super(tagName, attrs, value, location);
 
     this.paused = false;
     this.currentTime = 0;
@@ -1179,8 +1183,8 @@ class HTMLMediaElement extends HTMLSrcableElement {
   }
 }
 class HTMLImageElement extends HTMLSrcableElement {
-  constructor(attrs = [], value = '') {
-    super('IMG', attrs, value);
+  constructor(attrs = [], value = '', location = null) {
+    super('IMG', attrs, value, location);
 
     this.data = new Uint8Array(0);
     // this.stack = new Error().stack;
@@ -1215,8 +1219,8 @@ class HTMLImageElement extends HTMLSrcableElement {
   set naturalHeight(naturalHeight) {}
 };
 class HTMLAudioElement extends HTMLMediaElement {
-  constructor(attrs = [], value = '') {
-    super('AUDIO', attrs, value);
+  constructor(attrs = [], value = '', location = null) {
+    super('AUDIO', attrs, value, location);
 
     this.on('attribute', (name, value) => {
       if (name === 'src') {
@@ -1244,8 +1248,8 @@ class HTMLAudioElement extends HTMLMediaElement {
 }
 class MicrophoneMediaStream {}
 class HTMLVideoElement extends HTMLMediaElement {
-  constructor(attrs = [], value = '') {
-    super('VIDEO', attrs, value);
+  constructor(attrs = [], value = '', location = null) {
+    super('VIDEO', attrs, value, location);
 
     this.data = new Uint8Array(0);
 
@@ -1269,8 +1273,8 @@ class HTMLVideoElement extends HTMLMediaElement {
   set height(height) {}
 }
 class HTMLIframeElement extends HTMLSrcableElement {
-  constructor(attrs = [], value = '') {
-    super('IFRAME', attrs, value);
+  constructor(attrs = [], value = '', location = null) {
+    super('IFRAME', attrs, value, location);
 
     this.on('attribute', (name, value) => {
       if (name === 'src') {
@@ -1305,8 +1309,8 @@ class HTMLIframeElement extends HTMLSrcableElement {
 }
 const defaultCanvasSize = [1280, 1024];
 class HTMLCanvasElement extends HTMLElement {
-  constructor(attrs = [], value = '') {
-    super('CANVAS', attrs, value);
+  constructor(attrs = [], value = '', location = null) {
+    super('CANVAS', attrs, value, location);
 
     this._context = null;
 
@@ -1414,18 +1418,24 @@ const _fromAST = (node, window, parentNode = null) => {
     return commentNode;
   } else {
     const tagName = node.tagName && node.tagName.toUpperCase();
-    const {attrs, value} = node;
+    const {attrs, value, __location} = node;
     const HTMLElementTemplate = window[htmlTagsSymbol][tagName];
+    const location = __location ? {
+      line: __location.line,
+      col: __location.col,
+    } : null;
     const element = HTMLElementTemplate ?
       new HTMLElementTemplate(
         attrs,
-        value
+        value,
+        location,
       )
     :
       new window[htmlElementsSymbol].HTMLElement(
         tagName,
         attrs,
-        value
+        value,
+        location,
       );
     element.parentNode = parentNode;
     if (node.childNodes) {
@@ -1529,9 +1539,9 @@ const _runHtml = async (element, window) => {
     }
   }
 };
-const _runJavascript = (jsString, window, filename = 'script') => {
+const _runJavascript = (jsString, window, filename = 'script', lineOffset = 0, colOffset = 0) => {
   try {
-    windowEval(jsString, window, filename);
+    windowEval(jsString, window, filename, lineOffset, colOffset);
   } catch (err) {
     console.warn(err.stack);
   }
@@ -1565,7 +1575,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         })
         .catch(err => {
           loading = false;
-          window.emit('error', err);
+          window.emit('error', {
+            error: err,
+          });
         });
       loading = true;
     }
@@ -1767,7 +1779,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   return window;
 };
 const _parseDocument = (s, options, window) => {
-  const document = _fromAST(parse5.parse(s), window);
+  const document = _fromAST(parse5.parse(s, {
+    locationInfo: true,
+  }), window);
   const html = document.childNodes.find(element => element.tagName === 'HTML');
   const head = html.childNodes.find(element => element.tagName === 'HEAD');
   const body = html.childNodes.find(element => element.tagName === 'BODY');
@@ -1776,7 +1790,9 @@ const _parseDocument = (s, options, window) => {
   document.readyState = null;
   document.head = head;
   document.body = body;
-  document.location = url.parse(options.url);
+  document.location = url.parse(options.url, {
+    locationInfo: true,
+  });
   document.createElement = tagName => {
     tagName = tagName.toUpperCase();
     const HTMLElementTemplate = window[htmlTagsSymbol][tagName];
@@ -1792,7 +1808,9 @@ const _parseDocument = (s, options, window) => {
   };
   document.close = () => {};
   document.write = htmlString => {
-    const childNodes = parse5.parseFragment(htmlString).childNodes.map(childNode => _fromAST(childNode, window, this));
+    const childNodes = parse5.parseFragment(htmlString, {
+      locationInfo: true,
+    }).childNodes.map(childNode => _fromAST(childNode, window, this));
     for (let i = 0; i < childNodes.length; i++) {
       document.body.appendChild(childNodes[i]);
     }
@@ -1836,7 +1854,9 @@ exokit.load = (src, options = {}) => fetch(src)
     }
   })
   .then(htmlString => {
-    const parsedUrl = url.parse(src);
+    const parsedUrl = url.parse(src, {
+      locationInfo: true,
+    });
     return exokit(htmlString, {
       url: options.url || src,
       baseUrl: options.baseUrl || url.format({
