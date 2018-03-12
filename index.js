@@ -1340,7 +1340,7 @@ const _fromAST = (node, window, parentNode = null) => {
     textNode.parentNode = parentNode;
     return textNode;
   } else if (node.nodeName === '#comment') {
-    const commentNode = new window[htmlElementsSymbol].CommentNode(node.value);
+    const commentNode = new window[htmlElementsSymbol].CommentNode(node.data);
     commentNode.parentNode = parentNode;
     return commentNode;
   } else {
