@@ -15,6 +15,7 @@ const WebSocket = require('ws/lib/websocket');
 const {LocalStorage} = require('node-localstorage');
 const createMemoryHistory = require('history/createMemoryHistory').default;
 const ClassList = require('classlist');
+const selector = require('selector-lite');
 const windowEval = require('window-eval-native');
 const THREE = require('./lib/three-min.js');
 
@@ -924,125 +925,31 @@ class HTMLElement extends Node {
   }
 
   getElementById(id) {
-    return this.traverse(node => {
-      if (
-        (node.getAttribute && node.getAttribute('id') === id) ||
-        (node.attrs && node.attrs.some(attr => attr.name === 'id' && attr.value === id))
-      ) {
-        return node;
-      }
-    });
+    return selector.find(this, '#' + id, true);
   }
   getElementByClassName(className) {
-    return this.traverse(node => {
-      if (
-        (node.getAttribute && node.getAttribute('class') === className) ||
-        (node.attrs && node.attrs.some(attr => attr.name === 'class' && attr.value === className))
-      ) {
-        return node;
-      }
-    });
+    return selector.find(this, '.' + className, true);
   }
   getElementByTagName(tagName) {
-    tagName = tagName.toUpperCase();
-
-    return this.traverse(node => {
-      if (node.tagName === tagName) {
-        return node;
-      }
-    });
+    return selector.find(this, tagName, true);
   }
-  querySelector(selector) {
-    let match;
-    if (match = selector.match(/^#(.+)$/)) {
-      return this.getElementById(match[1]);
-    } else if (match = selector.match(/^\.(.+)$/)) {
-      return this.getElementByClassName(match[1]);
-    } else {
-      return this.getElementByTagName(selector);
-    }
+  querySelector(s) {
+    return selector.find(this, s, true);
   }
   getElementsById(id) {
-    const result = [];
-    this.traverse(node => {
-      if (
-        (node.getAttribute && node.getAttribute('id') === id) ||
-        (node.attrs && node.attrs.some(attr => attr.name === 'id' && attr.value === id))
-      ) {
-        result.push(node);
-      }
-    });
-    return result;
+    return selector.find(this, '#' + id);
   }
   getElementsByClassName(className) {
-    const result = [];
-    this.traverse(node => {
-      if (
-        (node.getAttribute && node.getAttribute('class') === className) ||
-        (node.attrs && node.attrs.some(attr => attr.name === 'class' && attr.value === className))
-      ) {
-        result.push(node);
-      }
-    });
-    return result;
+    return selector.find(this, '.' + className);
   }
   getElementsByTagName(tagName) {
-    tagName = tagName.toUpperCase();
-
-    const result = [];
-    this.traverse(node => {
-      if (node.tagName === tagName) {
-        result.push(node);
-      }
-    });
-    return result;
+    return selector.find(this, tagName);
   }
-  querySelectorAll(selector) {
-    let match;
-    if (match = selector.match(/^#(.+)$/)) {
-      return this.getElementsById(match[1]);
-    } else if (match = selector.match(/^\.(.+)$/)) {
-      return this.getElementsByClassName(match[1]);
-    } else {
-      return this.getElementsByTagName(selector);
-    }
+  querySelectorAll(s) {
+    return selector.find(this, s);
   }
-  matches(selector) {
-    let match;
-    if (match = selector.match(/^#(.+)$/)) {
-      const id = match[1];
-      return (
-        (this.getAttribute && this.getAttribute('id') === id) ||
-        (this.attrs && this.attrs.some(attr => attr.name === 'id' && attr.value === id))
-      );
-    } else if (match = selector.match(/^\.(.+)$/)) {
-      const className = match[1];
-      return (
-        (this.getAttribute && this.getAttribute('class') === className) ||
-        (this.attrs && this.attrs.some(attr => attr.name === 'class' && attr.value === className))
-      );
-    } else {
-      const tagName = selector.toUpperCase();
-      return this.tagName === tagName;
-    }
-  }
-  traverse(fn) {
-    const _recurse = node => {
-      const result = fn(node);
-      if (result !== undefined) {
-        return result;
-      } else {
-        if (node.childNodes) {
-          for (let i = 0; i < node.childNodes.length; i++) {
-            const result = _recurse(node.childNodes[i]);
-            if (result !== undefined) {
-              return result;
-            }
-          }
-        }
-      }
-    };
-    return _recurse(this);
+  matches(s) {
+    return selector.matches(this, s);
   }
 
   dispatchEvent(event) {
