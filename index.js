@@ -1886,7 +1886,7 @@ const _parseDocument = (s, options, window) => {
   const documentAst = parse5.parse(s, {
     locationInfo: true,
   });
-  documentAst.tagName = 'DOCUMENT';
+  documentAst.tagName = 'document';
   const document = _fromAST(documentAst, window);
   const html = document.childNodes.find(element => element.tagName === 'HTML');
   const head = html.childNodes.find(element => element.tagName === 'HEAD');
