@@ -737,6 +737,7 @@ const autoClosingTags = {
   param: true,
   source: true,
   track: true,
+  window: true,
 };
 class HTMLElement extends Node {
   constructor(tagName = 'DIV', attrs = [], value = '', location = null) {
