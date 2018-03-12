@@ -1486,12 +1486,20 @@ const _promiseSerial = async promiseFns => {
   }
 };
 const _loadPromise = el => new Promise((accept, reject) => {
-  el.on('load', () => {
+  const load = () => {
+    _cleanup();
     accept();
-  });
-  el.on('error', err => {
+  };
+  const error = err => {
+    _cleanup();
     reject(err);
-  });
+  };
+  const _cleanup = () => {
+    el.removeListener('load', load);
+    el.removeListener('error', error);
+  };
+  el.on('load', load);
+  el.on('error', error);
 });
 const _runHtml = async (element, window) => {
   if (element instanceof HTMLElement) {
