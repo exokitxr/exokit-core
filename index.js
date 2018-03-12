@@ -900,6 +900,20 @@ class HTMLElement extends Node {
     }
   }
 
+  get id() {
+    return this.attributes['id'] || '';
+  }
+  set id(id) {
+    this.attributes['id'] = id;
+  }
+
+  get className() {
+    return this.attributes['class'] || '';
+  }
+  set className(className) {
+    this.attributes['class'] = className;
+  }
+
   getElementById(id) {
     return this.traverse(node => {
       if (
@@ -1083,13 +1097,6 @@ class HTMLElement extends Node {
     return 0;
   }
   set offsetHeight(offsetHeight) {}
-
-  get className() {
-    return this.attributes['class'] || '';
-  }
-  set className(className) {
-    this.attributes['class'] = className;
-  }
 
   get style() {
     const style = _parseStyle(this.attributes['style'] || '');
