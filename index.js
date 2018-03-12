@@ -21,7 +21,6 @@ const THREE = require('./lib/three-min.js');
 
 const windowSymbol = Symbol();
 const htmlTagsSymbol = Symbol();
-const htmlElementsSymbol = Symbol();
 const optionsSymbol = Symbol();
 let nativeBindings = false;
 
@@ -1559,12 +1558,12 @@ class CommentNode extends Node {
 
 const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
   if (node.nodeName === '#text') {
-    const textNode = new window[htmlElementsSymbol].TextNode(node.value);
+    const textNode = new TextNode(node.value);
     textNode.parentNode = parentNode;
     textNode.ownerDocument = ownerDocument;
     return textNode;
   } else if (node.nodeName === '#comment') {
-    const commentNode = new window[htmlElementsSymbol].CommentNode(node.data);
+    const commentNode = new CommentNode(node.data);
     commentNode.parentNode = parentNode;
     commentNode.ownerDocument = ownerDocument;
     return commentNode;
@@ -1583,7 +1582,7 @@ const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
         location,
       )
     :
-      new window[htmlElementsSymbol].HTMLElement(
+      new HTMLElement(
         tagName,
         attrs,
         value,
@@ -1824,50 +1823,40 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.setInterval = setInterval;
   window.clearInterval = clearInterval;
   window.performance = performance;
-  window[htmlElementsSymbol] = {
-    Node,
-    HTMLElement,
-    HTMLAnchorElement,
-    HTMLScriptElement,
-    HTMLImageElement: (Old => class HTMLImageElement extends Old {
-      constructor() {
-        super(...arguments);
+  const HTMLImageElementBound = (Old => class HTMLImageElement extends Old {
+    constructor() {
+      super(...arguments);
 
-        this.ownerDocument = window.document; // need to set owner document here because HTMLImageElement can be manually constructed via new Image()
-      }
-    })(HTMLImageElement),
-    HTMLAudioElement,
-    HTMLVideoElement,
-    HTMLIframeElement,
-    HTMLCanvasElement,
-    TextNode,
-    CommentNode,
-  };
+      this.ownerDocument = window.document; // need to set owner document here because HTMLImageElement can be manually constructed via new Image()
+    }
+  })(HTMLImageElement);
   window[htmlTagsSymbol] = {
-    A: window[htmlElementsSymbol].HTMLAnchorElement,
-    SCRIPT: window[htmlElementsSymbol].HTMLScriptElement,
-    IMG: window[htmlElementsSymbol].HTMLImageElement,
-    AUDIO: window[htmlElementsSymbol].HTMLAudioElement,
-    VIDEO: window[htmlElementsSymbol].HTMLVideoElement,
-    IFRAME: window[htmlElementsSymbol].HTMLIframeElement,
-    CANVAS: window[htmlElementsSymbol].HTMLCanvasElement,
+    A: HTMLAnchorElement,
+    SCRIPT: HTMLScriptElement,
+    IMG: HTMLImageElementBound,
+    AUDIO: HTMLAudioElement,
+    VIDEO: HTMLVideoElement,
+    IFRAME: HTMLIframeElement,
+    CANVAS: HTMLCanvasElement,
   };
   window[optionsSymbol] = options;
-  window.HTMLElement = window[htmlElementsSymbol].HTMLElement;
-  window.HTMLAnchorElement = window[htmlElementsSymbol].HTMLAnchorElement;
-  window.HTMLScriptElement = window[htmlElementsSymbol].HTMLScriptElement;
-  window.HTMLImageElement = window[htmlElementsSymbol].HTMLImageElement;
-  window.HTMLAudioElement = window[htmlElementsSymbol].HTMLAudioElement;
-  window.HTMLVideoElement = window[htmlElementsSymbol].HTMLVideoElement;
-  window.HTMLIframeElement = window[htmlElementsSymbol].HTMLIframeElement;
-  window.HTMLCanvasElement = window[htmlElementsSymbol].HTMLCanvasElement;
+  window.HTMLElement = HTMLElement;
+  window.HTMLAnchorElement = HTMLAnchorElement;
+  window.HTMLScriptElement = HTMLScriptElement;
+  window.HTMLImageElement = HTMLImageElementBound;
+  window.HTMLAudioElement = HTMLAudioElement;
+  window.HTMLVideoElement = HTMLVideoElement;
+  window.HTMLIframeElement = HTMLIframeElement;
+  window.HTMLCanvasElement = HTMLCanvasElement;
   window.Event = Event;
   window.KeyboardEvent = KeyboardEvent;
   window.MouseEvent = MouseEvent;
   window.MessageEvent = MessageEvent;
   window.MutationObserver = MutationObserver;
-  window.Node = window[htmlElementsSymbol].Node;
-  window.Image = window[htmlElementsSymbol].HTMLImageElement;
+  window.Node = Node;
+  window.TextNode = TextNode;
+  window.CommentNode = CommentNode;
+  window.Image = HTMLImageElementBound;
   window.ImageData = ImageData;
   window.ImageBitmap = ImageBitmap;
   window.Path2D = Path2D;
@@ -1975,7 +1964,7 @@ const _parseDocument = (s, options, window) => {
   document.createElement = tagName => {
     tagName = tagName.toUpperCase();
     const HTMLElementTemplate = window[htmlTagsSymbol][tagName];
-    const element = HTMLElementTemplate ? new HTMLElementTemplate() : new window[htmlElementsSymbol].HTMLElement(tagName);
+    const element = HTMLElementTemplate ? new HTMLElementTemplate() : new HTMLElement(tagName);
     element.ownerDocument = document;
     return element;
   };
