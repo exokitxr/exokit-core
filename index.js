@@ -13,6 +13,7 @@ const {XMLHttpRequest} = require('xmlhttprequest');
 const {Response, Blob} = fetch;
 const WebSocket = require('ws/lib/websocket');
 const {LocalStorage} = require('node-localstorage');
+const ClassList = require('classlist');
 const windowEval = require('window-eval-native');
 const THREE = require('./lib/three-min.js');
 
@@ -692,6 +693,7 @@ class HTMLElement extends Node {
     this.attributes = _makeAttributesProxy(attrs);
     this.childNodes = [];
     this._innerHTML = '';
+    this.classList = new ClassList(this);
   }
 
   inspect() {
