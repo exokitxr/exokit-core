@@ -665,6 +665,21 @@ const _makeAttributesProxy = attrs => new Proxy(attrs, {
     }
   },
 });
+const autoClosingTags = {
+  area: true,
+  base: true,
+  br: true,
+  embed: true,
+  hr: true,
+  iframe: true,
+  img: true,
+  input: true,
+  link: true,
+  meta: true,
+  param: true,
+  source: true,
+  track: true,
+};
 class HTMLElement extends Node {
   constructor(tagName = 'DIV', attrs = [], value = '') {
     super(null);
@@ -679,13 +694,59 @@ class HTMLElement extends Node {
   }
 
   inspect() {
-    let result = '<' + this.tagName.toLowerCase();
-    for (let i = 0; i < this.attrs.length; i++) {
-      const attr = this.attrs[i];
-      result += ' ' + attr.name + '=' + JSON.stringify(attr.value);
-    }
-    result += '>';
-    return result;
+    const _getIndent = depth => Array(depth*2 + 1).join(' ');
+    const _recurse = (el, depth = 0) => {
+      let result = '';
+      if (el.tagName) {
+        const tagName = el.tagName.toLowerCase();
+        const indent = _getIndent(depth);
+        const isAutoClosingTag = autoClosingTags[tagName];
+
+        result += indent;
+        result += '<' + tagName;
+        for (let i = 0; i < el.attrs.length; i++) {
+          const attr = el.attrs[i];
+          result += ' ' + attr.name + '=' + JSON.stringify(attr.value);
+        }
+        if (isAutoClosingTag) {
+          result += '/';
+        }
+        result += '>';
+
+        if (!isAutoClosingTag) {
+          let childrenResult = '';
+          for (let i = 0; i < el.childNodes.length; i++) {
+            const childResult = _recurse(el.childNodes[i], depth + 1);
+            if (childResult && !childrenResult) {
+              childrenResult += '\n';
+            }
+            childrenResult += childResult;
+          }
+          if (childrenResult) {
+            result += childrenResult;
+            result += indent;
+          }
+          result += '</' + tagName + '>';
+        }
+        if (depth !== 0) {
+          result += '\n';
+        }
+      } else if (el.constructor.name === 'TextNode' && /\S/.test(el.value)) {
+        result += _getIndent(depth);
+        result += el.value;
+        if (depth !== 0) {
+          result += '\n';
+        }
+      } else if (el.constructor.name === 'CommentNode') {
+        result += _getIndent(depth);
+        result += '<!--' + el.value + '-->';
+        if (depth !== 0) {
+          result += '\n';
+        }
+      }
+      return result;
+    };
+    return _recurse(this);
   }
 
   get nodeType() {
