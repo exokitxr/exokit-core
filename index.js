@@ -828,62 +828,6 @@ class HTMLElement extends Node {
     this._classList = null;
   }
 
-  inspect() {
-    const _getIndent = depth => Array(depth*2 + 1).join(' ');
-    const _recurse = (el, depth = 0) => {
-      let result = '';
-      if (el.tagName) {
-        const tagName = el.tagName.toLowerCase();
-        const indent = _getIndent(depth);
-        const isAutoClosingTag = autoClosingTags[tagName];
-
-        result += indent;
-        result += '<' + tagName;
-        for (let i = 0; i < el.attrs.length; i++) {
-          const attr = el.attrs[i];
-          result += ' ' + attr.name + '=' + JSON.stringify(attr.value);
-        }
-        if (isAutoClosingTag) {
-          result += '/';
-        }
-        result += '>';
-
-        if (!isAutoClosingTag) {
-          let childrenResult = '';
-          for (let i = 0; i < el.childNodes.length; i++) {
-            const childResult = _recurse(el.childNodes[i], depth + 1);
-            if (childResult && !childrenResult) {
-              childrenResult += '\n';
-            }
-            childrenResult += childResult;
-          }
-          if (childrenResult) {
-            result += childrenResult;
-            result += indent;
-          }
-          result += '</' + tagName + '>';
-        }
-        if (depth !== 0) {
-          result += '\n';
-        }
-      } else if (el.constructor.name === 'TextNode' && /\S/.test(el.value)) {
-        result += _getIndent(depth);
-        result += el.value;
-        if (depth !== 0) {
-          result += '\n';
-        }
-      } else if (el.constructor.name === 'CommentNode') {
-        result += _getIndent(depth);
-        result += '<!--' + el.value + '-->';
-        if (depth !== 0) {
-          result += '\n';
-        }
-      }
-      return result;
-    };
-    return _recurse(this);
-  }
-
   get nodeType() {
     return Node.ELEMENT_NODE;
   }
@@ -1207,6 +1151,81 @@ class HTMLElement extends Node {
         document.emit('pointerlockchange');
       });
     }
+  }
+
+  inspect() {
+    const _getIndent = depth => Array(depth*2 + 1).join(' ');
+    const _recurse = (el, depth = 0) => {
+      let result = '';
+      if (el.tagName) {
+        const tagName = el.tagName.toLowerCase();
+        const indent = _getIndent(depth);
+        const isAutoClosingTag = autoClosingTags[tagName];
+
+        result += indent;
+        result += '<' + tagName;
+        for (let i = 0; i < el.attrs.length; i++) {
+          const attr = el.attrs[i];
+          result += ' ' + attr.name + '=' + JSON.stringify(attr.value);
+        }
+        if (isAutoClosingTag) {
+          result += '/';
+        }
+        result += '>';
+
+        if (!isAutoClosingTag) {
+          let childrenResult = '';
+          for (let i = 0; i < el.childNodes.length; i++) {
+            const childResult = _recurse(el.childNodes[i], depth + 1);
+            if (childResult && !childrenResult) {
+              childrenResult += '\n';
+            }
+            childrenResult += childResult;
+          }
+          if (childrenResult) {
+            result += childrenResult;
+            result += indent;
+          }
+          result += '</' + tagName + '>';
+        }
+        if (depth !== 0) {
+          result += '\n';
+        }
+      } else if (el.constructor.name === 'TextNode' && /\S/.test(el.value)) {
+        result += _getIndent(depth);
+        result += el.value;
+        if (depth !== 0) {
+          result += '\n';
+        }
+      } else if (el.constructor.name === 'CommentNode') {
+        result += _getIndent(depth);
+        result += '<!--' + el.value + '-->';
+        if (depth !== 0) {
+          result += '\n';
+        }
+      }
+      return result;
+    };
+    return _recurse(this);
+  }
+
+  traverse(fn) {
+    const _recurse = node => {
+      const result = fn(node);
+      if (result !== undefined) {
+        return result;
+      } else {
+        if (node.childNodes) {
+          for (let i = 0; i < node.childNodes.length; i++) {
+            const result = _recurse(node.childNodes[i]);
+            if (result !== undefined) {
+              return result;
+            }
+          }
+        }
+      }
+    };
+    return _recurse(this);
   }
 }
 class HTMLAnchorElement extends HTMLElement {
