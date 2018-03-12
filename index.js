@@ -718,6 +718,7 @@ class Node extends EventEmitter {
 
     this.nodeName = nodeName;
     this.parentNode = null;
+    this.ownerDocument = null;
   }
 
   get nextSibling() {
@@ -961,20 +962,20 @@ class HTMLElement extends Node {
   }
 
   focus() {
-    const window = this[windowSymbol];
-    if (window.document.activeElement) {
-      window.document.activeElement.blur();
+    const document = this.ownerDocument;
+    if (document.activeElement) {
+      document.activeElement.blur();
     }
 
-    window.document.activeElement = this;
+    document.activeElement = this;
     this.dispatchEvent(new Event('focus', {
       target: this,
     }));
   }
 
   blur() {
-    const window = this[windowSymbol];
-    window.document.activeElement = null;
+    const document = this.ownerDocument;
+    document.activeElement = null;
     this.dispatchEvent(new Event('blur', {
       target: this,
     }));
@@ -1035,7 +1036,7 @@ class HTMLElement extends Node {
     const oldChildNodes = this.childNodes;
     const newChildNodes = parse5.parseFragment(innerHTML, {
       locationInfo: true,
-    }).childNodes.map(childNode => _fromAST(childNode, this[windowSymbol], this));
+    }).childNodes.map(childNode => _fromAST(childNode, this.ownerDocument.defaultView, this, this.ownerDocument));
     this.childNodes = newChildNodes;
 
     if (oldChildNodes.length > 0) {
@@ -1045,7 +1046,7 @@ class HTMLElement extends Node {
       this.emit('children', newChildNodes, [], null, null);
     }
 
-    _promiseSerial(newChildNodes.map(childNode => () => _runHtml(childNode, this[windowSymbol])))
+    _promiseSerial(newChildNodes.map(childNode => () => _runHtml(childNode, this.ownerDocument.defaultView)))
       .catch(err => {
         console.warn(err);
       });
@@ -1054,7 +1055,7 @@ class HTMLElement extends Node {
   }
 
   requestPointerLock() {
-    const {document} = this[windowSymbol];
+    const document = this.ownerDocument;
 
     if (document.pointerLockElement === null) {
       document.pointerLockElement = this;
@@ -1065,7 +1066,7 @@ class HTMLElement extends Node {
     }
   }
   exitPointerLock() {
-    const {document} = this[windowSymbol];
+    const document = this.ownerDocument;
 
     if (document.pointerLockElement !== null) {
       document.pointerLockElement = null;
@@ -1216,7 +1217,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
         this.readyState = null;
 
         const url = value;
-        this[windowSymbol].fetch(url)
+        this.ownerDocument.defaultView.fetch(url)
           .then(res => {
             if (res.status >= 200 && res.status < 300) {
               return res.text();
@@ -1225,7 +1226,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
             }
           })
           .then(jsString => {
-            _runJavascript(jsString, this[windowSymbol], url);
+            _runJavascript(jsString, this.ownerDocument.defaultView, url);
 
             this.readyState = 'complete';
 
@@ -1239,7 +1240,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
       }
     });
     this.on('innerHTML', innerHTML => {
-      const window = this[windowSymbol];
+      const window = this.ownerDocument.defaultView;
       _runJavascript(innerHTML, window, window.location.href, this.location.line !== null ? this.location.line - 1 : 0, this.location.col !== null ? this.location.col - 1 : 0);
 
       this.readyState = 'complete';
@@ -1407,10 +1408,13 @@ class HTMLIframeElement extends HTMLSrcableElement {
   constructor(attrs = [], value = '', location = null) {
     super('IFRAME', attrs, value, location);
 
+    this.contentWindow = null;
+    this.contentDocument = null;
+
     this.on('attribute', (name, value) => {
       if (name === 'src') {
         const url = value;
-        this[windowSymbol].fetch(url)
+        this.ownerDocument.defaultView.fetch(url)
           .then(res => {
             if (res.status >= 200 && res.status < 300) {
               return res.text();
@@ -1419,6 +1423,8 @@ class HTMLIframeElement extends HTMLSrcableElement {
             }
           })
           .then(htmlString => {
+            const parentWindow = this.ownerDocument.defaultView;
+            this.contentWindow = _parseWindow('', parentWindow[optionsSymbol], parentWindow, parentWindow.top);
             const contentDocument = _parseDocument(htmlString, this.contentWindow[optionsSymbol], this.contentWindow);
             this.contentDocument = contentDocument;
 
@@ -1430,11 +1436,6 @@ class HTMLIframeElement extends HTMLSrcableElement {
             this.emit('error', err);
           });
       }
-    });
-    this.on('window', () => {
-      const parentWindow = this[windowSymbol];
-      this.contentWindow = _parseWindow('', parentWindow[optionsSymbol], parentWindow, parentWindow.top);
-      this.contentDocument = this.contentWindow.document;
     });
   }
 }
@@ -1556,14 +1557,16 @@ class CommentNode extends Node {
   }
 }
 
-const _fromAST = (node, window, parentNode = null) => {
+const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
   if (node.nodeName === '#text') {
     const textNode = new window[htmlElementsSymbol].TextNode(node.value);
     textNode.parentNode = parentNode;
+    textNode.ownerDocument = ownerDocument;
     return textNode;
   } else if (node.nodeName === '#comment') {
     const commentNode = new window[htmlElementsSymbol].CommentNode(node.data);
     commentNode.parentNode = parentNode;
+    commentNode.ownerDocument = ownerDocument;
     return commentNode;
   } else {
     const tagName = node.tagName && node.tagName.toUpperCase();
@@ -1587,8 +1590,13 @@ const _fromAST = (node, window, parentNode = null) => {
         location,
       );
     element.parentNode = parentNode;
+    if (!ownerDocument) { // if there is no owner document, it's us
+      ownerDocument = element;
+      ownerDocument.defaultView = window;
+    }
+    element.ownerDocument = ownerDocument;
     if (node.childNodes) {
-      element.childNodes = node.childNodes.map(childNode => _fromAST(childNode, window, element));
+      element.childNodes = node.childNodes.map(childNode => _fromAST(childNode, window, element, ownerDocument));
     }
     return element;
   }
@@ -1817,23 +1825,23 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.clearInterval = clearInterval;
   window.performance = performance;
   window[htmlElementsSymbol] = {
-    Node: (Old => {
-      class Node extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } }
-      for (const k in Old) {
-        Node[k] = Old[k];
+    Node,
+    HTMLElement,
+    HTMLAnchorElement,
+    HTMLScriptElement,
+    HTMLImageElement: (Old => class HTMLImageElement extends Old {
+      constructor() {
+        super(...arguments);
+
+        this.ownerDocument = window.document; // need to set owner document here because HTMLImageElement can be manually constructed via new Image()
       }
-      return Node;
-    })(Node),
-    HTMLElement: (Old => class HTMLElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLElement),
-    HTMLAnchorElement: (Old => class HTMLAnchorElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLAnchorElement),
-    HTMLScriptElement: (Old => class HTMLScriptElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLScriptElement),
-    HTMLImageElement: (Old => class HTMLImageElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLImageElement),
-    HTMLAudioElement: (Old => class HTMLAudioElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLAudioElement),
-    HTMLVideoElement: (Old => class HTMLVideoElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLVideoElement),
-    HTMLIframeElement: (Old => class HTMLIframeElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLIframeElement),
-    HTMLCanvasElement: (Old => class HTMLCanvasElement extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(HTMLCanvasElement),
-    TextNode: (Old => class TextNode extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(TextNode),
-    CommentNode: (Old => class CommentNode extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } })(CommentNode),
+    })(HTMLImageElement),
+    HTMLAudioElement,
+    HTMLVideoElement,
+    HTMLIframeElement,
+    HTMLCanvasElement,
+    TextNode,
+    CommentNode,
   };
   window[htmlTagsSymbol] = {
     A: window[htmlElementsSymbol].HTMLAnchorElement,
@@ -1967,7 +1975,9 @@ const _parseDocument = (s, options, window) => {
   document.createElement = tagName => {
     tagName = tagName.toUpperCase();
     const HTMLElementTemplate = window[htmlTagsSymbol][tagName];
-    return HTMLElementTemplate ? new HTMLElementTemplate() : new window[htmlElementsSymbol].HTMLElement(tagName);
+    const element = HTMLElementTemplate ? new HTMLElementTemplate() : new window[htmlElementsSymbol].HTMLElement(tagName);
+    element.ownerDocument = document;
+    return element;
   };
   document.createElementNS = (namespace, tagName) => document.createElement(tagName);
   document.createDocumentFragment = () => document.createElement();
@@ -1982,7 +1992,7 @@ const _parseDocument = (s, options, window) => {
   document.write = htmlString => {
     const childNodes = parse5.parseFragment(htmlString, {
       locationInfo: true,
-    }).childNodes.map(childNode => _fromAST(childNode, window, this));
+    }).childNodes.map(childNode => _fromAST(childNode, window, document.body, document));
     for (let i = 0; i < childNodes.length; i++) {
       document.body.appendChild(childNodes[i]);
     }
@@ -2106,7 +2116,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
 
       // const srcError = new Error();
 
-      this[windowSymbol].fetch(src)
+      this.ownerDocument.defaultView.fetch(src)
         .then(res => {
           if (res.status >= 200 && res.status < 300) {
             return res.arrayBuffer();
@@ -2195,7 +2205,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
 
       // const srcError = new Error();
 
-      this[windowSymbol].fetch(src)
+      this.ownerDocument.defaultView.fetch(src)
         .then(res => {
           if (res.status >= 200 && res.status < 300) {
             return res.arrayBuffer();
@@ -2285,7 +2295,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
 
       // const srcError = new Error();
 
-      this[windowSymbol].fetch(src)
+      this.ownerDocument.defaultView.fetch(src)
         .then(res => {
           if (res.status >= 200 && res.status < 300) {
             return res.arrayBuffer();
