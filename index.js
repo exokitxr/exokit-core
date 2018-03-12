@@ -66,11 +66,68 @@ class Location extends EventEmitter {
   }
 }
 
-class MessageEvent {
+class Event {
+  constructor(type, init = {}) {
+    this.type = type;
+    this.defaultPrevented = false;
+    this.propagationStopped = false;
+    
+    this.target = init.target ? init.target : null;
+  }
+
+  preventDefault() {
+    this.defaultPrevented = true;
+  }
+
+  stopPropagation() {
+    this.propagationStopped = true;
+  }
+}
+class KeyboardEvent extends Event {
+  constructor(type, init = {}) {
+    super(type, init);
+
+    this.key = init.key !== undefined ? init.key : '';
+    this.code = init.code !== undefined ? init.code : '';
+    this.location = init.location !== undefined ? init.location : 0;
+    this.ctrlKey = init.ctrlKey !== undefined ? init.ctrlKey : false;
+    this.shiftKey = init.shiftKey !== undefined ? init.shiftKey : false;
+    this.altKey = init.altKey !== undefined ? init.altKey : false;
+    this.metaKey = init.metaKey !== undefined ? init.metaKey : false;
+    this.repeat = init.repeat !== undefined ? init.repeat : false;
+    this.isComposing = init.isComposing !== undefined ? init.isComposing : false;
+    this.charCode = init.charCode !== undefined ? init.charCode : 0;
+    this.keyCode = init.keyCode !== undefined ? init.keyCode : 0;
+    this.which = init.which !== undefined ? init.which : 0;
+  }
+}
+class MouseEvent extends Event {
+  constructor(type, init = {}) {
+    super(type);
+
+    this.screenX = init.screenX !== undefined ? init.screenX : 0;
+    this.screenY = init.screenY !== undefined ? init.screenY : 0;
+    this.clientX = init.clientX !== undefined ? init.clientX : 0;
+    this.clientY = init.clientY !== undefined ? init.clientY : 0;
+    this.movementX = init.movementX !== undefined ? init.movementX : 0;
+    this.movementY = init.movementY !== undefined ? init.movementY : 0;
+    this.ctrlKey = init.ctrlKey !== undefined ? init.ctrlKey : false;
+    this.shiftKey = init.shiftKey !== undefined ? init.shiftKey : false;
+    this.altKey = init.altKey !== undefined ? init.altKey : false;
+    this.metaKey = init.metaKey !== undefined ? init.metaKey : false;
+    this.button = init.button !== undefined ? init.button : 0;
+    this.relatedTarget = init.relatedTarget !== undefined ? init.relatedTarget : null;
+    this.region = init.region !== undefined ? init.region : null;
+  }
+}
+class MessageEvent extends Event {
   constructor(data) {
+    super('message');
+
     this.data = data;
   }
 }
+
 class MutationRecord {
   constructor(type, target, addedNodes, removedNodes, previousSibling, nextSibling, attributeName, attributeNamespace, oldValue) {
     this.type = type;
@@ -930,6 +987,14 @@ class HTMLElement extends Node {
     return _recurse(this);
   }
 
+  dispatchEvent(event) {
+    this.emit(event.type, event);
+
+    if (!event.propagationStopped && this.parentNode) {
+      this.parentNode.dispatchEvent(event);
+    }
+  }
+
   cloneNode(deep = false) {
     const el = new this.constructor(this.attrs, this.value);
     if (deep) {
@@ -1698,6 +1763,10 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.HTMLVideoElement = window[htmlElementsSymbol].HTMLVideoElement;
   window.HTMLIframeElement = window[htmlElementsSymbol].HTMLIframeElement;
   window.HTMLCanvasElement = window[htmlElementsSymbol].HTMLCanvasElement;
+  window.Event = Event;
+  window.KeyboardEvent = KeyboardEvent;
+  window.MouseEvent = MouseEvent;
+  window.MessageEvent = MessageEvent;
   window.MutationObserver = MutationObserver;
   window.Node = window[htmlElementsSymbol].Node;
   window.Image = window[htmlElementsSymbol].HTMLImageElement;
