@@ -995,6 +995,26 @@ class HTMLElement extends Node {
     }
   }
 
+  focus() {
+    const window = this[windowSymbol];
+    if (window.document.activeElement) {
+      window.document.activeElement.blur();
+    }
+
+    window.document.activeElement = this;
+    this.dispatchEvent(new Event('focus', {
+      target: this,
+    }));
+  }
+
+  blur() {
+    const window = this[windowSymbol];
+    window.document.activeElement = null;
+    this.dispatchEvent(new Event('blur', {
+      target: this,
+    }));
+  }
+
   click() {
     this.dispatchEvent(new MouseEvent('click'));
   }
