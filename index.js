@@ -1883,9 +1883,11 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   return window;
 };
 const _parseDocument = (s, options, window) => {
-  const document = _fromAST(parse5.parse(s, {
+  const documentAst = parse5.parse(s, {
     locationInfo: true,
-  }), window);
+  });
+  documentAst.tagName = 'DOCUMENT';
+  const document = _fromAST(documentAst, window);
   const html = document.childNodes.find(element => element.tagName === 'HTML');
   const head = html.childNodes.find(element => element.tagName === 'HEAD');
   const body = html.childNodes.find(element => element.tagName === 'BODY');
