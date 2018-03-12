@@ -1567,12 +1567,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.innerWidth = 1280;
   window.innerHeight = 1024;
   window.devicePixelRatio = 1;
-  window.console = console;
-  window.setTimeout = setTimeout;
-  window.clearTimeout = clearTimeout;
-  window.setInterval = setInterval;
-  window.clearInterval = clearInterval;
-  window.performance = performance;
+  window.document = null;
   window.location = new Location(options.url);
   let loading = false;
   window.location.on('update', href => {
@@ -1659,8 +1654,13 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     },
   };
   window.localStorage = new LocalStorage(path.join(options.dataPath, '.localStorage'));
-  window.document = null;
   window.URL = URL;
+  window.console = console;
+  window.setTimeout = setTimeout;
+  window.clearTimeout = clearTimeout;
+  window.setInterval = setInterval;
+  window.clearInterval = clearInterval;
+  window.performance = performance;
   window[htmlElementsSymbol] = {
     Node: (Old => {
       class Node extends Old { constructor() { super(...arguments); this[windowSymbol] = window; this.emit('window'); } }
