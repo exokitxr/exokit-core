@@ -71,7 +71,7 @@ class Event {
     this.type = type;
     this.defaultPrevented = false;
     this.propagationStopped = false;
-    
+
     this.target = init.target ? init.target : null;
   }
 
