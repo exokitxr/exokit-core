@@ -1870,6 +1870,8 @@ exokit.load = (src, options = {}) => fetch(src)
       baseUrl: options.baseUrl || url.format({
         protocol: parsedUrl.protocol || 'http:',
         host: parsedUrl.host || '127.0.0.1',
+        pathname: parsedUrl.pathname,
+        search: parsedUrl.search,
       }),
       dataPath: options.dataPath,
     });
