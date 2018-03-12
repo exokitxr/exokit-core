@@ -995,6 +995,10 @@ class HTMLElement extends Node {
     }
   }
 
+  click() {
+    this.dispatchEvent(new MouseEvent('click'));
+  }
+
   cloneNode(deep = false) {
     const el = new this.constructor(this.attrs, this.value);
     if (deep) {
