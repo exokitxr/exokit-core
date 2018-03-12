@@ -794,10 +794,10 @@ class HTMLElement extends Node {
     this.value = value;
     this.location = location;
 
-    this.attributes = _makeAttributesProxy(attrs);
+    this._attributes = null;
     this.childNodes = [];
     this._innerHTML = '';
-    this.classList = new ClassList(this);
+    this._classList = null;
   }
 
   inspect() {
@@ -860,6 +860,22 @@ class HTMLElement extends Node {
     return Node.ELEMENT_NODE;
   }
   set nodeType(nodeType) {}
+
+  get attributes() {
+    if (!this._attributes) {
+      this._attributes = _makeAttributesProxy(this.attrs);
+    }
+    return this._attributes;
+  }
+  set attributes(attributes) {}
+
+  get classList() {
+    if (!this._classList) {
+      this._classList = new ClassList(this);
+    }
+    return this._classList;
+  }
+  set classList(classList) {}
 
   get children() {
     return this.childNodes;
