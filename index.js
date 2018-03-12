@@ -13,6 +13,7 @@ const {XMLHttpRequest} = require('xmlhttprequest');
 const {Response, Blob} = fetch;
 const WebSocket = require('ws/lib/websocket');
 const {LocalStorage} = require('node-localstorage');
+const createMemoryHistory = require('history/createMemoryHistory').default;
 const ClassList = require('classlist');
 const windowEval = require('window-eval-native');
 const THREE = require('./lib/three-min.js');
@@ -61,9 +62,54 @@ class Location extends EventEmitter {
   set password(password) { this._url.password = password; this.update(); }
   get origin() { return this._url.origin; }
   set origin(origin) { this._url.origin = origin; this.update(); }
+  set(u) {
+    this._url.href = u;
+  }
   update() {
     this.emit('update', this.href);
   }
+}
+class History extends EventEmitter {
+  constructor(u) {
+    super();
+
+    this._history = createMemoryHistory({
+      initialEntries: [u],
+    });
+    this._history.listen((location, action) => {
+      if (action === 'POP') {
+        const {pathname, search, hash, state} = location;
+        this.emit('popstate', url.format({
+          pathname,
+          search,
+          hash,
+        }), state);
+      }
+    });
+  }
+  back(n) {
+    this._history.goBack(n);
+  }
+  forward(n) {
+    this._history.goForward(n);
+  }
+  go(n) {
+    this._history.go(n);
+  }
+  pushState(state, title, url) {
+    this._history.push(url, state);
+  }
+  replaceState(state, title, url) {
+    this._history.replace(url, state);
+  }
+  get length() {
+    return this._history.length;
+  }
+  set length(length) {}
+  get state() {
+    return this._history.location.state;
+  }
+  set state(state) {}
 }
 
 class Event {
@@ -1165,6 +1211,13 @@ class HTMLWindowElement extends HTMLLoadableElement {
   set onmessage(onmessage) {
     _elementSetter(this, 'message', onmessage);
   }
+
+  get onpopstate() {
+    return _elementGetter(this, 'popstate');
+  }
+  set onpopstate(onpopstate) {
+    _elementSetter(this, 'popstate', onpopstate);
+  }
 }
 class HTMLScriptElement extends HTMLLoadableElement {
   constructor(attrs = [], value = '', location = null) {
@@ -1659,6 +1712,14 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.devicePixelRatio = 1;
   window.document = null;
   window.location = new Location(options.url);
+  window.history = new History(window.location.href);
+  window.history.on('popstate', (u, state) => {
+    window.location.set(u);
+
+    const event = new Event('popstate');
+    event.state = state;
+    window.dispatchEvent(event);
+  });
   let loading = false;
   window.location.on('update', href => {
     if (!loading) {
