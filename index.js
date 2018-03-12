@@ -1552,7 +1552,7 @@ class CommentNode extends Node {
   set lastChild(lastChild) {}
 
   inspect() {
-    return `[CommentNode ${JSON.stringify(this.value)}]`;
+    return `<!--${this.value}-->`;
   }
 }
 
