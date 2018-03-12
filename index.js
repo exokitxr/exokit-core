@@ -585,23 +585,23 @@ class AudioContext {
   constructor() {
     this.listener = new AudioListener();
   }
-  
+
   createMediaElementSource() {
     return new AudioNode();
   }
-  
+
   createMediaStreamSource() {
     return new AudioNode();
   }
-  
+
   createGain() {
     return new GainNode();
   }
-  
+
   createAnalyser() {
     return new AnalyserNode();
   }
-  
+
   createPanner() {
     return new PannerNode();
   }
@@ -1187,7 +1187,7 @@ class HTMLVideoElement extends HTMLMediaElement {
     super('VIDEO', attrs, value);
 
     this.data = new Uint8Array(0);
-    
+
     this.on('attribute', (name, value) => {
       if (name === 'src') {
         process.nextTick(() => { // XXX
@@ -1196,7 +1196,7 @@ class HTMLVideoElement extends HTMLMediaElement {
       }
     });
   }
-  
+
   get width() {
     return 0;
   }
@@ -2059,7 +2059,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     set height(height) {
       this.video.height = height;
     }
-    
+
     get data() {
       return this.video.data;
     }
