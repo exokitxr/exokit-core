@@ -900,6 +900,15 @@ class HTMLElement extends Node {
     }
   }
 
+  get firstChild() {
+    return this.childNodes.length > 0 ? this.childNodes[0] : null;
+  }
+  set firstChild(firstChild) {}
+  get lastChild() {
+    return this.childNodes.length > 0 ? this.childNodes[this.childNodes.length - 1] : null;
+  }
+  set lastChild(lastChild) {}
+
   get id() {
     return this.attributes['id'] || '';
   }
@@ -1596,14 +1605,23 @@ class TextNode extends Node {
     this.value = value;
   }
 
-  inspect() {
-    return `[TextNode ${JSON.stringify(this.value)}]`;
-  }
-
   get nodeType() {
     return Node.TEXT_NODE;
   }
   set nodeType(nodeType) {}
+
+  get firstChild() {
+    return null;
+  }
+  set firstChild(firstChild) {}
+  get lastChild() {
+    return null;
+  }
+  set lastChild(lastChild) {}
+
+  inspect() {
+    return `[TextNode ${JSON.stringify(this.value)}]`;
+  }
 }
 class CommentNode extends Node {
   constructor(value) {
@@ -1612,14 +1630,23 @@ class CommentNode extends Node {
     this.value = value;
   }
 
-  inspect() {
-    return `[CommentNode ${JSON.stringify(this.value)}]`;
-  }
-
   get nodeType() {
     return Node.COMMENT_NODE;
   }
   set nodeType(nodeType) {}
+
+  get firstChild() {
+    return null;
+  }
+  set firstChild(firstChild) {}
+  get lastChild() {
+    return null;
+  }
+  set lastChild(lastChild) {}
+
+  inspect() {
+    return `[CommentNode ${JSON.stringify(this.value)}]`;
+  }
 }
 
 const _fromAST = (node, window, parentNode = null) => {
