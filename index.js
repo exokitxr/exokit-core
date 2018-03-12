@@ -1527,7 +1527,7 @@ class Text extends Node {
   set lastChild(lastChild) {}
 
   inspect() {
-    return JSON.stringify(this.value)};
+    return JSON.stringify(this.value);
   }
 }
 class Comment extends Node {
