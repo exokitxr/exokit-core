@@ -1114,13 +1114,13 @@ class HTMLElement extends Node {
         if (depth !== 0) {
           result += '\n';
         }
-      } else if (el.constructor.name === 'TextNode' && /\S/.test(el.value)) {
+      } else if (el.constructor.name === 'Text' && /\S/.test(el.value)) {
         result += _getIndent(depth);
         result += el.value;
         if (depth !== 0) {
           result += '\n';
         }
-      } else if (el.constructor.name === 'CommentNode') {
+      } else if (el.constructor.name === 'Comment') {
         result += _getIndent(depth);
         result += '<!--' + el.value + '-->';
         if (depth !== 0) {
@@ -1505,7 +1505,7 @@ class MediaRecorder extends EventEmitter {
 
   requestData() {}
 }
-class TextNode extends Node {
+class Text extends Node {
   constructor(value) {
     super('#text');
 
@@ -1527,10 +1527,10 @@ class TextNode extends Node {
   set lastChild(lastChild) {}
 
   inspect() {
-    return `[TextNode ${JSON.stringify(this.value)}]`;
+    return JSON.stringify(this.value)};
   }
 }
-class CommentNode extends Node {
+class Comment extends Node {
   constructor(value) {
     super('#comment');
 
@@ -1558,15 +1558,15 @@ class CommentNode extends Node {
 
 const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
   if (node.nodeName === '#text') {
-    const textNode = new TextNode(node.value);
-    textNode.parentNode = parentNode;
-    textNode.ownerDocument = ownerDocument;
-    return textNode;
+    const text = new Text(node.value);
+    text.parentNode = parentNode;
+    text.ownerDocument = ownerDocument;
+    return text;
   } else if (node.nodeName === '#comment') {
-    const commentNode = new CommentNode(node.data);
-    commentNode.parentNode = parentNode;
-    commentNode.ownerDocument = ownerDocument;
-    return commentNode;
+    const comment = new Comment(node.data);
+    comment.parentNode = parentNode;
+    comment.ownerDocument = ownerDocument;
+    return comment;
   } else {
     const tagName = node.tagName && node.tagName.toUpperCase();
     const {attrs, value, __location} = node;
@@ -1854,8 +1854,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.MessageEvent = MessageEvent;
   window.MutationObserver = MutationObserver;
   window.Node = Node;
-  window.TextNode = TextNode;
-  window.CommentNode = CommentNode;
+  window.Text = Text;
+  window.Comment = Comment;
   window.Image = HTMLImageElementBound;
   window.ImageData = ImageData;
   window.ImageBitmap = ImageBitmap;
@@ -1970,8 +1970,8 @@ const _parseDocument = (s, options, window) => {
   };
   document.createElementNS = (namespace, tagName) => document.createElement(tagName);
   document.createDocumentFragment = () => document.createElement();
-  document.createTextNode = text => new TextNode(text);
-  document.createComment = comment => new CommentNode(comment);
+  document.createTextNode = text => new Text(text);
+  document.createComment = comment => new Comment(comment);
   document.styleSheets = [];
   document.activeElement = null;
   document.open = () => {
