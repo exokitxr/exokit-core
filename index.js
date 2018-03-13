@@ -1909,6 +1909,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.HTMLVideoElement = HTMLVideoElement;
   window.HTMLIframeElement = HTMLIframeElement;
   window.HTMLCanvasElement = HTMLCanvasElement;
+  window.getComputedStyle = () => ({});
   window.Event = Event;
   window.KeyboardEvent = KeyboardEvent;
   window.MouseEvent = MouseEvent;
