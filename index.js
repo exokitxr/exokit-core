@@ -2186,12 +2186,12 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   Path2D = bindings.nativePath2D;
   CanvasRenderingContext2D = bindings.nativeCanvasRenderingContext2D;
   WebGLContext = bindings.nativeGl;
-  /* return function WebGLContext() {
-    return new Proxy(new nativeGl(), {
+  /* WebGLContext = function WebGLContext() {
+    return new Proxy(Reflect.construct(bindings.nativeGl, arguments), {
       get(target, propKey, receiver) {
         const orig = target[propKey];
         if (typeof orig === 'function') {
-          return function(a, b, c, d, e, f) {
+          return function() {
             console.log('gl proxy method ' + propKey);
             return orig.apply(target, arguments);
           };
