@@ -10,7 +10,7 @@ const parseIntStrict = require('parse-int');
 const parse5 = require('parse5');
 
 const fetch = require('window-fetch');
-const {XMLHttpRequest} = require('xmlhttprequest');
+const {XMLHttpRequest} = require('w3c-xmlhttprequest');
 const {Response, Blob} = fetch;
 const WebSocket = require('ws/lib/websocket');
 const {LocalStorage} = require('node-localstorage');
