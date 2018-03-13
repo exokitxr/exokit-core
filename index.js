@@ -1714,6 +1714,26 @@ const _runJavascript = (jsString, window, filename = 'script', lineOffset = 0, c
     console.warn(err.stack);
   }
 };
+
+const rafCbs = [];
+const requestAnimationFrame = fn => {
+  rafCbs.push(fn);
+  return fn;
+};
+const cancelAnimationFrame = fn => {
+  const index = rafCbs.indexOf(fn);
+  if (index !== -1) {
+    rafCbs.splice(index, 1);
+  }
+};
+const tickAnimationFrame = () => {
+  const localRafCbs = rafCbs.slice();
+  rafCbs.length = 0;
+  for (let i = 0; i < localRafCbs.length; i++) {
+    localRafCbs[i]();
+  }
+};
+
 const _makeWindow = (options = {}, parent = null, top = null) => {
   const _normalizeUrl = src => new URL(src, options.baseUrl).href;
 
@@ -1922,30 +1942,25 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.createImageBitmap = function() {
     return Promise.resolve(ImageBitmap.createImageBitmap.apply(ImageBitmap, arguments));
   };
-  const rafCbs = [];
-  window.requestAnimationFrame = fn => {
-    rafCbs.push(fn);
-    return fn;
-  };
-  window.cancelAnimationFrame = fn => {
-    const index = rafCbs.indexOf(fn);
-    if (index !== -1) {
-      rafCbs.splice(index, 1);
-    }
-  };
-  window.tickAnimationFrame = () => {
-    const localRafCbs = rafCbs.slice();
-    rafCbs.length = 0;
-    for (let i = 0; i < localRafCbs.length; i++) {
-      localRafCbs[i]();
-    }
-  };
-  window.updateVrFrame = update => {
-    window.emit('updatevrframe', update);
-  };
-  window.updateArFrame = (viewMatrix, projectionMatrix) => {
-    window.emit('updatearframe', viewMatrix, projectionMatrix);
-  };
+  window.requestAnimationFrame = requestAnimationFrame;
+  window.cancelAnimationFrame = cancelAnimationFrame;
+
+  if (!parent) {
+    window.tickAnimationFrame = tickAnimationFrame;
+    window.updateVrFrame = update => {
+      window.emit('updatevrframe', update);
+    };
+    window.updateArFrame = (viewMatrix, projectionMatrix) => {
+      window.emit('updatearframe', viewMatrix, projectionMatrix);
+    };
+  } else {
+    parent.on('updatevrframe', update => { // XXX clean up listeners on window destroy
+      window.emit('updatevrframe', update);
+    });
+    parent.on('updatearframe', update => {
+      window.emit('updatearframe', update);
+    });
+  }
   return window;
 };
 const _parseDocument = (s, options, window) => {
