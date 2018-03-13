@@ -1,6 +1,7 @@
 const events = require('events');
 const {EventEmitter} = events;
 const path = require('path');
+const fs = require('fs');
 const url = require('url');
 const {URL} = url;
 const {performance} = require('perf_hooks');
@@ -1910,7 +1911,21 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     if (blob) {
       return Promise.resolve(new Response(blob));
     } else {
-      return fetch(_normalizeUrl(url), options);
+      url = _normalizeUrl(url);
+      const match = url.match(/^file:\/\/(.*)$/);
+      if (match) {
+        return new Promise((accept, reject) => {
+          fs.readFile(match[1], (err, data) => {
+            if (!err) {
+              accept(new Response(new Blob([data])));
+            } else {
+              reject(err);
+            }
+          });
+        });
+      } else {
+        return fetch(url, options);
+      }
     }
   };
   window.XMLHttpRequest = XMLHttpRequest;
