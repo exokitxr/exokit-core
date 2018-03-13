@@ -918,6 +918,7 @@ class HTMLElement extends Node {
     return this.attributes['id'] || '';
   }
   set id(id) {
+    id = id + '';
     this.attributes['id'] = id;
   }
 
@@ -925,34 +926,44 @@ class HTMLElement extends Node {
     return this.attributes['class'] || '';
   }
   set className(className) {
+    className = className + '';
     this.attributes['class'] = className;
   }
 
   getElementById(id) {
+    id = id + '';
     return selector.find(this, '#' + id, true);
   }
   getElementByClassName(className) {
+    className = className + '';
     return selector.find(this, '.' + className, true);
   }
   getElementByTagName(tagName) {
+    tagName = tagName + '';
     return selector.find(this, tagName, true);
   }
   querySelector(s) {
+    s = s + '';
     return selector.find(this, s, true);
   }
   getElementsById(id) {
+    id = id + '';
     return selector.find(this, '#' + id);
   }
   getElementsByClassName(className) {
+    className = className + '';
     return selector.find(this, '.' + className);
   }
   getElementsByTagName(tagName) {
+    tagName = tagName + '';
     return selector.find(this, tagName);
   }
   querySelectorAll(s) {
+    s = s + '';
     return selector.find(this, s);
   }
   matches(s) {
+    s = s + '';
     return selector.matches(this, s);
   }
 
@@ -1036,6 +1047,7 @@ class HTMLElement extends Node {
     return parse5.serialize(this);
   }
   set innerHTML(innerHTML) {
+    innerHTML = innerHTML + '';
     const oldChildNodes = this.childNodes;
     const newChildNodes = parse5.parseFragment(innerHTML, {
       locationInfo: true,
