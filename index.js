@@ -998,9 +998,9 @@ class HTMLElement extends Node {
 
   focus() {
     const document = this.ownerDocument;
-    if (document.activeElement) {
-      document.activeElement.blur();
-    }
+    document.activeElement.dispatchEvent(new Event('blur', {
+      target: document.activeElement,
+    }));
 
     document.activeElement = this;
     this.dispatchEvent(new Event('focus', {
@@ -1010,10 +1010,9 @@ class HTMLElement extends Node {
 
   blur() {
     const document = this.ownerDocument;
-    document.activeElement = null;
-    this.dispatchEvent(new Event('blur', {
-      target: this,
-    }));
+    if (document.activeElement !== document.body) {
+      document.body.focus();
+    }
   }
 
   click() {
@@ -2103,7 +2102,7 @@ const _parseDocument = (s, options, window) => {
   document.createTextNode = text => new Text(text);
   document.createComment = comment => new Comment(comment);
   document.styleSheets = [];
-  document.activeElement = null;
+  document.activeElement = body;
   document.open = () => {
     document.innerHTML = '';
   };
