@@ -1,5 +1,6 @@
 const events = require('events');
 const {EventEmitter} = events;
+const stream = require('stream');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
@@ -11,6 +12,7 @@ const parse5 = require('parse5');
 
 const fetch = require('window-fetch');
 const {XMLHttpRequest} = require('w3c-xmlhttprequest');
+const XHRUtils = require('w3c-xmlhttprequest/lib/utils');
 const {Response, Blob} = fetch;
 const WebSocket = require('ws/lib/websocket');
 const {LocalStorage} = require('node-localstorage');
@@ -37,6 +39,22 @@ URL.revokeObjectURL = blob => {
 };
 
 const redirectUrls = {};
+
+XHRUtils.createClient = (createClient => function() {
+  const properties = arguments[0];
+  if (properties._responseFn) {
+    const cb = arguments[2];
+    properties._responseFn(cb);
+    return {
+      on() {},
+      setHeader() {},
+      write() {},
+      end() {},
+    };
+  } else {
+    return createClient.apply(this, arguments);
+  }
+})(XHRUtils.createClient);
 
 class Location extends EventEmitter {
   constructor(u) {
@@ -1941,7 +1959,60 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.redirect = (url1, url2) => {
     redirectUrls[url1] = url2;
   };
-  window.XMLHttpRequest = XMLHttpRequest;
+  window.XMLHttpRequest = (Old => class XMLHttpRequest extends Old {
+    open() {
+      const blob = urls.get(url);
+      if (blob) {
+        this._properties._responseFn = cb => {
+          process.nextTick(() => {
+            const {buffer} = blob;
+            const response = new stream.PassThrough();
+            response.statusCode = 200;
+            response.headers = {
+              'content-length': buffer.length + '',
+            };
+            cb(response);
+          });
+        };
+      } else {
+        arguments[1] = _normalizeUrl(arguments[1]);
+        if (redirectUrls[arguments[1]]) {
+          arguments[1] = redirectUrls[arguments[1]];
+        }
+        const match = arguments[1].match(/^file:\/\/(.*)$/);
+        if (match) {
+          const p = match[1];
+          this._properties._responseFn = cb => {
+            fs.lstat(p, (err, stats) => {
+              if (!err) {
+                const response = fs.createReadStream(p);
+                response.statusCode = 200;
+                response.headers = {
+                  'content-length': stats.size + '',
+                };
+                cb(response);
+              } else if (err.code === 'ENOENT') {
+                const response = new stream.PassThrough();
+                response.statusCode = 404;
+                response.headers = {};
+                response.end('file not found: ' + p);
+                cb(response);
+              } else {
+                const response = new stream.PassThrough();
+                response.statusCode = 500;
+                response.headers = {};
+                response.end(err.stack);
+                cb(response);
+              }
+            });
+          };
+          arguments[1] = 'http://127.0.0.1/'; // needed to pass protocol check, will not be fetched
+        }
+      }
+
+      return Old.prototype.open.apply(this, arguments);
+    }
+  })(XMLHttpRequest);
   window.WebSocket = WebSocket;
   window.Worker = class Worker extends nativeWorker {
     constructor(src, workerOptions = {}) {
