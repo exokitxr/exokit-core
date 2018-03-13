@@ -38,8 +38,10 @@ URL.revokeObjectURL = blob => {
 class Location extends EventEmitter {
   constructor(u) {
     super();
+
     this._url = new url.URL(u);
   }
+  // triggers navigation
   get href() { return this._url.href; }
   set href(href) { this._url.href = href; this.update(); }
   get protocol() { return this._url.protocol; }
@@ -54,14 +56,16 @@ class Location extends EventEmitter {
   set pathname(pathname) { this._url.pathname = pathname; this.update(); }
   get search() { return this._url.search; }
   set search(search) { this._url.search = search; this.update(); }
+  // does not trigger navigation
   get hash() { return this._url.hash; }
-  set hash(hash) { this._url.hash = hash; this.update(); }
+  set hash(hash) { this._url.hash = hash; }
   get username() { return this._url.username; }
-  set username(username) { this._url.username = username; this.update(); }
+  set username(username) { this._url.username = username; }
   get password() { return this._url.password; }
-  set password(password) { this._url.password = password; this.update(); }
+  set password(password) { this._url.password = password; }
   get origin() { return this._url.origin; }
-  set origin(origin) { this._url.origin = origin; this.update(); }
+  set origin(origin) {} // read only
+  // helpers
   set(u) {
     this._url.href = u;
   }
