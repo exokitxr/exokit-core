@@ -36,6 +36,8 @@ URL.revokeObjectURL = blob => {
   urls.delete(url);
 };
 
+const redirectUrls = {};
+
 class Location extends EventEmitter {
   constructor(u) {
     super();
@@ -1912,6 +1914,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       return Promise.resolve(new Response(blob));
     } else {
       url = _normalizeUrl(url);
+      if (redirectUrls[url]) {
+        url = redirectUrls[url];
+      }
       const match = url.match(/^file:\/\/(.*)$/);
       if (match) {
         return new Promise((accept, reject) => {
@@ -1927,6 +1932,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         return fetch(url, options);
       }
     }
+  };
+  window.redirect = (url1, url2) => {
+    redirectUrls[url1] = url2;
   };
   window.XMLHttpRequest = XMLHttpRequest;
   window.WebSocket = WebSocket;
