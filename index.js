@@ -1750,7 +1750,12 @@ const tickAnimationFrame = () => {
 };
 
 const _makeWindow = (options = {}, parent = null, top = null) => {
-  const _normalizeUrl = src => new URL(src, options.baseUrl).href;
+  const _normalizeUrl = src => {
+    if (!/^[a-z]+:\/\//i.test(src)) {
+      src = new URL(src, options.baseUrl).href;
+    }
+    return src;
+  };
 
   const window = new HTMLWindowElement();
   window.window = window;
