@@ -773,7 +773,7 @@ class Node extends EventEmitter {
     }
   }
   set previousSibling(previousSibling) {}
-  
+
   get nextElementSibling() {
     if (this.parentNode) {
       const selfIndex = this.parentNode.childNodes.indexOf(this);
@@ -966,7 +966,7 @@ class HTMLElement extends Node {
     return this.childNodes.length > 0 ? this.childNodes[this.childNodes.length - 1] : null;
   }
   set lastChild(lastChild) {}
-  
+
   get firstElementChild() {
     for (let i = 0; i < this.childNodes.length; i++) {
       const childNode = this.childNodes[i];
@@ -1352,7 +1352,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
   set src(value) {
     this.setAttribute('src', value);
   }
-  
+
   get type() {
     return this.getAttribute('type') || '';
   }
@@ -1363,7 +1363,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
   set innerHTML(innerHTML) {
     this.emit('innerHTML', innerHTML);
   }
-  
+
   isRunnable() {
     const {type} = this;
     return !type || /^(?:(?:text|application)\/javascript|application\/ecmascript)$/.test(type);
