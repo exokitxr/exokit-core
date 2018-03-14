@@ -1306,7 +1306,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
     this.readyState = null;
 
     this.on('attribute', (name, value) => {
-      if (name === 'src') {
+      if (name === 'src' && this.isRunnable()) {
         this.readyState = null;
 
         const url = value;
@@ -1333,14 +1333,16 @@ class HTMLScriptElement extends HTMLLoadableElement {
       }
     });
     this.on('innerHTML', innerHTML => {
-      const window = this.ownerDocument.defaultView;
-      _runJavascript(innerHTML, window, window.location.href, this.location.line !== null ? this.location.line - 1 : 0, this.location.col !== null ? this.location.col - 1 : 0);
+      if (this.isRunnable()) {
+        const window = this.ownerDocument.defaultView;
+        _runJavascript(innerHTML, window, window.location.href, this.location.line !== null ? this.location.line - 1 : 0, this.location.col !== null ? this.location.col - 1 : 0);
 
-      this.readyState = 'complete';
+        this.readyState = 'complete';
 
-      process.nextTick(() => {
-        this.emit('load');
-      });
+        process.nextTick(() => {
+          this.emit('load');
+        });
+      }
     });
   }
 
@@ -1350,22 +1352,38 @@ class HTMLScriptElement extends HTMLLoadableElement {
   set src(value) {
     this.setAttribute('src', value);
   }
+  
+  get type() {
+    return this.getAttribute('type') || '';
+  }
+  set type(value) {
+    this.setAttribute('type', value);
+  }
 
   set innerHTML(innerHTML) {
     this.emit('innerHTML', innerHTML);
   }
+  
+  isRunnable() {
+    const {type} = this;
+    return !type || /^(?:(?:text|application)\/javascript|application\/ecmascript)$/.test(type);
+  }
 
   run() {
-    let running = false;
-    if (this.attributes.src) {
-      this.src = this.attributes.src;
-      running = true;
+    if (this.isRunnable()) {
+      let running = false;
+      if (this.attributes.src) {
+        this.src = this.attributes.src;
+        running = true;
+      }
+      if (this.childNodes.length > 0) {
+        this.innerHTML = this.childNodes[0].value;
+        running = true;
+      }
+      return running;
+    } else {
+      return false;
     }
-    if (this.childNodes.length > 0) {
-      this.innerHTML = this.childNodes[0].value;
-      running = true;
-    }
-    return running;
   }
 }
 class HTMLSrcableElement extends HTMLLoadableElement {
