@@ -846,6 +846,13 @@ const _makeAttributesProxy = attrs => new Proxy(attrs, {
     }
     return true;
   },
+  deleteProperty(target, prop) {
+    const index = target.findIndex(attr => attr.name === prop);
+    if (index !== -1) {
+      target.splice(index, 1);
+    }
+    return true;
+  },
   has(target, prop) {
     if (typeof prop === 'number') {
       return target[prop] !== undefined;
@@ -923,6 +930,12 @@ class HTMLElement extends Node {
     this.attributes[name] = value;
 
     this.emit('attribute', name, value, oldValue);
+  }
+  removeAttribute(name) {
+    const oldValue = this.attributes[name];
+    delete this.attributes[name];
+
+    this.emit('attribute', name, null, oldValue);
   }
 
   appendChild(childNode) {
