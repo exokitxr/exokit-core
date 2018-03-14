@@ -926,6 +926,10 @@ class HTMLElement extends Node {
   }
 
   appendChild(childNode) {
+    if (childNode.parentNode) {
+      childNode.parentNode.removeChild(childNode);
+    }
+
     this.childNodes.push(childNode);
     childNode.parentNode = this;
 
