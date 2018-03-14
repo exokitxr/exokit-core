@@ -773,6 +773,37 @@ class Node extends EventEmitter {
     }
   }
   set previousSibling(previousSibling) {}
+  
+  get nextElementSibling() {
+    if (this.parentNode) {
+      const selfIndex = this.parentNode.childNodes.indexOf(this);
+      for (let i = selfIndex + 1; i < this.parentNode.childNodes.length; i++) {
+        const childNode = this.parentNode.childNodes[i];
+        if (childNode.nodeType === Node.ELEMENT_NODE) {
+          return childNode;
+        }
+      }
+      return null;
+    } else {
+      return null;
+    }
+  }
+  set nextElementSibling(nextElementSibling) {}
+  get previousElementSibling() {
+    if (this.parentNode) {
+      const selfIndex = this.parentNode.childNodes.indexOf(this);
+      for (let i = selfIndex - 1; i >= 0; i--) {
+        const childNode = this.parentNode.childNodes[i];
+        if (childNode.nodeType === Node.ELEMENT_NODE) {
+          return childNode;
+        }
+      }
+      return null;
+    } else {
+      return null;
+    }
+  }
+  set previousElementSibling(previousElementSibling) {}
 }
 Node.ELEMENT_NODE = 1;
 Node.TEXT_NODE = 3;
