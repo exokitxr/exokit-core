@@ -758,6 +758,7 @@ class Node extends EventEmitter {
       return null;
     }
   }
+  set nextSibling(nextSibling) {}
   get previousSibling() {
     if (this.parentNode) {
       const selfIndex = this.parentNode.childNodes.indexOf(this);
