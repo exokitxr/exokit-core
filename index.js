@@ -18,6 +18,8 @@ const WebSocket = require('ws/lib/websocket');
 const {LocalStorage} = require('node-localstorage');
 const createMemoryHistory = require('history/createMemoryHistory').default;
 const ClassList = require('classlist');
+const he = require('he');
+he.encode.options.useNamedReferences = true;
 const selector = require('selector-lite');
 const windowEval = require('window-eval-native');
 const THREE = require('./lib/three-min.js');
@@ -1175,6 +1177,14 @@ class HTMLElement extends Node {
       });
 
     this.emit('innerHTML', innerHTML);
+  }
+
+  get innerText() {
+    return he.encode(this.innerHTML);
+  }
+  set innerText(innerText) {
+    innerText = innerText + '';
+    this.innerHTML = he.decode(innerText);
   }
 
   get textContent() {
