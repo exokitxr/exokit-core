@@ -1142,6 +1142,29 @@ class HTMLElement extends Node {
     this.emit('innerHTML', innerHTML);
   }
 
+  get textContent() {
+    let result = '';
+    const _recurse = el => {
+      if (el.nodeType === Node.TEXT_NODE) {
+        result += el.value;
+      } else if (el.childNodes) {
+        for (let i = 0; i < el.childNodes.length; i++) {
+          _recurse(el.childNodes[i]);
+        }
+      }
+    };
+    _recurse(this);
+    return result;
+  }
+  set textContent(textContent) {
+    textContent = textContent + '';
+
+    while (this.childNodes.length > 0) {
+      this.removeChild(this.childNodes[this.childNodes.length - 1]);
+    }
+    this.appendChild(new Text(textContent));
+  }
+
   requestPointerLock() {
     const document = this.ownerDocument;
 
