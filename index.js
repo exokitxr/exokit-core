@@ -1294,6 +1294,11 @@ class HTMLWindowElement extends HTMLLoadableElement {
     _elementSetter(this, 'popstate', onpopstate);
   }
 }
+class HTMLDocumentElement extends HTMLLoadableElement {
+  constructor() {
+    super('DOCUMENT');
+  }
+}
 class HTMLScriptElement extends HTMLLoadableElement {
   constructor(attrs = [], value = '', location = null) {
     super('SCRIPT', attrs, value, location);
@@ -1945,6 +1950,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     }
   })(HTMLImageElement);
   window[htmlTagsSymbol] = {
+    DOCUMENT: HTMLDocumentElement,
     A: HTMLAnchorElement,
     SCRIPT: HTMLScriptElement,
     IMG: HTMLImageElementBound,
@@ -2182,6 +2188,8 @@ const _parseDocument = (s, options, window) => {
     }
 
     document.emit('readystatechange');
+    document.emit('load');
+    window.emit('load');
   });
 
   return document;
