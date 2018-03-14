@@ -2149,7 +2149,6 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.AnalyserNode = AnalyserNode;
   window.PannerNode = PannerNode;
   window.StereoPannerNode = StereoPannerNode;
-  window.Path2D = Path2D;
   window.createImageBitmap = function() {
     return Promise.resolve(ImageBitmap.createImageBitmap.apply(ImageBitmap, arguments));
   };
