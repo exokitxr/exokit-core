@@ -9,9 +9,9 @@
     "parse-int": "^1.0.2",
     "parse5": "^4.0.0",
     "selector-lite": "^0.1.1",
-    "w3c-xmlhttprequest": "^2.1.2",
     "window-eval-native": "0.0.2",
     "window-fetch": "0.0.3",
+    "window-xhr": "0.0.1",
     "ws": "^4.0.0"
   },
   "devDependencies": {

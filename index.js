@@ -11,7 +11,7 @@ const parseIntStrict = require('parse-int');
 const parse5 = require('parse5');
 
 const fetch = require('window-fetch');
-const {XMLHttpRequest} = require('w3c-xmlhttprequest');
+const {XMLHttpRequest} = require('window-xhr');
 const XHRUtils = require('w3c-xmlhttprequest/lib/utils');
 const {Response, Blob} = fetch;
 const WebSocket = require('ws/lib/websocket');
