@@ -737,6 +737,19 @@ class AudioContext {
   }
 }
 
+class DOMRect {
+  constructor(x = 0, y = 0, w = 0, h = 0) {
+    this.x = x;
+    this.y = y;
+    this.width = w;
+    this.height = h;
+    this.left = w >= 0 ? x : x + w;
+    this.top = h >= 0 ? y : y + h;
+    this.right = w >= 0 ? x + w : x;
+    this.bottom = h >= 0 ? y + h : y;
+  }
+}
+
 class Node extends EventEmitter {
   constructor(nodeName = null) {
     super();
@@ -1065,6 +1078,10 @@ class HTMLElement extends Node {
     if (!event.propagationStopped && this.parentNode) {
       this.parentNode.dispatchEvent(event);
     }
+  }
+  
+  getBoundingClientRect() {
+    return new DOMRect();
   }
 
   focus() {
@@ -1625,6 +1642,10 @@ class HTMLCanvasElement extends HTMLElement {
     if (typeof value === 'number' && isFinite(value)) {
       this.setAttribute('height', value);
     }
+  }
+  
+  getBoundingClientRect() {
+    return new DOMRect(0, 0, this.width, this.height);
   }
 
   get data() {
@@ -2412,6 +2433,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       return this.height;
     }
     set naturalHeight(naturalHeight) {}
+    
+    getBoundingClientRect() {
+      return new DOMRect(0, 0, this.width, this.height);
+    }
 
     get data() {
       return this.image.data;
@@ -2571,6 +2596,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     }
     set height(height) {
       this.video.height = height;
+    }
+    
+    getBoundingClientRect() {
+      return new DOMRect(0, 0, this.width, this.height);
     }
 
     get data() {
