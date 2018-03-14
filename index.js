@@ -332,6 +332,7 @@ class Path2D {
   lineTo() {}
   quadraticCurveTo() {}
 }
+class CanvasGradient {}
 class CanvasRenderingContext2D {
   drawImage() {}
   fillRect() {}
@@ -2022,6 +2023,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.ImageData = ImageData;
   window.ImageBitmap = ImageBitmap;
   window.Path2D = Path2D;
+  window.CanvasGradient = CanvasGradient;
   window.CanvasRenderingContext2D = CanvasRenderingContext2D;
   window.MediaRecorder = MediaRecorder;
   window.Gamepad = Gamepad;
@@ -2285,6 +2287,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   ImageData = bindings.nativeImageData;
   ImageBitmap = bindings.nativeImageBitmap;
   Path2D = bindings.nativePath2D;
+  CanvasGradient = bindings.nativeCanvasGradient;
   CanvasRenderingContext2D = bindings.nativeCanvasRenderingContext2D;
   WebGLContext = bindings.nativeGl;
   /* WebGLContext = function WebGLContext() {
