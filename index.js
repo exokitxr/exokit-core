@@ -966,6 +966,27 @@ class HTMLElement extends Node {
     return this.childNodes.length > 0 ? this.childNodes[this.childNodes.length - 1] : null;
   }
   set lastChild(lastChild) {}
+  
+  get firstElementChild() {
+    for (let i = 0; i < this.childNodes.length; i++) {
+      const childNode = this.childNodes[i];
+      if (childNode.nodeType === Node.ELEMENT_NODE) {
+        return childNode;
+      }
+    }
+    return null;
+  }
+  set firstElementChild(firstElementChild) {}
+  get lastElementChild() {
+    for (let i = this.childNodes.length - 1; i >= 0; i--) {
+      const childNode = this.childNodes[i];
+      if (childNode.nodeType === Node.ELEMENT_NODE) {
+        return childNode;
+      }
+    }
+    return null;
+  }
+  set lastElementChild(lastElementChild) {}
 
   get id() {
     return this.attributes['id'] || '';
