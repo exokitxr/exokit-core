@@ -1079,7 +1079,7 @@ class HTMLElement extends Node {
       this.parentNode.dispatchEvent(event);
     }
   }
-  
+
   getBoundingClientRect() {
     return new DOMRect();
   }
@@ -1643,7 +1643,7 @@ class HTMLCanvasElement extends HTMLElement {
       this.setAttribute('height', value);
     }
   }
-  
+
   getBoundingClientRect() {
     return new DOMRect(0, 0, this.width, this.height);
   }
@@ -2433,7 +2433,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       return this.height;
     }
     set naturalHeight(naturalHeight) {}
-    
+
     getBoundingClientRect() {
       return new DOMRect(0, 0, this.width, this.height);
     }
@@ -2597,7 +2597,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     set height(height) {
       this.video.height = height;
     }
-    
+
     getBoundingClientRect() {
       return new DOMRect(0, 0, this.width, this.height);
     }
