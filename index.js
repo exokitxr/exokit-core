@@ -2291,7 +2291,7 @@ const _parseDocument = (s, options, window) => {
   const head = html.childNodes.find(element => element.tagName === 'HEAD');
   const body = html.childNodes.find(element => element.tagName === 'BODY');
 
-  document.documentElement = document;
+  document.documentElement = html;
   document.readyState = null;
   document.head = head;
   document.body = body;
