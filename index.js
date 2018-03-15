@@ -354,7 +354,7 @@ class CanvasRenderingContext2D {
   putImageData() {}
 }
 const VERSION = Symbol();
-class WebGLContext {
+class WebGLRenderingContext {
   get VERSION() {
     return VERSION;
   }
@@ -1668,7 +1668,7 @@ class HTMLCanvasElement extends HTMLElement {
       if (contextType === '2d') {
         this._context = new CanvasRenderingContext2D(this.width, this.height);
       } else if (contextType === 'webgl') {
-        this._context = new WebGLContext(this);
+        this._context = new WebGLRenderingContext(this);
       }
     }
     return this._context;
@@ -2337,8 +2337,8 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   Path2D = bindings.nativePath2D;
   CanvasGradient = bindings.nativeCanvasGradient;
   CanvasRenderingContext2D = bindings.nativeCanvasRenderingContext2D;
-  WebGLContext = bindings.nativeGl;
-  /* WebGLContext = function WebGLContext() {
+  WebGLRenderingContext = bindings.nativeGl;
+  /* WebGLRenderingContext = function WebGLRenderingContext() {
     return new Proxy(Reflect.construct(bindings.nativeGl, arguments), {
       get(target, propKey, receiver) {
         const orig = target[propKey];
