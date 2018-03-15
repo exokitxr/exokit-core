@@ -2073,6 +2073,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.Path2D = Path2D;
   window.CanvasGradient = CanvasGradient;
   window.CanvasRenderingContext2D = CanvasRenderingContext2D;
+  window.WebGLRenderingContext = WebGLRenderingContext;
   window.MediaRecorder = MediaRecorder;
   window.Gamepad = Gamepad;
   window.VRStageParameters = VRStageParameters;
