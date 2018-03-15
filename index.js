@@ -198,7 +198,7 @@ class MouseEvent extends Event {
 class WheelEvent extends MouseEvent {
   constructor(type, init = {}) {
     super(type, init);
-    
+
     this.deltaX = init.deltaX !== undefined ? init.deltaX : 0;
     this.deltaY = init.deltaY !== undefined ? init.deltaY : 0;
     this.deltaZ = init.deltaZ !== undefined ? init.deltaZ : 0;
@@ -775,7 +775,7 @@ class Node extends EventEmitter {
     this.parentNode = null;
     this.ownerDocument = null;
   }
-  
+
   get parentElement() {
     if (this.parentNode && this.parentNode.nodeType === Node.ELEMENT_NODE) {
       return this.parentNode;
