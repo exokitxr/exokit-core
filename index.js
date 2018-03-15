@@ -1168,7 +1168,7 @@ class HTMLElement extends Node {
   }
   set offsetWidth(offsetWidth) {}
   get offsetHeight() {
-    return this.offsetHeight;
+    return this.clientHeight;
   }
   set offsetHeight(offsetHeight) {}
 
