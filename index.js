@@ -1668,7 +1668,6 @@ class HTMLCanvasElement extends HTMLElement {
       this.setAttribute('width', value);
     }
   }
-
   get height() {
     return this.getAttribute('height') || defaultCanvasSize[1];
   }
@@ -1677,6 +1676,15 @@ class HTMLCanvasElement extends HTMLElement {
       this.setAttribute('height', value);
     }
   }
+
+  get clientWidth() {
+    return this.width;
+  }
+  set clientWidth(clientWidth) {}
+  get clientHeight() {
+    return this.height;
+  }
+  set clientHeight(clientHeight) {}
 
   getBoundingClientRect() {
     return new DOMRect(0, 0, this.width, this.height);
