@@ -2392,7 +2392,6 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     constructor(attrs = [], value = '') {
       super('IMG', attrs, value);
 
-      this._src = '';
       this.image = new bindings.nativeImage();
     }
 
@@ -2414,10 +2413,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     }
 
     get src() {
-      return this._src;
+      return this.getAttribute('src');
     }
     set src(src) {
-      this._src = src;
+      this.setAttribute('src', src);
 
       // const srcError = new Error();
 
@@ -2502,15 +2501,14 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     constructor(attrs = [], value = '') {
       super('AUDIO', attrs, value);
 
-      this._src = '';
       this.audio = new nativeAudio.Audio();
     }
 
     get src() {
-      return this._src;
+      return this.getAttribute('src');
     }
     set src(src) {
-      this._src = src;
+      this.setAttribute('src', src);
 
       // const srcError = new Error();
 
@@ -2592,15 +2590,14 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     constructor(attrs = [], value = '') {
       super('VIDEO', attrs, value);
 
-      this._src = '';
       this.video = new nativeVideo.Video();
     }
 
     get src() {
-      return this._src;
+      return this.getAttribute('src');
     }
     set src(src) {
-      this._src = src;
+      this.setAttribute('src', src);
 
       // const srcError = new Error();
 
