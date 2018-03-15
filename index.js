@@ -1162,7 +1162,7 @@ class HTMLElement extends Node {
     return 0;
   }
   set clientHeight(clientHeight) {}
-  
+
   get offsetWidth() {
     return this.clientWidth;
   }
