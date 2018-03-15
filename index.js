@@ -1400,6 +1400,20 @@ class HTMLDocumentElement extends HTMLLoadableElement {
     super('DOCUMENT');
   }
 }
+class HTMLBodyElement extends HTMLElement {
+  constructor() {
+    super('BODY');
+  }
+
+  get clientWidth() {
+    return this.ownerDocument.defaultView.innerWidth;
+  }
+  set clientWidth(clientWidth) {}
+  get clientHeight() {
+    return this.ownerDocument.defaultView.innerHeight;
+  }
+  set clientHeight(clientHeight) {}
+}
 class HTMLScriptElement extends HTMLLoadableElement {
   constructor(attrs = [], value = '', location = null) {
     super('SCRIPT', attrs, value, location);
@@ -2082,6 +2096,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   })(HTMLImageElement);
   window[htmlTagsSymbol] = {
     DOCUMENT: HTMLDocumentElement,
+    BODY: HTMLBodyElement,
     A: HTMLAnchorElement,
     SCRIPT: HTMLScriptElement,
     IMG: HTMLImageElementBound,
