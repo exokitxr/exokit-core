@@ -195,6 +195,19 @@ class MouseEvent extends Event {
     this.region = init.region !== undefined ? init.region : null;
   }
 }
+class WheelEvent extends MouseEvent {
+  constructor(type, init = {}) {
+    super(type, init);
+    
+    this.deltaX = init.deltaX !== undefined ? init.deltaX : 0;
+    this.deltaY = init.deltaY !== undefined ? init.deltaY : 0;
+    this.deltaZ = init.deltaZ !== undefined ? init.deltaZ : 0;
+    this.deltaMode = init.deltaMode !== undefined ? init.deltaMode : 0;
+  }
+}
+WheelEvent.DOM_DELTA_PIXEL = 0x00;
+WheelEvent.DOM_DELTA_LINE = 0x01;
+WheelEvent.DOM_DELTA_PAGE = 0x02;
 class MessageEvent extends Event {
   constructor(data) {
     super('message');
@@ -2064,6 +2077,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.Event = Event;
   window.KeyboardEvent = KeyboardEvent;
   window.MouseEvent = MouseEvent;
+  window.WheelEvent = WheelEvent;
   window.MessageEvent = MessageEvent;
   window.MutationObserver = MutationObserver;
   window.Node = Node;
