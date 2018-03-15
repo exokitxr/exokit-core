@@ -1148,7 +1148,7 @@ class HTMLElement extends Node {
     this.removeListener.apply(this, arguments);
   }
 
-  get offsetWidth() {
+  get clientWidth() {
     const style = _parseStyle(this.attributes['style'] || '');
     const fontFamily = style['font-family'];
     if (fontFamily) {
@@ -1157,9 +1157,18 @@ class HTMLElement extends Node {
       return 0;
     }
   }
+  set clientWidth(clientWidth) {}
+  get clientHeight() {
+    return 0;
+  }
+  set clientHeight(clientHeight) {}
+  
+  get offsetWidth() {
+    return this.clientWidth;
+  }
   set offsetWidth(offsetWidth) {}
   get offsetHeight() {
-    return 0;
+    return this.offsetHeight;
   }
   set offsetHeight(offsetHeight) {}
 
