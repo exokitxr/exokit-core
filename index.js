@@ -775,6 +775,15 @@ class Node extends EventEmitter {
     this.parentNode = null;
     this.ownerDocument = null;
   }
+  
+  get parentElement() {
+    if (this.parentNode && this.parentNode.nodeType === Node.ELEMENT_NODE) {
+      return this.parentNode;
+    } else {
+      return null;
+    }
+  }
+  set parentElement(parentElement) {}
 
   get nextSibling() {
     if (this.parentNode) {
