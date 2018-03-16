@@ -1382,13 +1382,27 @@ class HTMLLoadableElement extends HTMLElement {
     _elementSetter(this, 'error', onerror);
   }
 }
-class HTMLWindowElement extends HTMLLoadableElement {
+class HTMLWindowElement extends HTMLElement {
   constructor() {
     super('WINDOW');
   }
 
   postMessage(data) {
     this.emit('message', new MessageEvent(data));
+  }
+  
+  get onload() {
+    return _elementGetter(this, 'load');
+  }
+  set onload(onload) {
+    _elementSetter(this, 'load', onload);
+  }
+
+  get onerror() {
+    return _elementGetter(this, 'error');
+  }
+  set onerror(onerror) {
+    _elementSetter(this, 'error', onerror);
   }
 
   get onmessage() {
