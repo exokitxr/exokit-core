@@ -27,6 +27,7 @@ const THREE = require('./lib/three-min.js');
 const windowSymbol = Symbol();
 const htmlTagsSymbol = Symbol();
 const optionsSymbol = Symbol();
+const disabledEventsSymbol = Symbol();
 let nativeBindings = false;
 
 let id = 0;
@@ -1385,16 +1386,27 @@ class HTMLLoadableElement extends HTMLElement {
 class HTMLWindowElement extends HTMLElement {
   constructor() {
     super('WINDOW');
+    
+    this[disabledEventsSymbol] = {};
   }
 
   postMessage(data) {
     this.emit('message', new MessageEvent(data));
   }
   
+  emit(type, event) {
+    if (!this[disabledEventsSymbol][type]) {
+      super.emit(type, event);
+    }
+  }
+  
   get onload() {
     return _elementGetter(this, 'load');
   }
   set onload(onload) {
+    if (!this[windowEval.parsingSymbol]) {
+      this[disabledEventsSymbol]['load'] = true;
+    }
     _elementSetter(this, 'load', onload);
   }
 
@@ -1402,6 +1414,9 @@ class HTMLWindowElement extends HTMLElement {
     return _elementGetter(this, 'error');
   }
   set onerror(onerror) {
+    if (!this[windowEval.parsingSymbol]) {
+      this[disabledEventsSymbol]['error'] = true;
+    }
     _elementSetter(this, 'error', onerror);
   }
 
