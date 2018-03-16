@@ -1404,7 +1404,7 @@ class HTMLWindowElement extends HTMLElement {
     return _elementGetter(this, 'load');
   }
   set onload(onload) {
-    if (!this[windowEval.parsingSymbol]) {
+    if (!windowEval.isParsing(this)) {
       this[disabledEventsSymbol]['load'] = true;
     }
     _elementSetter(this, 'load', onload);
@@ -1414,7 +1414,7 @@ class HTMLWindowElement extends HTMLElement {
     return _elementGetter(this, 'error');
   }
   set onerror(onerror) {
-    if (!this[windowEval.parsingSymbol]) {
+    if (!windowEval.isParsing(this)) {
       this[disabledEventsSymbol]['error'] = true;
     }
     _elementSetter(this, 'error', onerror);
