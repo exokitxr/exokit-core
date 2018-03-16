@@ -1223,6 +1223,11 @@ class HTMLElement extends Node {
   }
   set offsetLeft(offsetLeft) {}
 
+  get offsetParent() {
+    return this.ownerDocument.documentElement;
+  }
+  set offsetParent(offsetParent) {}
+
   get style() {
     const style = _parseStyle(this.attributes['style'] || '');
     Object.defineProperty(style, 'cssText', {
