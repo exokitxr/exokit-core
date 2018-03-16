@@ -1386,38 +1386,59 @@ class HTMLLoadableElement extends HTMLElement {
 class HTMLWindowElement extends HTMLElement {
   constructor() {
     super('WINDOW');
-    
-    this[disabledEventsSymbol] = {};
+
+    /* Treat function onload() as a special case that disables automatic event attach for onload, because this is how browsers work. E.g.
+    <!doctype html><html><head><script>
+      function onload() {
+        console.log ('onload'); // NOT called; presence of top-level function onload() makes all the difference
+      }
+      window.onload = onload;
+    </script></head></html>
+    */
+    this[disabledEventsSymbol] = {
+      load: undefined,
+      error: undefined,
+    };
   }
 
   postMessage(data) {
     this.emit('message', new MessageEvent(data));
   }
-  
+
   emit(type, event) {
     if (!this[disabledEventsSymbol][type]) {
       super.emit(type, event);
     }
   }
-  
+
   get onload() {
-    return _elementGetter(this, 'load');
+    return this[disabledEventsSymbol]['load'] !== undefined ? this[disabledEventsSymbol]['load'] : _elementGetter(this, 'load');
   }
   set onload(onload) {
-    if (!windowEval.isParsing(this)) {
-      this[disabledEventsSymbol]['load'] = true;
+    if (windowEval.isParsing(this)) {
+      this[disabledEventsSymbol]['load'] = onload;
+    } else {
+      if (this[disabledEventsSymbol]['load'] !== undefined) {
+        this[disabledEventsSymbol]['load'] = onload;
+      } else {
+        _elementSetter(this, 'load', onload);
+      }
     }
-    _elementSetter(this, 'load', onload);
   }
 
   get onerror() {
-    return _elementGetter(this, 'error');
+    return this[disabledEventsSymbol]['error'] !== undefined ? this[disabledEventsSymbol]['error'] : _elementGetter(this, 'error');
   }
   set onerror(onerror) {
-    if (!windowEval.isParsing(this)) {
-      this[disabledEventsSymbol]['error'] = true;
+    if (windowEval.isParsing(this)) {
+      this[disabledEventsSymbol]['error'] = onerror;
+    } else {
+      if (this[disabledEventsSymbol]['error'] !== undefined) {
+        this[disabledEventsSymbol]['error'] = onerror;
+      } else {
+        _elementSetter(this, 'error', onerror);
+      }
     }
-    _elementSetter(this, 'error', onerror);
   }
 
   get onmessage() {
