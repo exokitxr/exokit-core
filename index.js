@@ -2420,6 +2420,18 @@ const _parseDocument = (s, options, window) => {
   document[pointerLockElementSymbol] = null;
   window.document = document;
 
+  if (window.top === window) {
+    document.addEventListener('pointerlockchange', () => {
+      const iframes = document.getElementsByTagName('iframe');
+      for (let i = 0; i < iframes.length; i++) {
+        const iframe = iframes[i];
+        if (iframe.contentDocument) {
+          iframe.contentDocument.emit('pointerlockchange');
+        }
+      }
+    });
+  }
+
   process.nextTick(async () => {
     document.readyState = 'complete';
 
