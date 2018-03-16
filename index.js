@@ -985,6 +985,7 @@ class HTMLElement extends Node {
     this.childNodes.push(childNode);
     childNode.parentNode = this;
 
+    childNode.emit('parent');
     this.emit('children', [childNode], [], this.childNodes[this.childNodes.length - 2] || null, null);
   }
   removeChild(childNode) {
@@ -993,6 +994,7 @@ class HTMLElement extends Node {
       this.childNodes.splice(index, 1);
       childNode.parentNode = null;
 
+      childNode.emit('parent');
       this.emit('children', [], [childNode], this.childNodes[index - 1] || null, this.childNodes[index] || null);
     }
   }
@@ -1002,6 +1004,7 @@ class HTMLElement extends Node {
       this.childNodes.splice(index, 0, childNode);
       childNode.parentNode = this;
 
+      childNode.emit('parent');
       this.emit('children', [childNode], [], this.childNodes[index - 1] || null, this.childNodes[index + 1] || null);
     }
   }
@@ -1011,6 +1014,7 @@ class HTMLElement extends Node {
       this.childNodes.splice(index + 1, 0, childNode);
       childNode.parentNode = this;
 
+      childNode.emit('parent');
       this.emit('children', [childNode], [], this.childNodes[index] || null, this.childNodes[index + 2] || null);
     }
   }
@@ -1198,9 +1202,15 @@ class HTMLElement extends Node {
     this.childNodes = newChildNodes;
 
     if (oldChildNodes.length > 0) {
+      for (let i = 0; i < oldChildNodes.length; i++) {
+        oldChildNodes[i].emit('parent');
+      }
       this.emit('children', [], oldChildNodes, null, null);
     }
     if (newChildNodes.length > 0) {
+      for (let i = 0; i < newChildNodes.length; i++) {
+        newChildNodes[i].emit('parent');
+      }
       this.emit('children', newChildNodes, [], null, null);
     }
 
