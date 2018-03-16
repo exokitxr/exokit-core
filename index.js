@@ -1214,6 +1214,15 @@ class HTMLElement extends Node {
   }
   set offsetHeight(offsetHeight) {}
 
+  get offsetTop() {
+    return 0;
+  }
+  set offsetTop(offsetTop) {}
+  get offsetLeft() {
+    return 0;
+  }
+  set offsetLeft(offsetLeft) {}
+
   get style() {
     const style = _parseStyle(this.attributes['style'] || '');
     Object.defineProperty(style, 'cssText', {
