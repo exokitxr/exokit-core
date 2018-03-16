@@ -28,6 +28,7 @@ const windowSymbol = Symbol();
 const htmlTagsSymbol = Symbol();
 const optionsSymbol = Symbol();
 const disabledEventsSymbol = Symbol();
+const pointerLockElementSymbol = Symbol();
 let nativeBindings = false;
 
 let id = 0;
@@ -1279,24 +1280,24 @@ class HTMLElement extends Node {
   }
 
   requestPointerLock() {
-    const document = this.ownerDocument;
+    const topDocument = this.ownerDocument.defaultView.top.document;
 
-    if (document.pointerLockElement === null) {
-      document.pointerLockElement = this;
+    if (topDocument[pointerLockElementSymbol] === null) {
+      topDocument[pointerLockElementSymbol] = this;
 
       process.nextTick(() => {
-        document.emit('pointerlockchange');
+        topDocument.emit('pointerlockchange');
       });
     }
   }
   exitPointerLock() {
-    const document = this.ownerDocument;
+    const topDocument = this.ownerDocument.defaultView.top.document;
 
-    if (document.pointerLockElement !== null) {
-      document.pointerLockElement = null;
+    if (topDocument[pointerLockElementSymbol] !== null) {
+      topDocument[pointerLockElementSymbol] = null;
 
       process.nextTick(() => {
-        document.emit('pointerlockchange');
+        topDocument.emit('pointerlockchange');
       });
     }
   }
@@ -1483,6 +1484,15 @@ class HTMLDocumentElement extends HTMLLoadableElement {
   constructor() {
     super('DOCUMENT');
   }
+
+  get pointerLockElement() {
+    if (this.defaultView.top === this.defaultView) {
+      return this[pointerLockElementSymbol];
+    } else {
+      return this.defaultView.top.document.pointerLockElement;
+    }
+  }
+  set pointerLockElement(pointerLockElement) {}
 }
 class HTMLBodyElement extends HTMLElement {
   constructor() {
@@ -2407,7 +2417,7 @@ const _parseDocument = (s, options, window) => {
       document.body.appendChild(childNodes[i]);
     }
   };
-  document.pointerLockElement = null;
+  document[pointerLockElementSymbol] = null;
   window.document = document;
 
   process.nextTick(async () => {
