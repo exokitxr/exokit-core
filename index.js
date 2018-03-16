@@ -2069,10 +2069,14 @@ const cancelAnimationFrame = fn => {
   }
 };
 const tickAnimationFrame = () => {
-  const localRafCbs = rafCbs.slice();
-  rafCbs.length = 0;
-  for (let i = 0; i < localRafCbs.length; i++) {
-    localRafCbs[i]();
+  if (rafCbs.length > 0) {
+    const localRafCbs = rafCbs.slice();
+    rafCbs.length = 0;
+
+    const now = performance.now();
+    for (let i = 0; i < localRafCbs.length; i++) {
+      localRafCbs[i](now);
+    }
   }
 };
 
