@@ -1159,12 +1159,36 @@ class HTMLElement extends Node {
     if (fontFamily) {
       return _hash(fontFamily) * _hash(this.innerHTML);
     } else {
-      return 0;
+      let result = 0;
+      const _recurse = el => {
+        if (el.nodeType === Node.ELEMENT_NODE) {
+          if (el.tagName === 'CANVAS') {
+            result = Math.max(el.width, result);
+          }
+          for (let i = 0; i < el.childNodes.length; i++) {
+            _recurse(el.childNodes[i]);
+          }
+        }
+      };
+      _recurse(this);
+      return result;
     }
   }
   set clientWidth(clientWidth) {}
   get clientHeight() {
-    return 0;
+    let result = 0;
+    const _recurse = el => {
+      if (el.nodeType === Node.ELEMENT_NODE) {
+        if (el.tagName === 'CANVAS') {
+          result = Math.max(el.height, result);
+        }
+        for (let i = 0; i < el.childNodes.length; i++) {
+          _recurse(el.childNodes[i]);
+        }
+      }
+    };
+    _recurse(this);
+    return result;
   }
   set clientHeight(clientHeight) {}
 
