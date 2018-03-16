@@ -1162,7 +1162,7 @@ class HTMLElement extends Node {
       let result = 0;
       const _recurse = el => {
         if (el.nodeType === Node.ELEMENT_NODE) {
-          if (el.tagName === 'CANVAS') {
+          if (el.tagName === 'CANVAS' || el.tagName === 'IMAGE' || el.tagName === 'VIDEO') {
             result = Math.max(el.width, result);
           }
           for (let i = 0; i < el.childNodes.length; i++) {
@@ -1179,7 +1179,7 @@ class HTMLElement extends Node {
     let result = 0;
     const _recurse = el => {
       if (el.nodeType === Node.ELEMENT_NODE) {
-        if (el.tagName === 'CANVAS') {
+        if (el.tagName === 'CANVAS' || el.tagName === 'IMAGE' || el.tagName === 'VIDEO') {
           result = Math.max(el.height, result);
         }
         for (let i = 0; i < el.childNodes.length; i++) {
