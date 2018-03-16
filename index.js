@@ -1302,17 +1302,6 @@ class HTMLElement extends Node {
       });
     }
   }
-  exitPointerLock() {
-    const topDocument = this.ownerDocument.defaultView.top.document;
-
-    if (topDocument[pointerLockElementSymbol] !== null) {
-      topDocument[pointerLockElementSymbol] = null;
-
-      process.nextTick(() => {
-        topDocument.emit('pointerlockchange');
-      });
-    }
-  }
 
   inspect() {
     const _getIndent = depth => Array(depth*2 + 1).join(' ');
@@ -1505,6 +1494,18 @@ class HTMLDocumentElement extends HTMLLoadableElement {
     }
   }
   set pointerLockElement(pointerLockElement) {}
+
+  exitPointerLock() {
+    const topDocument = this.defaultView.top.document;
+
+    if (topDocument[pointerLockElementSymbol] !== null) {
+      topDocument[pointerLockElementSymbol] = null;
+
+      process.nextTick(() => {
+        topDocument.emit('pointerlockchange');
+      });
+    }
+  }
 }
 class HTMLBodyElement extends HTMLElement {
   constructor() {
