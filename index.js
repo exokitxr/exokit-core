@@ -2861,15 +2861,11 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     get width() {
       return this.video.width;
     }
-    set width(width) {
-      this.video.width = width;
-    }
-
+    set width(width) {}
     get height() {
       return this.video.height;
     }
-    set height(height) {
-      this.video.height = height;
+    set height(height) {}
 
     get loop() {
       return this.getAttribute('loop');
