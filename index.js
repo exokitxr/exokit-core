@@ -2091,18 +2091,12 @@ const _runHtml = async (element, window) => {
 
     const audios = element.querySelectorAll('audio');
     for (let i = 0; i < audios.length; i++) {
-      const audio = audios[i];
-      if (audio.run()) {
-        await _loadPromise(audioEl);
-      }
+      audios[i].run();
     }
 
     const videos = element.querySelectorAll('video');
     for (let i = 0; i < videos.length; i++) {
-      const video = videos[i];
-      if (video.run()) {
-        await _loadPromise(videoEl);
-      }
+      videos[i].run();
     }
   }
 };
