@@ -1785,7 +1785,6 @@ class HTMLVideoElement extends HTMLMediaElement {
     return 0;
   }
   set width(width) {}
-
   get height() {
     return 0;
   }
