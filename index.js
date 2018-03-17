@@ -1771,6 +1771,11 @@ class HTMLAudioElement extends HTMLMediaElement {
     _elementSetter(this, 'canplaythrough', oncanplaythrough);
   }
 }
+HTMLAudioElement.HAVE_NOTHING = HTMLMediaElement.HAVE_NOTHING;
+HTMLAudioElement.HAVE_METADATA = HTMLMediaElement.HAVE_METADATA;
+HTMLAudioElement.HAVE_CURRENT_DATA = HTMLMediaElement.HAVE_CURRENT_DATA;
+HTMLAudioElement.HAVE_FUTURE_DATA = HTMLMediaElement.HAVE_FUTURE_DATA;
+HTMLAudioElement.HAVE_ENOUGH_DATA = HTMLMediaElement.HAVE_ENOUGH_DATA;
 class MicrophoneMediaStream {}
 class HTMLVideoElement extends HTMLMediaElement {
   constructor(attrs = [], value = '', location = null) {
@@ -1800,6 +1805,11 @@ class HTMLVideoElement extends HTMLMediaElement {
   }
   set height(height) {}
 }
+HTMLVideoElement.HAVE_NOTHING = HTMLMediaElement.HAVE_NOTHING;
+HTMLVideoElement.HAVE_METADATA = HTMLMediaElement.HAVE_METADATA;
+HTMLVideoElement.HAVE_CURRENT_DATA = HTMLMediaElement.HAVE_CURRENT_DATA;
+HTMLVideoElement.HAVE_FUTURE_DATA = HTMLMediaElement.HAVE_FUTURE_DATA;
+HTMLVideoElement.HAVE_ENOUGH_DATA = HTMLMediaElement.HAVE_ENOUGH_DATA;
 class HTMLIframeElement extends HTMLSrcableElement {
   constructor(attrs = [], value = '', location = null) {
     super('IFRAME', attrs, value, location);
