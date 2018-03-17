@@ -1628,7 +1628,7 @@ class HTMLSrcableElement extends HTMLLoadableElement {
   }
 
   get src() {
-    this.getAttribute('src');
+    return this.getAttribute('src');
   }
   set src(value) {
     this.setAttribute('src', value);
