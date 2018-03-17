@@ -967,6 +967,69 @@ const _makeAttributesProxy = el => new Proxy(el.attrs, {
     }
   },
 });
+const _cssText = style => {
+  let styleString = '';
+  for (const k in style) {
+    const v = style[k];
+    if (v !== undefined) {
+      styleString += (styleString.length > 0 ? ' ' : '') + k + ': ' + v + ';';
+    }
+  }
+  return styleString;
+};
+const _makeStyleProxy = el => {
+  let style = {};
+  return new Proxy({}, {
+    get(target, key) {
+      if (key === 'reset') {
+        return () => {
+          let stylesheet, err;
+          try {
+            stylesheet = css.parse(`x{${el.getAttribute('style')}}`).stylesheet;
+          } catch(e) {
+            err = e;
+          }
+          if (!err) {
+            style = {};
+            const {rules} = stylesheet;
+            for (let j = 0; j < rules.length; j++) {
+              const rule = rules[j];
+              const {declarations} = rule;
+              for (let k = 0; k < declarations.length; k++) {
+                const {property, value} = declarations[k];
+                style[property] = value;
+              }
+            }
+          }
+        };
+      } else if (key === 'clone') {
+        return () => {
+          const result = {};
+          for (const k in this) {
+            const v = this[k];
+            if (v !== undefined) {
+              result[k] = v;
+            }
+          }
+          return result;
+        };
+      } else if (key === 'cssText') {
+        return el.getAttribute('style') || '';
+      } else {
+        return style[key];
+      }
+    },
+    set(target, key, value) {
+      if (key === 'cssText') {
+        el.setAttribute('style', value);
+      } else {
+        style[key] = value;
+        el.setAttribute('style', _cssText(style));
+      }
+      return true;
+    },
+  });
+};
 const autoClosingTags = {
   area: true,
   base: true,
@@ -1300,13 +1363,11 @@ class HTMLElement extends Node {
 
   get style() {
     if (!this._style) {
-      this._style = new CSSStyleDeclaration(this);
+      this._style = _makeStyleProxy(this);
     }
     return this._style;
   }
-  set style(style) {
-    this.attributes['style'] = _formatStyle(style);
-  }
+  set style(style) {}
 
   get innerHTML() {
     return parse5.serialize(this);
@@ -2158,72 +2219,6 @@ const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
     return element;
   }
 };
-const _parseStyle = styleString => {
-  const style = {};
-  const split = styleString.split(/;\s*/);
-  for (let i = 0; i < split.length; i++) {
-    const split2 = split[i].split(/:\s*/);
-    if (split2.length === 2) {
-      style[split2[0]] = split2[1];
-    }
-  }
-  return style;
-};
-const _formatStyle = style => {
-  let styleString = '';
-  for (const k in style) {
-    styleString += (styleString.length > 0 ? ' ' : '') + k + ': ' + style[k] + ';';
-  }
-  return styleString;
-};
-class CSSStyleDeclaration {
-  constructor(el) {
-    this[elementSymbol] = el;
-
-    this.reset();
-  }
-
-  reset() {
-    let stylesheet, err;
-    try {
-      stylesheet = css.parse(`x{${this.cssText}}`).stylesheet;
-    } catch(e) {
-      err = e;
-    }
-    if (!err) {
-      for (const k in this) {
-        this[k] = undefined;
-      }
-      const {rules} = stylesheet;
-      for (let j = 0; j < rules.length; j++) {
-        const rule = rules[j];
-        const {declarations} = rule;
-        for (let k = 0; k < declarations.length; k++) {
-          const {property, value} = declarations[k];
-          this[property] = value;
-        }
-      }
-    }
-  }
-  
-  clone() {
-    const result = new {};
-    for (const k in this) {
-      const v = this[k];
-      if (v !== undefined) {
-        result[k] = v;
-      }
-    }
-    return result;
-  }
-
-  get cssText() {
-    return this[elementSymbol].attributes['style'] || '';
-  }
-  set cssText(cssText) {
-    this[elementSymbol].attributes['style'] = cssText;
-  }
-}
 const _hash = s => {
   let result = 0;
   for (let i = 0; i < s.length; i++) {
