@@ -22,6 +22,7 @@ const ClassList = require('classlist');
 const he = require('he');
 he.encode.options.useNamedReferences = true;
 const selector = require('selector-lite');
+const css = require('css');
 const {TextEncoder, TextDecoder} = require('text-encoding');
 const THREE = require('./lib/three-min.js');
 
@@ -1580,6 +1581,77 @@ class HTMLBodyElement extends HTMLElement {
   }
   set clientHeight(clientHeight) {}
 }
+class HTMLStyleElement extends HTMLLoadableElement {
+  constructor(attrs = [], value = '', location = null) {
+    super('SCRIPT', attrs, value, location);
+
+    this.stylesheet = null;
+
+    this.on('attribute', (name, value) => {
+      if (name === 'src' && this.isRunnable()) {
+        const url = value;
+        this.ownerDocument.defaultView.fetch(url)
+          .then(res => {
+            if (res.status >= 200 && res.status < 300) {
+              return res.text();
+            } else {
+              return Promise.reject(new Error('style src got invalid status code: ' + res.status + ' : ' + url));
+            }
+          })
+          .then(s => css.parse(s).stylesheet)
+          .then(stylesheet => {
+            this.stylesheet = stylesheet;
+            this.emit('load');
+          })
+          .catch(err => {
+            this.emit('error', err);
+          });
+      }
+    });
+    this.on('innerHTML', innerHTML => {
+      Promise.resolve()
+        .then(() => css.parse(innerHTML).stylesheet)
+        .then(stylesheet => {
+          this.stylesheet = stylesheet;
+          this.emit('load');
+        })
+        .catch(err => {
+          this.emit('error', err);
+        });
+    });
+  }
+
+  get src() {
+    return this.getAttribute('src') || '';
+  }
+  set src(value) {
+    this.setAttribute('src', value);
+  }
+
+  get type() {
+    return this.getAttribute('type') || '';
+  }
+  set type(value) {
+    this.setAttribute('type', value);
+  }
+
+  set innerHTML(innerHTML) {
+    this.emit('innerHTML', innerHTML);
+  }
+
+  run() {
+    let running = false;
+    if (this.attributes.src) {
+      this.src = this.attributes.src;
+      running = true;
+    }
+    if (this.childNodes.length > 0) {
+      this.innerHTML = this.childNodes[0].value;
+      running = true;
+    }
+    return running;
+  }
+}
 class HTMLScriptElement extends HTMLLoadableElement {
   constructor(attrs = [], value = '', location = null) {
     super('SCRIPT', attrs, value, location);
@@ -1599,8 +1671,8 @@ class HTMLScriptElement extends HTMLLoadableElement {
               return Promise.reject(new Error('script src got invalid status code: ' + res.status + ' : ' + url));
             }
           })
-          .then(jsString => {
-            _runJavascript(jsString, this.ownerDocument.defaultView, url);
+          .then(s => {
+            _runJavascript(s, this.ownerDocument.defaultView, url);
 
             this.readyState = 'complete';
 
@@ -2142,6 +2214,11 @@ const _runHtml = async (element, window) => {
       }
     }
 
+    const styles = element.querySelectorAll('style');
+    for (let i = 0; i < styles.length; i++) {
+      styles[i].run();
+    }
+
     const images = element.querySelectorAll('image');
     for (let i = 0; i < images.length; i++) {
       const image = images[i];
@@ -2321,6 +2398,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     DOCUMENT: HTMLDocumentElement,
     BODY: HTMLBodyElement,
     A: HTMLAnchorElement,
+    STYLE: HTMLStyleElement,
     SCRIPT: HTMLScriptElement,
     IMG: HTMLImageElementBound,
     AUDIO: HTMLAudioElement,
