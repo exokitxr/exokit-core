@@ -1518,6 +1518,24 @@ class HTMLElement extends Node {
     };
     return _recurse(this);
   }
+  async traverseAsync(fn) {
+    const _recurse = async node => {
+      const result = await fn(node);
+      if (result !== undefined) {
+        return result;
+      } else {
+        if (node.childNodes) {
+          for (let i = 0; i < node.childNodes.length; i++) {
+            const result = await _recurse(node.childNodes[i]);
+            if (result !== undefined) {
+              return result;
+            }
+          }
+        }
+      }
+    };
+    return await _recurse(this);
+  }
 }
 class HTMLAnchorElement extends HTMLElement {
   constructor(attrs = [], value = '', location = null) {
