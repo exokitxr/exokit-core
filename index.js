@@ -906,20 +906,20 @@ Node.COMMENT_NODE = 8;
 Node.DOCUMENT_NODE = 9;
 Node.DOCUMENT_TYPE_NODE = 10;
 Node.DOCUMENT_FRAGMENT_NODE = 11;
-const _setAttributeRaw = (target, prop, value) => {
+const _setAttributeRaw = (el, prop, value) => {
   const propN = parseIntStrict(prop);
   if (propN !== undefined) { // XXX handle attribute emits for indexed attribute sets
-    target[propN] = value;
+    el.attrs[propN] = value;
   } else if (prop === 'length') {
-    target.length = value;
+    el.attrs.length = value;
   } else {
-    const attr = target.find(attr => attr.name === prop);
+    const attr = el.attrs.find(attr => attr.name === prop);
     if (!attr) {
       const attr = {
         name: prop,
         value,
       };
-      target.push(attr);
+      el.attrs.push(attr);
       el.emit('attribute', prop, value, null);
     } else {
       const oldValue = attr.value;
@@ -941,7 +941,7 @@ const _makeAttributesProxy = el => new Proxy(el.attrs, {
     }
   },
   set(target, prop, value) {
-    _setAttributeRaw(target, prop, value);
+    _setAttributeRaw(el, prop, value);
     return true;
   },
   deleteProperty(target, prop) {
@@ -1123,7 +1123,7 @@ class HTMLElement extends Node {
   get classList() {
     if (!this._classList) {
       this._classList = new ClassList(this.className, className => {
-        _setAttributeRaw(this.attrs, 'className', className);
+        _setAttributeRaw(this, 'className', className);
       });
     }
     return this._classList;
