@@ -148,7 +148,6 @@ class History extends EventEmitter {
 class Event {
   constructor(type, init = {}) {
     this.type = type;
-    this.handled = false;
     this.defaultPrevented = false;
     this.propagationStopped = false;
 
@@ -1156,22 +1155,11 @@ class HTMLElement extends Node {
     return selector.matches(this, s);
   }
 
-  dispatchEvent(event, bubble = true) {
-    if (this.emit(event.type, event)) {
-      event.handled = true;
-    }
+  dispatchEvent(event) {
+    this.emit(event.type, event);
 
-    if (!event.propagationStopped) {
-      if (bubble && this.parentNode) {
-        this.parentNode.dispatchEvent(event, bubble);
-      } else if (!bubble) {
-        for (let i = 0; !event.propagationStopped && i < this.childNodes.length; i++) {
-          const childNode = this.childNodes[i];
-          if (childNode.nodeType === Node.ELEMENT_NODE) {
-            childNode.dispatchEvent(event, bubble);
-          }
-        }
-      }
+    if (!event.propagationStopped && this.parentNode) {
+      this.parentNode.dispatchEvent(event);
     }
   }
 
