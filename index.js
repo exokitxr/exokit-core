@@ -1646,19 +1646,31 @@ class HTMLSrcableElement extends HTMLLoadableElement {
 class HTMLMediaElement extends HTMLSrcableElement {
   constructor(tagName = null, attrs = [], value = '', location = null) {
     super(tagName, attrs, value, location);
-
-    this.paused = false;
-    this.currentTime = 0;
-    this.duration = 0;
-    this.loop = false;
   }
 
-  play() {
-    this.paused = false;
+  play() {}
+  pause() {}
+  
+  get paused() {
+    return true;
   }
-  pause() {
-    this.paused = true;
+  set paused(paused) {}
+  get currentTime() {
+    return 0;
   }
+  set currentTime(currentTime) {}
+  get duration() {
+    return 1;
+  }
+  set duration(duration) {}
+  get loop() {
+    return false;
+  }
+  set loop(loop) {}
+  get autoplay() {
+    return false;
+  }
+  set autoplay(autoplay) {}
 
   get HAVE_NOTHING() {
     return HTMLMediaElement.HAVE_NOTHING;
