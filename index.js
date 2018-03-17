@@ -10,6 +10,7 @@ const {performance} = require('perf_hooks');
 const parseIntStrict = require('parse-int');
 const parse5 = require('parse5');
 
+const windowEval = require('window-eval-native');
 const fetch = require('window-fetch');
 const {XMLHttpRequest} = require('window-xhr');
 const XHRUtils = require('window-xhr/lib/utils');
@@ -21,7 +22,6 @@ const ClassList = require('classlist');
 const he = require('he');
 he.encode.options.useNamedReferences = true;
 const selector = require('selector-lite');
-const windowEval = require('window-eval-native');
 const THREE = require('./lib/three-min.js');
 
 const windowSymbol = Symbol();

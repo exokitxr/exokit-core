@@ -10,6 +10,7 @@
     "parse-int": "^1.0.2",
     "parse5": "^4.0.0",
     "selector-lite": "^0.1.1",
+    "text-encoding": "^0.6.4",
     "window-eval-native": "0.0.3",
     "window-fetch": "0.0.3",
     "window-xhr": "0.0.1",
