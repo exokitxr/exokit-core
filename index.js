@@ -1231,7 +1231,7 @@ class HTMLElement extends Node {
   }
 
   get clientWidth() {
-    const style = _parseStyle(this.attributes['style'] || '');
+    const style = this.ownerDocument.defaultView.getComputedStyle(this);
     const fontFamily = style['font-family'];
     if (fontFamily) {
       return _hash(fontFamily) * _hash(this.innerHTML);
