@@ -1594,7 +1594,7 @@ class HTMLBodyElement extends HTMLElement {
 }
 class HTMLStyleElement extends HTMLLoadableElement {
   constructor(attrs = [], value = '', location = null) {
-    super('SCRIPT', attrs, value, location);
+    super('STYLE', attrs, value, location);
 
     this.stylesheet = null;
 
