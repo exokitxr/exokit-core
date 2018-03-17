@@ -2282,66 +2282,52 @@ const _loadPromise = el => new Promise((accept, reject) => {
   el.on('load', load);
   el.on('error', error);
 });
-const _runHtml = async (element, window) => {
+const _runHtml = (element, window) => {
   if (element instanceof HTMLElement) {
-    const styles = element.querySelectorAll('style');
-    for (let i = 0; i < styles.length; i++) {
-      const style = styles[i];
-      if (style.run()) {
-        if (style.childNodes.length > 0) {
-          try {
-            await _loadPromise(style)
+    return element.traverseAsync(async el => {
+      if (el instanceof window.HTMLStyleElement) {
+        if (el.run()) {
+          if (el.childNodes.length > 0) {
+            try {
+              await _loadPromise(el)
+                .catch(err => {
+                  console.warn(err);
+                });
+            } catch(err) {
+              console.warn(err);
+            }
+          } else {
+            _loadPromise(el)
               .catch(err => {
                 console.warn(err);
               });
-          } catch(err) {
-            console.warn(err);
           }
-        } else {
-          _loadPromise(script)
-            .catch(err => {
-              console.warn(err);
-            });
         }
-      }
-    }
-    
-    const scripts = element.querySelectorAll('script');
-    for (let i = 0; i < scripts.length; i++) {
-      const script = scripts[i];
-      if (script.run()) {
-        if (!script.attributes.async) {
-          try {
-            await _loadPromise(script);
-          } catch(err) {
-            console.warn(err);
+      } else if (el instanceof window.HTMLScriptElement) {
+        if (el.run()) {
+          if (!el.attributes.async) {
+            try {
+              await _loadPromise(el);
+            } catch(err) {
+              console.warn(err);
+            }
+          } else {
+            _loadPromise(el)
+              .catch(err => {
+                console.warn(err);
+              });
           }
-        } else {
-          _loadPromise(script)
-            .catch(err => {
-              console.warn(err);
-            });
         }
+      } else if (el instanceof window.HTMLImageElement) {
+        if (el.run()) {
+          await _loadPromise(el);
+        }
+      } else if (el instanceof window.HTMLAudioElement || el instanceof window.HTMLVideoElement) {
+        el.run();
       }
-    }
-
-    const images = element.querySelectorAll('image');
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i];
-      if (image.run()) {
-        await _loadPromise(image);
-      }
-    }
-
-    const audios = element.querySelectorAll('audio');
-    for (let i = 0; i < audios.length; i++) {
-      audios[i].run();
-    }
-
-    const videos = element.querySelectorAll('video');
-    for (let i = 0; i < videos.length; i++) {
-      videos[i].run();
-    }
+    });
+  } else {
+    return Promise.resolve();
   }
 };
 const _runJavascript = (jsString, window, filename = 'script', lineOffset = 0, colOffset = 0) => {
