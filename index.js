@@ -22,6 +22,7 @@ const ClassList = require('classlist');
 const he = require('he');
 he.encode.options.useNamedReferences = true;
 const selector = require('selector-lite');
+const {TextEncoder, TextDecoder} = require('text-encoding');
 const THREE = require('./lib/three-min.js');
 
 const windowSymbol = Symbol();
@@ -2321,6 +2322,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.VRFrameData = VRFrameData;
   window.btoa = btoa;
   window.atob = atob;
+  window.TextEncoder = TextEncoder;
+  window.TextDecoder = TextDecoder;
   window.fetch = (url, options) => {
     const blob = urls.get(url);
     if (blob) {
