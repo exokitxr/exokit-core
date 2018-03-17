@@ -1692,6 +1692,10 @@ HTMLMediaElement.HAVE_METADATA = 1;
 HTMLMediaElement.HAVE_CURRENT_DATA = 2;
 HTMLMediaElement.HAVE_FUTURE_DATA = 3;
 HTMLMediaElement.HAVE_ENOUGH_DATA = 4;
+class HTMLSourceElement extends HTMLSrcableElement {
+  constructor(attrs = [], value = '', location = null) {
+    super('SOURCE', attrs, value, location);
+  }
 }
 class HTMLImageElement extends HTMLSrcableElement {
   constructor(attrs = [], value = '', location = null) {
@@ -2266,6 +2270,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     IMG: HTMLImageElementBound,
     AUDIO: HTMLAudioElement,
     VIDEO: HTMLVideoElement,
+    SOURCE: HTMLSourceElement,
     IFRAME: HTMLIframeElement,
     CANVAS: HTMLCanvasElement,
   };
