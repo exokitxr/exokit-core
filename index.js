@@ -1651,15 +1651,47 @@ class HTMLMediaElement extends HTMLSrcableElement {
     this.currentTime = 0;
     this.duration = 0;
     this.loop = false;
+
+    this.HAVE_NOTHING = HTMLMediaElement.HAVE_NOTHING;
+    this.HAVE_METADATA = HTMLMediaElement.HAVE_METADATA;
+    this.HAVE_CURRENT_DATA = HTMLMediaElement.HAVE_CURRENT_DATA;
+    this.HAVE_FUTURE_DATA = HTMLMediaElement.HAVE_FUTURE_DATA;
+    this.HAVE_ENOUGH_DATA = HTMLMediaElement.HAVE_ENOUGH_DATA;
   }
 
   play() {
     this.paused = false;
   }
-
   pause() {
     this.paused = true;
   }
+
+  get HAVE_NOTHING() {
+    return HTMLMediaElement.HAVE_NOTHING;
+  }
+  set HAVE_NOTHING(v) {}
+  get HAVE_METADATA() {
+    return HTMLMediaElement.HAVE_METADATA;
+  }
+  set HAVE_METADATA(v) {}
+  get HAVE_CURRENT_DATA() {
+    return HTMLMediaElement.HAVE_CURRENT_DATA;
+  }
+  set HAVE_CURRENT_DATA(v) {}
+  get HAVE_FUTURE_DATA() {
+    return HTMLMediaElement.HAVE_FUTURE_DATA;
+  }
+  set HAVE_FUTURE_DATA(v) {}
+  get HAVE_ENOUGH_DATA() {
+    return HTMLMediaElement.HAVE_ENOUGH_DATA;
+  }
+  set HAVE_ENOUGH_DATA(v) {}
+}
+HTMLMediaElement.HAVE_NOTHING = 0;
+HTMLMediaElement.HAVE_METADATA = 1;
+HTMLMediaElement.HAVE_CURRENT_DATA = 2;
+HTMLMediaElement.HAVE_FUTURE_DATA = 3;
+HTMLMediaElement.HAVE_ENOUGH_DATA = 4;
 }
 class HTMLImageElement extends HTMLSrcableElement {
   constructor(attrs = [], value = '', location = null) {
@@ -1730,10 +1762,13 @@ class HTMLVideoElement extends HTMLMediaElement {
   constructor(attrs = [], value = '', location = null) {
     super('VIDEO', attrs, value, location);
 
+    this.readyState = HTMLMediaElement.HAVE_NOTHING;
     this.data = new Uint8Array(0);
 
     this.on('attribute', (name, value) => {
       if (name === 'src') {
+        this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
+
         process.nextTick(() => { // XXX
           this.emit('load');
         });
@@ -2751,6 +2786,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     constructor(attrs = [], value = '') {
       super('VIDEO', attrs, value);
 
+      this.readyState = HTMLMediaElement.HAVE_NOTHING;
       this.video = new nativeVideo.Video();
     }
 
@@ -2778,6 +2814,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           }
         })
         .then(() => {
+          this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
           this.emit('canplay');
           this.emit('canplaythrough');
         })
