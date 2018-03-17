@@ -1650,7 +1650,7 @@ class HTMLMediaElement extends HTMLSrcableElement {
 
   play() {}
   pause() {}
-  
+
   get paused() {
     return true;
   }
@@ -2795,7 +2795,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   };
   MicrophoneMediaStream = nativeAudio.MicrophoneMediaStream; */
 
-  /* const {nativeVideo} = bindings;
+  const {nativeVideo} = bindings;
   HTMLVideoElement = class extends HTMLMediaElement {
     constructor(attrs = [], value = '') {
       super('VIDEO', attrs, value);
@@ -2935,11 +2935,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     set onerror(onerror) {
       _elementSetter(this, 'error', onerror);
     }
-  }; */
-    
+
     run() {
       let running = false;
-      
+
       let sources;
       if (this.attributes.src) {
         this.src = this.attributes.src;
