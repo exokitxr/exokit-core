@@ -31,6 +31,9 @@ const disabledEventsSymbol = Symbol();
 const pointerLockElementSymbol = Symbol();
 let nativeBindings = false;
 
+const btoa = s => new Buffer(s, 'binary').toString('base64');
+const atob = s => new Buffer(s, 'base64').toString('binary');
+
 let id = 0;
 const urls = new Map();
 URL.createObjectURL = blob => {
@@ -2316,8 +2319,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.VRDisplay = VRDisplay;
   // window.ARDisplay = ARDisplay;
   window.VRFrameData = VRFrameData;
-  window.btoa = s => new Buffer(s, 'binary').toString('base64');
-  window.atob = s => new Buffer(s, 'base64').toString('binary');
+  window.btoa = btoa;
+  window.atob = atob;
   window.fetch = (url, options) => {
     const blob = urls.get(url);
     if (blob) {
