@@ -2938,23 +2938,31 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   }; */
     
     run() {
+      let running = false;
+      
       let sources;
       if (this.attributes.src) {
         this.src = this.attributes.src;
-        return true;
+        running = true;
       } else if (sources = this.childNodes.filter(childNode => childNode.nodeType === Node.ELEMENT_NODE && childNode.matches('source'))) {
         for (let i = 0; i < sources.length; i++) {
           const source = sources[i];
           const {src} = source;
           if (src) {
             this.src = src;
-            return true;
+            running = true;
+            break;
           }
         }
-        return false;
-      } else {
-        return false;
       }
+      if (this.attributes.loop || this.attributes.loop === '') {
+        this.loop = this.attributes.loop;
+      }
+      if (this.attributes.autoplay || this.attributes.autoplay === '') {
+        this.autoplay = this.attributes.autoplay;
+      }
+
+      return running;
     }
   };
 
