@@ -1651,12 +1651,6 @@ class HTMLMediaElement extends HTMLSrcableElement {
     this.currentTime = 0;
     this.duration = 0;
     this.loop = false;
-
-    this.HAVE_NOTHING = HTMLMediaElement.HAVE_NOTHING;
-    this.HAVE_METADATA = HTMLMediaElement.HAVE_METADATA;
-    this.HAVE_CURRENT_DATA = HTMLMediaElement.HAVE_CURRENT_DATA;
-    this.HAVE_FUTURE_DATA = HTMLMediaElement.HAVE_FUTURE_DATA;
-    this.HAVE_ENOUGH_DATA = HTMLMediaElement.HAVE_ENOUGH_DATA;
   }
 
   play() {
