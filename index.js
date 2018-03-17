@@ -2516,6 +2516,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window[optionsSymbol] = options;
   window.HTMLElement = HTMLElement;
   window.HTMLAnchorElement = HTMLAnchorElement;
+  window.HTMLStyleElement = HTMLStyleElement;
   window.HTMLScriptElement = HTMLScriptElement;
   window.HTMLImageElement = HTMLImageElementBound;
   window.HTMLAudioElement = HTMLAudioElement;
