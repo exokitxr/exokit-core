@@ -2441,6 +2441,16 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   };
   window.requestAnimationFrame = requestAnimationFrame;
   window.cancelAnimationFrame = cancelAnimationFrame;
+  window.ArrayBuffer = ArrayBuffer;
+  window.Int8Array = Int8Array;
+  window.Uint8Array = Uint8Array;
+  window.Uint8ClampedArray = Uint8ClampedArray;
+  window.Int16Array = Int16Array;
+  window.Uint16Array = Uint16Array;
+  window.Uint32Array = Int32Array;
+  window.Float32Array = Float32Array;
+  window.Float64Array = Float64Array;
+  window.DataView = DataView;
 
   if (!parent) {
     window.tickAnimationFrame = tickAnimationFrame;
