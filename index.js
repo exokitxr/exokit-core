@@ -162,7 +162,7 @@ class Event {
   stopPropagation() {
     this.propagationStopped = true;
   }
-  
+
   initEvent(type, bubbles, cancelable) {
     this.type = type;
   }
@@ -188,15 +188,15 @@ class KeyboardEvent extends Event {
     this.keyCode = init.keyCode !== undefined ? init.keyCode : 0;
     this.which = init.which !== undefined ? init.which : 0;
   }
-  
+
   initKeyboardEvent(type, canBubble, cancelable, view, charCode, keyCode, location, modifiersList, repeat) {
     this.type = type;
-    
+
     const modifiers = modifiers.split(/\s/);
     const ctrlKey = modifiers.includes('Control') || modifiers.includes('AltGraph');
     const altKey = modifiers.includes('Alt') || modifiers.includes('AltGraph');
     const metaKey = modifiers.includes('Meta');
-    
+
     this.init({
       charCode,
       keyCode,
@@ -210,10 +210,10 @@ class KeyboardEvent extends Event {
 class MouseEvent extends Event {
   constructor(type, init = {}) {
     super(type);
-    
+
     this.init(init);
   }
-  
+
   init(init = {}) {
     this.screenX = init.screenX !== undefined ? init.screenX : 0;
     this.screenY = init.screenY !== undefined ? init.screenY : 0;
@@ -231,10 +231,10 @@ class MouseEvent extends Event {
     this.relatedTarget = init.relatedTarget !== undefined ? init.relatedTarget : null;
     this.region = init.region !== undefined ? init.region : null;
   }
-  
+
   initMouseEvent(type, canBubble, cancelable, view, detail, screenX, screenY, clientX, clientY, ctrlKey, altKey, shiftKey, metaKey, button, relatedTarget) {
     this.type = type;
-    
+
     this.init({
       screenX,
       screenY,
