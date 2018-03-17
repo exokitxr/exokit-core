@@ -2207,7 +2207,7 @@ class CSSStyleDeclaration {
   }
   
   clone() {
-    const result = new CSSStyleDeclaration(this[elementSymbol]);
+    const result = new {};
     for (const k in this) {
       const v = this[k];
       if (v !== undefined) {
