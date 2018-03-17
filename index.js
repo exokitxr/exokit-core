@@ -2907,7 +2907,6 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       } else if (sources = this.childNodes.filter(childNode => childNode.nodeType === Node.ELEMENT_NODE && childNode.matches('source'))) {
         for (let i = 0; i < sources.length; i++) {
           const source = sources[i];
-          console.log('got sources', source.src, source.getAttribute('src'), source.constructor);
           const {src} = source;
           if (src) {
             this.src = src;
