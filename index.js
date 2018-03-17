@@ -906,7 +906,7 @@ Node.COMMENT_NODE = 8;
 Node.DOCUMENT_NODE = 9;
 Node.DOCUMENT_TYPE_NODE = 10;
 Node.DOCUMENT_FRAGMENT_NODE = 11;
-const _makeAttributesProxy = attrs => new Proxy(attrs, {
+const _makeAttributesProxy = el => new Proxy(el.attrs, {
   get(target, prop) {
     const propN = parseIntStrict(prop);
     if (propN !== undefined) {
@@ -920,7 +920,7 @@ const _makeAttributesProxy = attrs => new Proxy(attrs, {
   },
   set(target, prop, value) {
     const propN = parseIntStrict(prop);
-    if (propN !== undefined) {
+    if (propN !== undefined) { // XXX handle attribute emits for indexed attribute sets
       target[propN] = value;
     } else if (prop === 'length') {
       target.length = value;
@@ -932,9 +932,11 @@ const _makeAttributesProxy = attrs => new Proxy(attrs, {
           value,
         };
         target.push(attr);
+        el.emit('attribute', prop, value, null);
       } else {
-        attr.name = prop;
+        const oldValue = attr.value;
         attr.value = value;
+        el.emit('attribute', prop, value, oldValue);
       }
     }
     return true;
@@ -942,7 +944,9 @@ const _makeAttributesProxy = attrs => new Proxy(attrs, {
   deleteProperty(target, prop) {
     const index = target.findIndex(attr => attr.name === prop);
     if (index !== -1) {
+      const oldValue = target[index].value;
       target.splice(index, 1);
+      el.emit('attribute', prop, null, oldValue);
     }
     return true;
   },
@@ -994,7 +998,7 @@ class HTMLElement extends Node {
 
   get attributes() {
     if (!this._attributes) {
-      this._attributes = _makeAttributesProxy(this.attrs);
+      this._attributes = _makeAttributesProxy(this);
     }
     return this._attributes;
   }
@@ -1021,14 +1025,10 @@ class HTMLElement extends Node {
   setAttribute(name, value) {
     const oldValue = this.attributes[name];
     this.attributes[name] = value;
-
-    this.emit('attribute', name, value, oldValue);
   }
   removeAttribute(name) {
     const oldValue = this.attributes[name];
     delete this.attributes[name];
-
-    this.emit('attribute', name, null, oldValue);
   }
 
   appendChild(childNode) {
@@ -1104,19 +1104,19 @@ class HTMLElement extends Node {
   set lastElementChild(lastElementChild) {}
 
   get id() {
-    return this.attributes['id'] || '';
+    return this.getAttribute('id') || '';
   }
   set id(id) {
     id = id + '';
-    this.attributes['id'] = id;
+    this.setAttribute('id', id);
   }
 
   get className() {
-    return this.attributes['class'] || '';
+    return this.getAttribute('class') || '';
   }
   set className(className) {
     className = className + '';
-    this.attributes['class'] = className;
+    this.setAttribute('class', className);
   }
 
   getElementById(id) {
