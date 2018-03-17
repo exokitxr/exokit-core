@@ -31,10 +31,13 @@ const htmlTagsSymbol = Symbol();
 const optionsSymbol = Symbol();
 const disabledEventsSymbol = Symbol();
 const pointerLockElementSymbol = Symbol();
+const styleSymbol = Symbol();
 let nativeBindings = false;
 
 const btoa = s => new Buffer(s, 'binary').toString('base64');
 const atob = s => new Buffer(s, 'base64').toString('binary');
+
+let styleEpoch = 0;
 
 let id = 0;
 const urls = new Map();
@@ -992,10 +995,13 @@ class HTMLElement extends Node {
     this.childNodes = [];
     this._innerHTML = '';
     this._classList = null;
-
+    this[styleSymbol] = null;
+    
     this.on('attribute', (name, value) => {
       if (name === 'class' && this._classList) {
         this._classList.reset(value);
+      } else if (name === 'style' && this[styleSymbol]) {
+        this[styleSymbol] = null;
       }
     });
   }
@@ -1612,6 +1618,7 @@ class HTMLStyleElement extends HTMLLoadableElement {
           .then(s => css.parse(s).stylesheet)
           .then(stylesheet => {
             this.stylesheet = stylesheet;
+            styleEpoch++;
             this.emit('load');
           })
           .catch(err => {
@@ -1624,6 +1631,7 @@ class HTMLStyleElement extends HTMLLoadableElement {
         .then(() => css.parse(innerHTML).stylesheet)
         .then(stylesheet => {
           this.stylesheet = stylesheet;
+          styleEpoch++;
           this.emit('load');
         })
         .catch(err => {
@@ -2427,7 +2435,34 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.HTMLVideoElement = HTMLVideoElement;
   window.HTMLIframeElement = HTMLIframeElement;
   window.HTMLCanvasElement = HTMLCanvasElement;
-  window.getComputedStyle = () => ({});
+  window.getComputedStyle = el => {
+    let styleSpec = el[styleSymbol];
+    if (!styleSpec || styleSpec.epoch !== styleEpoch) {
+      const style = {};
+      const styleEls = el.ownerDocument.documentElement.getElementsByTagName('style');
+      for (let i = 0; i < styleEls.length; i++) {
+        const {stylesheet} = styleEls[i];
+        const {rules} = stylesheet;
+        for (let j = 0; j < rules.length; j++) {
+          const rule = rules[j];
+          const {selectors} = rule;
+          if (selectors.some(selector => el.matches(selector))) {
+            const {declarations} = rule;
+            for (let k = 0; k < declarations.length; k++) {
+              const {property, value} = declarations[k];
+              style[property] = value;
+            }
+          }
+        }
+      }
+      styleSpec = {
+        style,
+        styleEpoch,
+      };
+      el[styleSymbol] = styleSpec;
+    }
+    return styleSpec.style;
+  };
   window.Event = Event;
   window.KeyboardEvent = KeyboardEvent;
   window.MouseEvent = MouseEvent;
