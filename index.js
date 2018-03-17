@@ -2716,39 +2716,35 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
 
       this.readyState = HTMLMediaElement.HAVE_NOTHING;
       this.audio = new nativeAudio.Audio();
-    }
 
-    get src() {
-      return this.getAttribute('src');
-    }
-    set src(src) {
-      this.setAttribute('src', src);
-
-      // const srcError = new Error();
-
-      this.ownerDocument.defaultView.fetch(src)
-        .then(res => {
-          if (res.status >= 200 && res.status < 300) {
-            return res.arrayBuffer();
-          } else {
-            return Promise.reject(new Error(`audio src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
-          }
-        })
-        .then(arrayBuffer => {
-          try {
-            this.audio.load(arrayBuffer);
-          } catch(err) {
-            throw new Error(`failed to decode audio: ${err.message} (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`);
-          }
-        })
-        .then(() => {
-          this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
-          this.emit('canplay');
-          this.emit('canplaythrough');
-        })
-        .catch(err => {
-          this.emit('error', err);
-        });
+      this.on('attribute', (name, value) => {
+        if (name === 'src') {
+          const src = value;
+          this.ownerDocument.defaultView.fetch(src)
+            .then(res => {
+              if (res.status >= 200 && res.status < 300) {
+                return res.arrayBuffer();
+              } else {
+                return Promise.reject(new Error(`audio src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
+              }
+            })
+            .then(arrayBuffer => {
+              try {
+                this.audio.load(arrayBuffer);
+              } catch(err) {
+                throw new Error(`failed to decode audio: ${err.message} (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`);
+              }
+            })
+            .then(() => {
+              this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
+              this.emit('canplay');
+              this.emit('canplaythrough');
+            })
+            .catch(err => {
+              this.emit('error', err);
+            });
+        }
+      });
     }
 
     play() {
@@ -2806,39 +2802,60 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
 
       this.readyState = HTMLMediaElement.HAVE_NOTHING;
       this.video = new nativeVideo.Video();
-    }
 
-    get src() {
-      return this.getAttribute('src');
-    }
-    set src(src) {
-      this.setAttribute('src', src);
-
-      // const srcError = new Error();
-
-      this.ownerDocument.defaultView.fetch(src)
-        .then(res => {
-          if (res.status >= 200 && res.status < 300) {
-            return res.arrayBuffer();
-          } else {
-            return Promise.reject(new Error(`video src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
+      this.on('attribute', (name, value) => {
+        if (name === 'src') {
+          console.log('video downloading...');
+          const src = value;
+          this.ownerDocument.defaultView.fetch(src)
+            .then(res => {
+              console.log('video download res');
+              if (res.status >= 200 && res.status < 300) {
+                return res.arrayBuffer();
+              } else {
+                return Promise.reject(new Error(`video src got invalid status code (url: ${JSON.stringify(src)}, code: ${res.status})`));
+              }
+            })
+            .then(arrayBuffer => {
+              console.log('video download arraybuffer');
+              try {
+                this.video.load(arrayBuffer);
+              } catch(err) {
+                throw new Error(`failed to decode video: ${err.message} (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`);
+              }
+            })
+            .then(() => {
+              console.log('video download done');
+              this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
+              this.emit('canplay');
+              this.emit('canplaythrough');
+            })
+            .catch(err => {
+              this.emit('error', err);
+            });
+        } else if (name === 'loop') {
+          this.video.loop = !!value || value === '';
+        } else if (name === 'autoplay') {
+          const autoplay = !!value || value === '';
+          if (autoplay) {
+            console.log('video set autoplay');
+            const canplay = () => {
+              console.log('video autoplay play');
+              this.video.play();
+              _cleanup();
+            };
+            const error = () => {
+              _cleanup();
+            };
+            const _cleanup = () => {
+              this.removeListener('canplay', canplay);
+              this.removeListener('error', error);
+            };
+            this.on('canplay', canplay);
+            this.on('error', error);
           }
-        })
-        .then(arrayBuffer => {
-          try {
-            this.video.load(arrayBuffer);
-          } catch(err) {
-            throw new Error(`failed to decode video: ${err.message} (url: ${JSON.stringify(src)}, size: ${arrayBuffer.byteLength})`);
-          }
-        })
-        .then(() => {
-          this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
-          this.emit('canplay');
-          this.emit('canplaythrough');
-        })
-        .catch(err => {
-          this.emit('error', err);
-        });
+        }
+      });
     }
 
     get width() {
@@ -2853,6 +2870,19 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     }
     set height(height) {
       this.video.height = height;
+
+    get loop() {
+      return this.getAttribute('loop');
+    }
+    set loop(loop) {
+      this.setAttribute('loop', loop);
+    }
+
+    get autoplay() {
+      return this.getAttribute('autoplay');
+    }
+    set autoplay(autoplay) {
+      this.setAttribute('autoplay', autoplay);
     }
 
     getBoundingClientRect() {
@@ -2867,7 +2897,6 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     play() {
       this.video.play();
     }
-
     pause() {
       this.video.pause();
     }
