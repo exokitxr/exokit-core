@@ -906,6 +906,28 @@ Node.COMMENT_NODE = 8;
 Node.DOCUMENT_NODE = 9;
 Node.DOCUMENT_TYPE_NODE = 10;
 Node.DOCUMENT_FRAGMENT_NODE = 11;
+const _setAttributeRaw = (target, prop, value) => {
+  const propN = parseIntStrict(prop);
+  if (propN !== undefined) { // XXX handle attribute emits for indexed attribute sets
+    target[propN] = value;
+  } else if (prop === 'length') {
+    target.length = value;
+  } else {
+    const attr = target.find(attr => attr.name === prop);
+    if (!attr) {
+      const attr = {
+        name: prop,
+        value,
+      };
+      target.push(attr);
+      el.emit('attribute', prop, value, null);
+    } else {
+      const oldValue = attr.value;
+      attr.value = value;
+      el.emit('attribute', prop, value, oldValue);
+    }
+  }
+};
 const _makeAttributesProxy = el => new Proxy(el.attrs, {
   get(target, prop) {
     const propN = parseIntStrict(prop);
@@ -919,26 +941,7 @@ const _makeAttributesProxy = el => new Proxy(el.attrs, {
     }
   },
   set(target, prop, value) {
-    const propN = parseIntStrict(prop);
-    if (propN !== undefined) { // XXX handle attribute emits for indexed attribute sets
-      target[propN] = value;
-    } else if (prop === 'length') {
-      target.length = value;
-    } else {
-      const attr = target.find(attr => attr.name === prop);
-      if (!attr) {
-        const attr = {
-          name: prop,
-          value,
-        };
-        target.push(attr);
-        el.emit('attribute', prop, value, null);
-      } else {
-        const oldValue = attr.value;
-        attr.value = value;
-        el.emit('attribute', prop, value, oldValue);
-      }
-    }
+    _setAttributeRaw(target, prop, value);
     return true;
   },
   deleteProperty(target, prop) {
@@ -989,6 +992,12 @@ class HTMLElement extends Node {
     this.childNodes = [];
     this._innerHTML = '';
     this._classList = null;
+
+    this.on('attribute', (name, value) => {
+      if (name === 'class' && this._classList) {
+        this._classList.reset(value);
+      }
+    });
   }
 
   get nodeType() {
@@ -1003,14 +1012,6 @@ class HTMLElement extends Node {
     return this._attributes;
   }
   set attributes(attributes) {}
-
-  get classList() {
-    if (!this._classList) {
-      this._classList = new ClassList(this);
-    }
-    return this._classList;
-  }
-  set classList(classList) {}
 
   get children() {
     return this.childNodes;
@@ -1118,6 +1119,16 @@ class HTMLElement extends Node {
     className = className + '';
     this.setAttribute('class', className);
   }
+
+  get classList() {
+    if (!this._classList) {
+      this._classList = new ClassList(this.className, className => {
+        _setAttributeRaw(this.attrs, 'className', className);
+      });
+    }
+    return this._classList;
+  }
+  set classList(classList) {}
 
   getElementById(id) {
     id = id + '';

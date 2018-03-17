@@ -3,7 +3,6 @@
   "version": "0.0.136",
   "main": "index.js",
   "dependencies": {
-    "classlist": "^1.0.1",
     "css": "^2.2.1",
     "he": "^1.1.1",
     "history": "^4.7.2",
@@ -12,6 +11,7 @@
     "parse5": "^4.0.0",
     "selector-lite": "^0.1.1",
     "text-encoding": "^0.6.4",
+    "window-classlist": "0.0.1",
     "window-eval-native": "0.0.3",
     "window-fetch": "0.0.3",
     "window-xhr": "0.0.1",
