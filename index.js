@@ -2582,11 +2582,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
           global.createImageBitmap = function() {\n\
             return Promise.resolve(ImageBitmap.createImageBitmap.apply(ImageBitmap, arguments));\n\
           };\n\
-          console.log("start script 1");\n\
           const smiggles = require("smiggles");\n\
-          console.log("start script 2", nativeBindings.nativeImageBitmap);\n\
           smiggles.bind({ImageBitmap: nativeBindings.nativeImageBitmap});\n\
-          console.log("start script 3");\n\
         ';
       }
 
