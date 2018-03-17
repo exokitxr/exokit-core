@@ -2266,28 +2266,45 @@ const _loadPromise = el => new Promise((accept, reject) => {
 });
 const _runHtml = async (element, window) => {
   if (element instanceof HTMLElement) {
-    const scripts = element.querySelectorAll('script');
-    for (let i = 0; i < scripts.length; i++) {
-      const script = scripts[i];
-      if (script.run()) {
-        if (script.attributes.async) {
+    const styles = element.querySelectorAll('style');
+    for (let i = 0; i < styles.length; i++) {
+      const style = styles[i];
+      if (style.run()) {
+        if (style.childNodes.length > 0) {
+          try {
+            await _loadPromise(style)
+              .catch(err => {
+                console.warn(err);
+              });
+          } catch(err) {
+            console.warn(err);
+          }
+        } else {
           _loadPromise(script)
             .catch(err => {
               console.warn(err);
             });
-        } else {
+        }
+      }
+    }
+    
+    const scripts = element.querySelectorAll('script');
+    for (let i = 0; i < scripts.length; i++) {
+      const script = scripts[i];
+      if (script.run()) {
+        if (!script.attributes.async) {
           try {
             await _loadPromise(script);
           } catch(err) {
             console.warn(err);
           }
+        } else {
+          _loadPromise(script)
+            .catch(err => {
+              console.warn(err);
+            });
         }
       }
-    }
-
-    const styles = element.querySelectorAll('style');
-    for (let i = 0; i < styles.length; i++) {
-      styles[i].run();
     }
 
     const images = element.querySelectorAll('image');
