@@ -2511,15 +2511,17 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       const styleEls = el.ownerDocument.documentElement.getElementsByTagName('style');
       for (let i = 0; i < styleEls.length; i++) {
         const {stylesheet} = styleEls[i];
-        const {rules} = stylesheet;
-        for (let j = 0; j < rules.length; j++) {
-          const rule = rules[j];
-          const {selectors} = rule;
-          if (selectors.some(selector => el.matches(selector))) {
-            const {declarations} = rule;
-            for (let k = 0; k < declarations.length; k++) {
-              const {property, value} = declarations[k];
-              style[property] = value;
+        if (stylesheet) {
+          const {rules} = stylesheet;
+          for (let j = 0; j < rules.length; j++) {
+            const rule = rules[j];
+            const {selectors} = rule;
+            if (selectors.some(selector => el.matches(selector))) {
+              const {declarations} = rule;
+              for (let k = 0; k < declarations.length; k++) {
+                const {property, value} = declarations[k];
+                style[property] = value;
+              }
             }
           }
         }
