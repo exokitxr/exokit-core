@@ -29,9 +29,10 @@ const THREE = require('./lib/three-min.js');
 const windowSymbol = Symbol();
 const htmlTagsSymbol = Symbol();
 const optionsSymbol = Symbol();
+const elementSymbol = Symbol();
+const computedStyleSymbol = Symbol();
 const disabledEventsSymbol = Symbol();
 const pointerLockElementSymbol = Symbol();
-const styleSymbol = Symbol();
 let nativeBindings = false;
 
 const btoa = s => new Buffer(s, 'binary').toString('base64');
@@ -995,13 +996,19 @@ class HTMLElement extends Node {
     this.childNodes = [];
     this._innerHTML = '';
     this._classList = null;
-    this[styleSymbol] = null;
-    
+    this._style = null;
+    this[computedStyleSymbol] = null;
+
     this.on('attribute', (name, value) => {
       if (name === 'class' && this._classList) {
         this._classList.reset(value);
-      } else if (name === 'style' && this[styleSymbol]) {
-        this[styleSymbol] = null;
+      } else if (name === 'style') {
+        if (this._style) {
+          this._style.reset();
+        }
+        if (this[computedStyleSymbol]) {
+          this[computedStyleSymbol] = null;
+        }
       }
     });
   }
@@ -1292,14 +1299,10 @@ class HTMLElement extends Node {
   set offsetParent(offsetParent) {}
 
   get style() {
-    const style = _parseStyle(this.attributes['style'] || '');
-    Object.defineProperty(style, 'cssText', {
-      get: () => this.attributes['style'],
-      set: cssText => {
-        this.attributes['style'] = cssText;
-      },
-    });
-    return style;
+    if (!this._style) {
+      this._style = new CSSStyleDeclaration(this);
+    }
+    return this._style;
   }
   set style(style) {
     this.attributes['style'] = _formatStyle(style);
@@ -2173,6 +2176,54 @@ const _formatStyle = style => {
   }
   return styleString;
 };
+class CSSStyleDeclaration {
+  constructor(el) {
+    this[elementSymbol] = el;
+
+    this.reset();
+  }
+
+  reset() {
+    let stylesheet, err;
+    try {
+      stylesheet = css.parse(`x{${this.cssText}}`).stylesheet;
+    } catch(e) {
+      err = e;
+    }
+    if (!err) {
+      for (const k in this) {
+        this[k] = undefined;
+      }
+      const {rules} = stylesheet;
+      for (let j = 0; j < rules.length; j++) {
+        const rule = rules[j];
+        const {declarations} = rule;
+        for (let k = 0; k < declarations.length; k++) {
+          const {property, value} = declarations[k];
+          this[property] = value;
+        }
+      }
+    }
+  }
+  
+  clone() {
+    const result = new CSSStyleDeclaration(this[elementSymbol]);
+    for (const k in this) {
+      const v = this[k];
+      if (v !== undefined) {
+        result[k] = v;
+      }
+    }
+    return result;
+  }
+
+  get cssText() {
+    return this[elementSymbol].attributes['style'] || '';
+  }
+  set cssText(cssText) {
+    this[elementSymbol].attributes['style'] = cssText;
+  }
+}
 const _hash = s => {
   let result = 0;
   for (let i = 0; i < s.length; i++) {
@@ -2436,9 +2487,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.HTMLIframeElement = HTMLIframeElement;
   window.HTMLCanvasElement = HTMLCanvasElement;
   window.getComputedStyle = el => {
-    let styleSpec = el[styleSymbol];
+    let styleSpec = el[computedStyleSymbol];
     if (!styleSpec || styleSpec.epoch !== styleEpoch) {
-      const style = {};
+      const style = el.style.clone();
       const styleEls = el.ownerDocument.documentElement.getElementsByTagName('style');
       for (let i = 0; i < styleEls.length; i++) {
         const {stylesheet} = styleEls[i];
@@ -2459,7 +2510,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         style,
         styleEpoch,
       };
-      el[styleSymbol] = styleSpec;
+      el[computedStyleSymbol] = styleSpec;
     }
     return styleSpec.style;
   };
