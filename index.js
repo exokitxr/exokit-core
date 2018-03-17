@@ -1228,7 +1228,13 @@ class HTMLElement extends Node {
   set offsetLeft(offsetLeft) {}
 
   get offsetParent() {
-    return this.ownerDocument.documentElement;
+    const body = this.ownerDocument.body;
+    for (let el = this; el; el = el.parentNode) {
+      if (el.parentNode === body) {
+        return body;
+      }
+    }
+    return null;
   }
   set offsetParent(offsetParent) {}
 
