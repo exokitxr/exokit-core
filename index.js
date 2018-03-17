@@ -1740,8 +1740,8 @@ class HTMLAudioElement extends HTMLMediaElement {
         this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
         
         process.nextTick(() => { // XXX
-          this.emit('load');
           this.emit('canplay');
+          this.emit('canplaythrough');
         });
       }
     });
@@ -1774,7 +1774,8 @@ class HTMLVideoElement extends HTMLMediaElement {
         this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
 
         process.nextTick(() => { // XXX
-          this.emit('load');
+          this.emit('canplay');
+          this.emit('canplaythrough');
         });
       }
     });
