@@ -2510,6 +2510,20 @@ const _parseDocument = (s, options, window) => {
   document.createDocumentFragment = () => document.createElement();
   document.createTextNode = text => new Text(text);
   document.createComment = comment => new Comment(comment);
+  document.createEvent = type => {
+    switch (type) {
+      case 'KeyboardEvent':
+      case 'KeyboardEvents':
+        return new KeyboardEvent();
+      case 'MouseEvent':
+      case 'MouseEvents':
+        return new MouseEvent();
+      case 'HTMLEvents':
+        return new Event();
+      default:
+        throw new Error('invalid arguments');
+    }
+  };
   document.styleSheets = [];
   document.activeElement = body;
   document.open = () => {
