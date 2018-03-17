@@ -1732,9 +1732,13 @@ class HTMLImageElement extends HTMLSrcableElement {
 class HTMLAudioElement extends HTMLMediaElement {
   constructor(attrs = [], value = '', location = null) {
     super('AUDIO', attrs, value, location);
+    
+    this.readyState = HTMLMediaElement.HAVE_NOTHING;
 
     this.on('attribute', (name, value) => {
       if (name === 'src') {
+        this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
+        
         process.nextTick(() => { // XXX
           this.emit('load');
           this.emit('canplay');
@@ -2697,6 +2701,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     constructor(attrs = [], value = '') {
       super('AUDIO', attrs, value);
 
+      this.readyState = HTMLMediaElement.HAVE_NOTHING;
       this.audio = new nativeAudio.Audio();
     }
 
@@ -2724,6 +2729,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           }
         })
         .then(() => {
+          this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
           this.emit('canplay');
           this.emit('canplaythrough');
         })
