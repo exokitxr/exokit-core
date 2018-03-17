@@ -1707,18 +1707,21 @@ class HTMLStyleElement extends HTMLLoadableElement {
   get src() {
     return this.getAttribute('src') || '';
   }
-  set src(value) {
-    this.setAttribute('src', value);
+  set src(src) {
+    src = src + '';
+    this.setAttribute('src', src);
   }
 
   get type() {
+    type = type + '';
     return this.getAttribute('type') || '';
   }
-  set type(value) {
-    this.setAttribute('type', value);
+  set type(type) {
+    this.setAttribute('type', type);
   }
 
   set innerHTML(innerHTML) {
+    innerHTML = innerHTML + '';
     this.emit('innerHTML', innerHTML);
   }
 
@@ -1785,18 +1788,21 @@ class HTMLScriptElement extends HTMLLoadableElement {
   get src() {
     return this.getAttribute('src') || '';
   }
-  set src(value) {
-    this.setAttribute('src', value);
+  set src(src) {
+    src = src + '';
+    this.setAttribute('src', src);
   }
 
   get type() {
     return this.getAttribute('type') || '';
   }
-  set type(value) {
-    this.setAttribute('type', value);
+  set type(type) {
+    type = type + '';
+    this.setAttribute('type', type);
   }
 
   set innerHTML(innerHTML) {
+    innerHTML = innerHTML + '';
     this.emit('innerHTML', innerHTML);
   }
 
