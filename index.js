@@ -2570,20 +2570,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       if (redirectUrls[url]) {
         url = redirectUrls[url];
       }
-      const match = url.match(/^file:\/\/(.*)$/);
-      if (match) {
-        return new Promise((accept, reject) => {
-          fs.readFile(match[1], (err, data) => {
-            if (!err) {
-              accept(new Response(new Blob([data])));
-            } else {
-              reject(err);
-            }
-          });
-        });
-      } else {
-        return fetch(url, options);
-      }
+      return fetch(url, options);
     }
   };
   window.redirect = (url1, url2) => {

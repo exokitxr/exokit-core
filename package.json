@@ -13,7 +13,7 @@
     "text-encoding": "^0.6.4",
     "window-classlist": "0.0.1",
     "window-eval-native": "0.0.3",
-    "window-fetch": "0.0.3",
+    "window-fetch": "0.0.5",
     "window-xhr": "0.0.1",
     "ws": "^4.0.0"
   },
