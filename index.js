@@ -3222,6 +3222,8 @@ module.exports = exokit;
 
 if (require.main === module) {
   if (process.argv.length === 3) {
-    exokit.load(process.argv[2]);
+    const baseUrl = 'file://' + __dirname + '/';
+    const u = new URL(process.argv[2], baseUrl).href;
+    exokit.load(u);
   }
 }
