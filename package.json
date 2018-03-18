@@ -1,6 +1,6 @@
 {
   "name": "exokit-core",
-  "version": "0.0.141",
+  "version": "0.0.142",
   "main": "index.js",
   "dependencies": {
     "css": "^2.2.1",
