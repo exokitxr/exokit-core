@@ -1164,8 +1164,9 @@ class HTMLElement extends Node {
     this.value = value;
     this.location = location;
 
-    this._attributes = null;
     this.childNodes = [];
+    this._attributes = null;
+    this._children = null;
     this._innerHTML = '';
     this._classList = null;
     this._style = null;
