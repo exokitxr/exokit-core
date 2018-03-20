@@ -881,10 +881,9 @@ class DOMRect {
 }
 
 class Node extends EventEmitter {
-  constructor(nodeName = null) {
+  constructor() {
     super();
 
-    this.nodeName = nodeName;
     this.parentNode = null;
     this.ownerDocument = null;
   }
@@ -1103,7 +1102,7 @@ const autoClosingTags = {
 };
 class HTMLElement extends Node {
   constructor(tagName = 'DIV', attrs = [], value = '', location = null) {
-    super(null);
+    super();
 
     this.tagName = tagName;
     this.attrs = attrs;
@@ -1135,6 +1134,11 @@ class HTMLElement extends Node {
     return Node.ELEMENT_NODE;
   }
   set nodeType(nodeType) {}
+
+  get nodeName() {
+    return this.tagName;
+  }
+  set nodeName(nodeName) {}
 
   get attributes() {
     if (!this._attributes) {
@@ -2203,7 +2207,7 @@ class MediaRecorder extends EventEmitter {
 }
 class Text extends Node {
   constructor(value) {
-    super('#text');
+    super();
 
     this.value = value;
   }
@@ -2212,6 +2216,11 @@ class Text extends Node {
     return Node.TEXT_NODE;
   }
   set nodeType(nodeType) {}
+
+  get nodeName() {
+    return '#text';
+  }
+  set nodeName(nodeName) {}
 
   get firstChild() {
     return null;
@@ -2228,7 +2237,7 @@ class Text extends Node {
 }
 class Comment extends Node {
   constructor(value) {
-    super('#comment');
+    super();
 
     this.value = value;
   }
@@ -2237,6 +2246,11 @@ class Comment extends Node {
     return Node.COMMENT_NODE;
   }
   set nodeType(nodeType) {}
+
+  get nodeName() {
+    return '#comment';
+  }
+  set nodeName(nodeName) {}
 
   get firstChild() {
     return null;
