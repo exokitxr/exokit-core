@@ -1442,11 +1442,15 @@ class HTMLElement extends Node {
     return el;
   }
 
-  addEventListener() {
-    this.on.apply(this, arguments);
+  addEventListener(event, listener) {
+    if (typeof listener === 'function') {
+      this.on(event, listener);
+    }
   }
-  removeEventListener() {
-    this.removeListener.apply(this, arguments);
+  removeEventListener(event, listener) {
+    if (typeof listener === 'function') {
+      this.removeListener(event, listener);
+    }
   }
 
   get clientWidth() {
