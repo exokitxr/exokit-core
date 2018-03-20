@@ -472,6 +472,61 @@ class WebGLRenderingContext {
   blendFuncSeparate() {}
   viewport() {}
 }
+class Screen {
+  constructor(window) {
+    this._window = window;
+  }
+
+  get top() {
+    return 0;
+  }
+  set top(top) {}
+  get left() {
+    return 0;
+  }
+  set left(left) {}
+  get width() {
+    return this._window.innerWidth;
+  }
+  set width(width) {}
+  get height() {
+    return this._window.innerHeight;
+  }
+  set height(height) {}
+  get colorDepth() {
+    return 24;
+  }
+  set colorDepth(colorDepth) {}
+  get orientation() {
+    return {
+      angle: 0,
+      type: 'landscape-primary',
+      onchange: null,
+    };
+  }
+  set orientation(orientation) {}
+
+  get pixelDepth() {
+    return this.colorDepth;
+  }
+  set pixelDepth(pixelDepth) {}
+  get availTop() {
+    return this.top;
+  }
+  set availTop(availTop) {}
+  get availLeft() {
+    return this.left;
+  }
+  set availLeft(availLeft) {}
+  get availWidth() {
+    return this.width;
+  }
+  set availWidth(availWidth) {}
+  get availHeight() {
+    return this.height;
+  }
+  set availHeight(availHeight) {}
+}
 let nativeVr = null;
 class VRFrameData {
   constructor() {
@@ -2554,6 +2609,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.CanvasRenderingContext2D = CanvasRenderingContext2D;
   window.WebGLRenderingContext = WebGLRenderingContext;
   window.MediaRecorder = MediaRecorder;
+  window.screen = new Screen(window);
+  window.Screen = Screen;
   window.Gamepad = Gamepad;
   window.VRStageParameters = VRStageParameters;
   window.VRDisplay = VRDisplay;
