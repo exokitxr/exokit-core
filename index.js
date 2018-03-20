@@ -1517,20 +1517,22 @@ class HTMLElement extends Node {
     return _recurse(this);
   }
   async traverseAsync(fn) {
-    const _recurse = async node => {
-      const result = await fn(node);
-      if (result !== undefined) {
-        return result;
-      } else if (node.childNodes) {
+    const nodes = [];
+    (function _recurse(node) {
+      nodes.push(node);
+      if (node.childNodes) {
         for (let i = 0; i < node.childNodes.length; i++) {
-          const result = await _recurse(node.childNodes[i]);
-          if (result !== undefined) {
-            return result;
-          }
+          _recurse(node.childNodes[i]);
         }
       }
-    };
-    return await _recurse(this);
+    })(this);
+
+    for (let i = 0; i < nodes.length; i++) {
+      const result = await fn(nodes[i]);
+      if (result !== undefined) {
+        return result;
+      }
+    }
   }
 }
 class HTMLAnchorElement extends HTMLElement {
