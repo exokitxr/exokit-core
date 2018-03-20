@@ -2445,7 +2445,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         }
       },
     },
-    getVRDisplays: () => vrDisplays,
+    getVRDisplays: () => Promise.resolve(vrDisplays),
     getGamepads: () => localGamepads,
     getVRMode: () => vrMode,
     setVRMode: newVrMode => {
