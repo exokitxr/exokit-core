@@ -273,6 +273,17 @@ class MessageEvent extends Event {
     this.data = data;
   }
 }
+class CustomEvent extends Event {
+  constructor(type, init = {}) {
+    super(type, init);
+
+    this.init(init);
+  }
+
+  init(init = {}) {
+    this.detail = init.detail !== undefined ? init.detail : null;
+  }
+}
 
 class MutationRecord {
   constructor(type, target, addedNodes, removedNodes, previousSibling, nextSibling, attributeName, attributeNamespace, oldValue) {
@@ -2611,6 +2622,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.MouseEvent = MouseEvent;
   window.WheelEvent = WheelEvent;
   window.MessageEvent = MessageEvent;
+  window.CustomEvent = CustomEvent;
   window.MutationObserver = MutationObserver;
   window.Node = Node;
   window.Text = Text;
