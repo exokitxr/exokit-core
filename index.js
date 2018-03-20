@@ -685,7 +685,7 @@ class MRDisplay {
         this.isPresenting = true;
 
         process.nextTick(() => {
-          this[windowSymbol].emit('vrdisplaypresentchange');
+          this[windowSymbol]._emit('vrdisplaypresentchange');
         });
       });
   }
@@ -701,7 +701,7 @@ class MRDisplay {
         this._rafs.length = 0;
 
         process.nextTick(() => {
-          this[windowSymbol].emit('vrdisplaypresentchange');
+          this[windowSymbol]._emit('vrdisplaypresentchange');
         });
       });
   }
@@ -967,6 +967,10 @@ class Node extends EventEmitter {
     }
   }
   set previousElementSibling(previousElementSibling) {}
+
+  _emit() { // need to call this instead of EventEmitter.prototype.emit because some frameworks override HTMLElement.prototype.emit()
+    return EventEmitter.prototype.emit.apply(this, arguments);
+  }
 }
 Node.ELEMENT_NODE = 1;
 Node.TEXT_NODE = 3;
@@ -989,11 +993,11 @@ const _setAttributeRaw = (el, prop, value) => {
         value,
       };
       el.attrs.push(attr);
-      el.emit('attribute', prop, value, null);
+      el._emit('attribute', prop, value, null);
     } else {
       const oldValue = attr.value;
       attr.value = value;
-      el.emit('attribute', prop, value, oldValue);
+      el._emit('attribute', prop, value, oldValue);
     }
   }
 };
@@ -1018,7 +1022,7 @@ const _makeAttributesProxy = el => new Proxy(el.attrs, {
     if (index !== -1) {
       const oldValue = target[index].value;
       target.splice(index, 1);
-      el.emit('attribute', prop, null, oldValue);
+      el._emit('attribute', prop, null, oldValue);
     }
     return true;
   },
@@ -1186,8 +1190,8 @@ class HTMLElement extends Node {
     this.childNodes.push(childNode);
     childNode.parentNode = this;
 
-    childNode.emit('parent');
-    this.emit('children', [childNode], [], this.childNodes[this.childNodes.length - 2] || null, null);
+    childNode._emit('parent');
+    this._emit('children', [childNode], [], this.childNodes[this.childNodes.length - 2] || null, null);
   }
   removeChild(childNode) {
     const index = this.childNodes.indexOf(childNode);
@@ -1195,8 +1199,8 @@ class HTMLElement extends Node {
       this.childNodes.splice(index, 1);
       childNode.parentNode = null;
 
-      childNode.emit('parent');
-      this.emit('children', [], [childNode], this.childNodes[index - 1] || null, this.childNodes[index] || null);
+      childNode._emit('parent');
+      this._emit('children', [], [childNode], this.childNodes[index - 1] || null, this.childNodes[index] || null);
     }
   }
   insertBefore(childNode, nextSibling) {
@@ -1205,8 +1209,8 @@ class HTMLElement extends Node {
       this.childNodes.splice(index, 0, childNode);
       childNode.parentNode = this;
 
-      childNode.emit('parent');
-      this.emit('children', [childNode], [], this.childNodes[index - 1] || null, this.childNodes[index + 1] || null);
+      childNode._emit('parent');
+      this._emit('children', [childNode], [], this.childNodes[index - 1] || null, this.childNodes[index + 1] || null);
     }
   }
   insertAfter(childNode, nextSibling) {
@@ -1215,8 +1219,8 @@ class HTMLElement extends Node {
       this.childNodes.splice(index + 1, 0, childNode);
       childNode.parentNode = this;
 
-      childNode.emit('parent');
-      this.emit('children', [childNode], [], this.childNodes[index] || null, this.childNodes[index + 2] || null);
+      childNode._emit('parent');
+      this._emit('children', [childNode], [], this.childNodes[index] || null, this.childNodes[index + 2] || null);
     }
   }
 
@@ -1314,7 +1318,7 @@ class HTMLElement extends Node {
   }
 
   dispatchEvent(event) {
-    this.emit(event.type, event);
+    this._emit(event.type, event);
 
     if (!event.propagationStopped && this.parentNode) {
       this.parentNode.dispatchEvent(event);
@@ -1452,15 +1456,15 @@ class HTMLElement extends Node {
 
     if (oldChildNodes.length > 0) {
       for (let i = 0; i < oldChildNodes.length; i++) {
-        oldChildNodes[i].emit('parent');
+        oldChildNodes[i]._emit('parent');
       }
-      this.emit('children', [], oldChildNodes, null, null);
+      this._emit('children', [], oldChildNodes, null, null);
     }
     if (newChildNodes.length > 0) {
       for (let i = 0; i < newChildNodes.length; i++) {
-        newChildNodes[i].emit('parent');
+        newChildNodes[i]._emit('parent');
       }
-      this.emit('children', newChildNodes, [], null, null);
+      this._emit('children', newChildNodes, [], null, null);
     }
 
     _promiseSerial(newChildNodes.map(childNode => () => _runHtml(childNode, this.ownerDocument.defaultView)))
@@ -1468,7 +1472,7 @@ class HTMLElement extends Node {
         console.warn(err);
       });
 
-    this.emit('innerHTML', innerHTML);
+    this._emit('innerHTML', innerHTML);
   }
 
   get innerText() {
@@ -1509,7 +1513,7 @@ class HTMLElement extends Node {
       topDocument[pointerLockElementSymbol] = this;
 
       process.nextTick(() => {
-        topDocument.emit('pointerlockchange');
+        topDocument._emit('pointerlockchange');
       });
     }
   }
@@ -1655,12 +1659,12 @@ class HTMLWindowElement extends HTMLElement {
   }
 
   postMessage(data) {
-    this.emit('message', new MessageEvent(data));
+    this._emit('message', new MessageEvent(data));
   }
 
-  emit(type, event) {
+  _emit(type, event) {
     if (!this[disabledEventsSymbol][type]) {
-      super.emit(type, event);
+      super._emit(type, event);
     }
   }
 
@@ -1729,7 +1733,7 @@ class HTMLDocumentElement extends HTMLLoadableElement {
       topDocument[pointerLockElementSymbol] = null;
 
       process.nextTick(() => {
-        topDocument.emit('pointerlockchange');
+        topDocument._emit('pointerlockchange');
       });
     }
   }
@@ -1769,10 +1773,10 @@ class HTMLStyleElement extends HTMLLoadableElement {
           .then(stylesheet => {
             this.stylesheet = stylesheet;
             styleEpoch++;
-            this.emit('load');
+            this._emit('load');
           })
           .catch(err => {
-            this.emit('error', err);
+            this._emit('error', err);
           });
       }
     });
@@ -1782,10 +1786,10 @@ class HTMLStyleElement extends HTMLLoadableElement {
         .then(stylesheet => {
           this.stylesheet = stylesheet;
           styleEpoch++;
-          this.emit('load');
+          this._emit('load');
         })
         .catch(err => {
-          this.emit('error', err);
+          this._emit('error', err);
         });
     });
   }
@@ -1808,7 +1812,7 @@ class HTMLStyleElement extends HTMLLoadableElement {
 
   set innerHTML(innerHTML) {
     innerHTML = innerHTML + '';
-    this.emit('innerHTML', innerHTML);
+    this._emit('innerHTML', innerHTML);
   }
 
   run() {
@@ -1848,12 +1852,12 @@ class HTMLScriptElement extends HTMLLoadableElement {
 
             this.readyState = 'complete';
 
-            this.emit('load');
+            this._emit('load');
           })
           .catch(err => {
             this.readyState = 'complete';
 
-            this.emit('error', err);
+            this._emit('error', err);
           });
       }
     });
@@ -1865,7 +1869,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
         this.readyState = 'complete';
 
         process.nextTick(() => {
-          this.emit('load');
+          this._emit('load');
         });
       }
     });
@@ -1889,7 +1893,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
 
   set innerHTML(innerHTML) {
     innerHTML = innerHTML + '';
-    this.emit('innerHTML', innerHTML);
+    this._emit('innerHTML', innerHTML);
   }
 
   isRunnable() {
@@ -2005,7 +2009,7 @@ class HTMLImageElement extends HTMLSrcableElement {
     this.on('attribute', (name, value) => {
       if (name === 'src') {
         process.nextTick(() => { // XXX
-          this.emit('load');
+          this._emit('load');
         });
       }
     });
@@ -2042,8 +2046,8 @@ class HTMLAudioElement extends HTMLMediaElement {
         this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
 
         process.nextTick(() => { // XXX
-          this.emit('canplay');
-          this.emit('canplaythrough');
+          this._emit('canplay');
+          this._emit('canplaythrough');
         });
       }
     });
@@ -2081,8 +2085,8 @@ class HTMLVideoElement extends HTMLMediaElement {
         this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
 
         process.nextTick(() => { // XXX
-          this.emit('canplay');
-          this.emit('canplaythrough');
+          this._emit('canplay');
+          this._emit('canplaythrough');
         });
       }
     });
@@ -2127,11 +2131,11 @@ class HTMLIframeElement extends HTMLSrcableElement {
             this.contentDocument = contentDocument;
 
             contentDocument.once('readystatechange', () => {
-              this.emit('load');
+              this._emit('load');
             });
           })
           .catch(err => {
-            this.emit('error', err);
+            this._emit('error', err);
           });
       }
     });
@@ -2470,13 +2474,13 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     if (!loading) {
       exokit.load(href)
         .then(newWindow => {
-          window.emit('beforeunload');
-          window.emit('unload');
-          window.emit('navigate', newWindow);
+          window._emit('beforeunload');
+          window._emit('unload');
+          window._emit('navigate', newWindow);
         })
         .catch(err => {
           loading = false;
-          window.emit('error', {
+          window._emit('error', {
             error: err,
           });
         });
@@ -2767,17 +2771,17 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   if (!parent) {
     window.tickAnimationFrame = tickAnimationFrame;
     window.updateVrFrame = update => {
-      window.emit('updatevrframe', update);
+      window._emit('updatevrframe', update);
     };
     window.updateArFrame = (viewMatrix, projectionMatrix) => {
-      window.emit('updatearframe', viewMatrix, projectionMatrix);
+      window._emit('updatearframe', viewMatrix, projectionMatrix);
     };
   } else {
     parent.on('updatevrframe', update => { // XXX clean up listeners on window destroy
-      window.emit('updatevrframe', update);
+      window._emit('updatevrframe', update);
     });
     parent.on('updatearframe', update => {
-      window.emit('updatearframe', update);
+      window._emit('updatearframe', update);
     });
   }
   return window;
@@ -2847,7 +2851,7 @@ const _parseDocument = (s, options, window) => {
       for (let i = 0; i < iframes.length; i++) {
         const iframe = iframes[i];
         if (iframe.contentDocument) {
-          iframe.contentDocument.emit('pointerlockchange');
+          iframe.contentDocument._emit('pointerlockchange');
         }
       }
     });
@@ -2862,9 +2866,9 @@ const _parseDocument = (s, options, window) => {
       console.warn(err);
     }
 
-    document.emit('readystatechange');
-    document.emit('load');
-    window.emit('load');
+    document._emit('readystatechange');
+    document._emit('load');
+    window._emit('load');
   });
 
   return document;
@@ -2970,10 +2974,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           }
         })
         .then(() => {
-          this.emit('load');
+          this._emit('load');
         })
         .catch(err => {
-          this.emit('error', err);
+          this._emit('error', err);
         });
     }
 
@@ -3056,11 +3060,11 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
             })
             .then(() => {
               this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
-              this.emit('canplay');
-              this.emit('canplaythrough');
+              this._emit('canplay');
+              this._emit('canplaythrough');
             })
             .catch(err => {
-              this.emit('error', err);
+              this._emit('error', err);
             });
         }
       });
@@ -3146,11 +3150,11 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
             .then(() => {
               console.log('video download done');
               this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
-              this.emit('canplay');
-              this.emit('canplaythrough');
+              this._emit('canplay');
+              this._emit('canplaythrough');
             })
             .catch(err => {
-              this.emit('error', err);
+              this._emit('error', err);
             });
         } else if (name === 'loop') {
           this.video.loop = !!value || value === '';
