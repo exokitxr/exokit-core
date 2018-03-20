@@ -2963,9 +2963,9 @@ const _parseDocument = (s, options, window) => {
       console.warn(err);
     }
 
-    document._emit('readystatechange');
-    document._emit('load');
-    window._emit('load');
+    document.dispatchEvent(new Event('readystatechange', {target: document}));
+    document.dispatchEvent(new Event('load', {target: document}));
+    window.dispatchEvent(new Event('load', {target: document}));
   });
 
   return document;
