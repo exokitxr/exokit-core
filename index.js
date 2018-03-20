@@ -1139,6 +1139,42 @@ const _makeStyleProxy = el => {
     },
   });
 };
+const _dashToCamelCase = s => {
+  let match = s.match(/^data-(.+)$/);
+  if (match) {
+    s = match[1];
+    s = s.replace(/-([a-z])/g, (all, letter) => letter.toUpperCase());
+    return s;
+  } else {
+    return null;
+  }
+};
+const _camelCaseToDash = s => {
+  if (!/-[a-z]/.test(s)) {
+    s = 'data-' + s;
+    s = s.replace(/([A-Z])/g, (all, letter) => '-' + letter.toLowerCase());
+    return s;
+  } else {
+    return null;
+  }
+};
+const _makeDataset = el => new Proxy(el.attrs, {
+  get(target, key) {
+    for (let i = 0; i < target.length; i++) {
+      const attr = target[i];
+      if (_dashToCamelCase(attr.name) === key) {
+        return attr.value;
+      }
+    }
+  },
+  set(target, key, value) {
+    const dashName = _camelCaseToDash(key);
+    if (dashName) {
+      _setAttributeRaw(el, dashName, value);
+    }
+    return true;
+  },
+});
 const autoClosingTags = {
   area: true,
   base: true,
@@ -1170,6 +1206,7 @@ class HTMLElement extends Node {
     this._innerHTML = '';
     this._classList = null;
     this._style = null;
+    this._dataset = null;
     this[computedStyleSymbol] = null;
 
     this.on('attribute', (name, value) => {
@@ -1484,6 +1521,14 @@ class HTMLElement extends Node {
     return this._style;
   }
   set style(style) {}
+
+  get dataset() {
+    if (!this._dataset) {
+      this._dataset = _makeDataset(this);
+    }
+    return this._dataset;
+  }
+  set dataset(dataset) {}
 
   get innerHTML() {
     return parse5.serialize(this);
