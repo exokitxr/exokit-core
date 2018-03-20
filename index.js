@@ -1256,6 +1256,9 @@ class HTMLElement extends Node {
     const oldValue = this.attributes[name];
     this.attributes[name] = value;
   }
+  hasAttribute(name) {
+    return name in this.attributes;
+  }
   removeAttribute(name) {
     const oldValue = this.attributes[name];
     delete this.attributes[name];
