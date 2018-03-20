@@ -153,10 +153,11 @@ class History extends EventEmitter {
 class Event {
   constructor(type, init = {}) {
     this.type = type;
+    this.target = init.target ? init.target : null;
+
     this.defaultPrevented = false;
     this.propagationStopped = false;
-
-    this.target = init.target ? init.target : null;
+    this.currentTarget = null;
   }
 
   preventDefault() {
@@ -1400,7 +1401,9 @@ class HTMLElement extends Node {
   }
 
   dispatchEvent(event) {
+    event.currentTarget = this;
     this._emit(event.type, event);
+    event.currentTarget = null;
 
     if (!event.propagationStopped && this.parentNode) {
       this.parentNode.dispatchEvent(event);
