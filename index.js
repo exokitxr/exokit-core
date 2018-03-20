@@ -1036,6 +1036,46 @@ const _makeAttributesProxy = el => new Proxy(el.attrs, {
     }
   },
 });
+const _makeChildrenProxy = el => {
+  const {HTMLElement} = el.ownerDocument.defaultView;
+  const _getChildren = childNodes => childNodes.filter(childNode => childNode instanceof HTMLElement);
+
+  return new Proxy(el.childNodes, {
+    get(target, prop) {
+      const propN = parseIntStrict(prop);
+      if (propN !== undefined) {
+        return _getChildren(target)[propN];
+      } else if (prop === 'length') {
+        return _getChildren(target).length;
+      } else if (prop === 'item') {
+        return i => {
+          if (typeof i === 'number') {
+            return _getChildren(target)[i];
+          } else {
+            return undefined;
+          }
+        };
+      } else {
+        return undefined;
+      }
+    },
+    set(target, prop, value) {
+      return true;
+    },
+    deleteProperty(target, prop) {
+      return true;
+    },
+    has(target, prop) {
+      if (typeof prop === 'number') {
+        return _getChildren(target)[prop] !== undefined;
+      } else if (prop === 'length' || prop === 'item') {
+        return true;
+      } else {
+        return false;
+      }
+    },
+  });
+};
 const _cssText = style => {
   let styleString = '';
   for (const k in style) {
@@ -1164,11 +1204,12 @@ class HTMLElement extends Node {
   set attributes(attributes) {}
 
   get children() {
-    return this.childNodes;
+    if (!this._children) {
+      this._children = _makeChildrenProxy(this);
+    }
+    return this._children;
   }
-  set children(children) {
-    this.childNodes = children;
-  }
+  set children(children) {}
 
   getAttribute(name) {
     return this.attributes[name];
