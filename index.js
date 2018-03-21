@@ -2700,7 +2700,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
           for (let j = 0; j < rules.length; j++) {
             const rule = rules[j];
             const {selectors} = rule;
-            if (selectors.some(selector => el.matches(selector))) {
+            if (selectors && selectors.some(selector => el.matches(selector))) {
               const {declarations} = rule;
               for (let k = 0; k < declarations.length; k++) {
                 const {property, value} = declarations[k];
