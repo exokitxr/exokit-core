@@ -29,12 +29,12 @@
   "description": "Browser environment for node.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/modulesio/exokit.git"
+    "url": "git+https://github.com/webmixedreality/exokit-core.git"
   },
   "bugs": {
-    "url": "https://github.com/modulesio/exokit/issues"
+    "url": "https://github.com/webmixedreality/exokit-core/issues"
   },
-  "homepage": "https://github.com/modulesio/exokit#readme",
+  "homepage": "https://github.com/webmixedreality/exokit-core#readme",
   "keywords": [
     "exobrowser",
     "web",
