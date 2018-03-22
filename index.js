@@ -3219,7 +3219,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   };
   MicrophoneMediaStream = nativeAudio.MicrophoneMediaStream; */
 
-  const {nativeVideo} = bindings;
+  /* const {nativeVideo} = bindings;
   HTMLVideoElement = class extends HTMLMediaElement {
     constructor(attrs = [], value = '') {
       super('VIDEO', attrs, value);
@@ -3387,7 +3387,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
 
       return running;
     }
-  };
+  }; */
 
   nativeVr = bindings.nativeVr;
 };
