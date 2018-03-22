@@ -2212,7 +2212,11 @@ class HTMLIframeElement extends HTMLSrcableElement {
 
     this.on('attribute', (name, value) => {
       if (name === 'src') {
-        const url = value;
+        let url = value;
+        const match = url.match(/^javascript:(.+)$/); // XXX should support this for regular fetches too
+        if (match) {
+          url = 'data:text/html,' + encodeURIComponent(`<!doctype html><html><head><script>${match[1]}</script></head></html>`);
+        }
         this.ownerDocument.defaultView.fetch(url)
           .then(res => {
             if (res.status >= 200 && res.status < 300) {
