@@ -1115,8 +1115,8 @@ const _makeStyleProxy = el => {
       } else if (key === 'clone') {
         return () => {
           const result = {};
-          for (const k in this) {
-            const v = this[k];
+          for (const k in style) {
+            const v = style[k];
             if (v !== undefined) {
               result[k] = v;
             }
