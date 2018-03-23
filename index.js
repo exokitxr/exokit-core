@@ -680,8 +680,8 @@ class MRDisplay {
     };
   }
 
-  requestPresent() {
-    return (nativeVr !== null ? nativeVr.requestPresent() : Promise.resolve())
+  requestPresent(layers) {
+    return (nativeVr !== null ? nativeVr.requestPresent(layers) : Promise.resolve())
       .then(() => {
         this.isPresenting = true;
 
