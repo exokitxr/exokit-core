@@ -3029,19 +3029,23 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   CanvasRenderingContext2D = bindings.nativeCanvasRenderingContext2D;
   WebGLRenderingContext = bindings.nativeGl;
   /* WebGLRenderingContext = function WebGLRenderingContext() {
-    return new Proxy(Reflect.construct(bindings.nativeGl, arguments), {
-      get(target, propKey, receiver) {
-        const orig = target[propKey];
-        if (typeof orig === 'function') {
-          return function() {
-            console.log('gl proxy method ' + propKey);
-            return orig.apply(target, arguments);
-          };
-        } else {
-          return orig;
-        }
+    const result = Reflect.construct(bindings.nativeGl, arguments);
+    for (const k in result) {
+      if (typeof result[k] === 'function') {
+        result[k] = (old => function() {
+          const {canvas} = this;
+          const window = canvas.ownerDocument.defaultView;
+          if (k === 'viewport') {
+            console.log(k, arguments);
+            return;
+          } else {
+            console.log(k);
+          }
+          return old.apply(this, arguments);
+        })(result[k]);
       }
-    });
+    }
+    return result;
   }; */
 
   HTMLImageElement = class extends HTMLSrcableElement {
