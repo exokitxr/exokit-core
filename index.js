@@ -3028,7 +3028,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   CanvasGradient = bindings.nativeCanvasGradient;
   CanvasRenderingContext2D = bindings.nativeCanvasRenderingContext2D;
   WebGLRenderingContext = bindings.nativeGl;
-  /* WebGLRenderingContext = function WebGLRenderingContext() {
+  WebGLRenderingContext = function WebGLRenderingContext() {
     const result = Reflect.construct(bindings.nativeGl, arguments);
     for (const k in result) {
       if (typeof result[k] === 'function') {
@@ -3038,6 +3038,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           if (k === 'viewport') {
             console.log(k, arguments);
             return;
+          } else if (k === 'scissor') {
+            hmdFBWidth = 1024;
+            hmdFBHeight = 1024;
+            gl.scissor(0, 0, hmdFBWidth, hmdFBHeight)
           } else {
             console.log(k);
           }
@@ -3046,7 +3050,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       }
     }
     return result;
-  }; */
+  };
 
   HTMLImageElement = class extends HTMLSrcableElement {
     constructor(attrs = [], value = '') {
