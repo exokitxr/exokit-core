@@ -1676,12 +1676,17 @@ class HTMLElement extends Node {
       const result = fn(node);
       if (result !== undefined) {
         return result;
-      } else if (node.childNodes) {
-        for (let i = 0; i < node.childNodes.length; i++) {
-          const result = _recurse(node.childNodes[i]);
-          if (result !== undefined) {
-            return result;
+      } else {
+        if (node.childNodes) {
+          for (let i = 0; i < node.childNodes.length; i++) {
+            const result = _recurse(node.childNodes[i]);
+            if (result !== undefined) {
+              return result;
+            }
           }
+        }
+        if (node.contentDocument) {
+          return _recurse(node.contentDocument);
         }
       }
     };
@@ -1695,6 +1700,9 @@ class HTMLElement extends Node {
         for (let i = 0; i < node.childNodes.length; i++) {
           _recurse(node.childNodes[i]);
         }
+      }
+      if (node.contentDocument) {
+        _recurse(node.contentDocument);
       }
     })(this);
 
