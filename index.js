@@ -1602,6 +1602,25 @@ class HTMLElement extends Node {
     }
     this.appendChild(new Text(textContent));
   }
+  
+  get onclick() {
+    return _elementGetter(this, 'click');
+  }
+  set onclick(onclick) {
+    _elementSetter(this, 'click', onclick);
+  }
+  get onmousedown() {
+    return _elementGetter(this, 'mousedown');
+  }
+  set onmousedown(onmousedown) {
+    _elementSetter(this, 'mousedown', onmousedown);
+  }
+  get onmouseup() {
+    return _elementGetter(this, 'mouseup');
+  }
+  set onmouseup(onmouseup) {
+    _elementSetter(this, 'mouseup', onmouseup);
+  }
 
   requestPointerLock() {
     const topDocument = this.ownerDocument.defaultView.top.document;
