@@ -2552,6 +2552,14 @@ const tickAnimationFrame = () => {
   }
 };
 
+let vrDisplays = [];
+const localGamepads = [null, null];
+const leftGamepad = new Gamepad('left', 0);
+const rightGamepad = new Gamepad('right', 1);
+let vrMode = null;
+let vrTexture = null;
+let vrTextures = [];
+
 const _makeWindow = (options = {}, parent = null, top = null) => {
   const _normalizeUrl = src => {
     if (!/^[a-z]+:\/\//i.test(src)) {
@@ -2596,37 +2604,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       loading = true;
     }
   });
-
-  let vrDisplays = [];
-
-  const localGamepads = [null, null];
-  const leftGamepad = new Gamepad('left', 0);
-  const rightGamepad = new Gamepad('right', 1);
-  const _updatevrframe = update => {
-    const {
-      gamepads,
-    } = update;
-
-    if (gamepads !== undefined) {
-      if (gamepads[0]) {
-        localGamepads[0] = leftGamepad;
-        localGamepads[0].copy(gamepads[0]);
-      } else {
-        localGamepads[0] = null;
-      }
-      if (gamepads[1]) {
-        localGamepads[1] = rightGamepad;
-        localGamepads[1].copy(gamepads[1]);
-      } else {
-        localGamepads[1] = null;
-      }
-    }
-  };
-  window.on('updatevrframe', _updatevrframe);
-
-  let vrMode = null;
-  let vrTexture = null;
-  let vrTextures = [];
+  
   window.navigator = {
     userAgent: 'exokit',
     mediaDevices: {
@@ -2885,6 +2863,27 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     window.updateArFrame = (viewMatrix, projectionMatrix) => {
       window._emit('updatearframe', viewMatrix, projectionMatrix);
     };
+    
+    window.on('updatevrframe', update => {
+      const {
+        gamepads,
+      } = update;
+
+      if (gamepads !== undefined) {
+        if (gamepads[0]) {
+          localGamepads[0] = leftGamepad;
+          localGamepads[0].copy(gamepads[0]);
+        } else {
+          localGamepads[0] = null;
+        }
+        if (gamepads[1]) {
+          localGamepads[1] = rightGamepad;
+          localGamepads[1].copy(gamepads[1]);
+        } else {
+          localGamepads[1] = null;
+        }
+      }
+    });
   } else {
     parent.on('updatevrframe', update => { // XXX clean up listeners on window destroy
       window._emit('updatevrframe', update);
