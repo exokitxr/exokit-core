@@ -772,10 +772,10 @@ class VRDisplay extends MRDisplay {
         this.stageParameters.copy(stageParameters);
       }
     };
-    window.on('updatevrframe', _updatevrframe);
+    window.top.on('updatevrframe', _updatevrframe);
 
     this._cleanups.push(() => {
-      window.removeListener('updatevrframe', _updatevrframe);
+      window.top.removeListener('updatevrframe', _updatevrframe);
     });
   }
 
@@ -794,16 +794,16 @@ class ARDisplay extends MRDisplay {
       this._width = window.innerWidth / 2;
       this._height = window.innerHeight;
     };
-    window.on('resize', _resize);
+    window.top.on('resize', _resize);
     const _updatearframe = (viewMatrix, projectionMatrix) => {
       this._viewMatrix.set(viewMatrix);
       this._projectionMatrix.set(projectionMatrix);
     };
-    window.on('updatearframe', _updatearframe);
+    window.top.on('updatearframe', _updatearframe);
 
     this._cleanups.push(() => {
-      window.removeListener('resize', _resize);
-      window.removeListener('updatearframe', _updatearframe);
+      window.top.removeListener('resize', _resize);
+      window.top.removeListener('updatearframe', _updatearframe);
     });
   }
 
@@ -2984,17 +2984,17 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         }
       }
     });
-  } else {
-    parent.on('updatevrframe', update => { // XXX clean up listeners on window destroy
+  } /* else {
+    top.on('updatevrframe', update => { // XXX clean up listeners on window destroy
       window._emit('updatevrframe', update);
     });
-    parent.on('updatearframe', update => {
+    top.on('updatearframe', update => {
       window._emit('updatearframe', update);
     });
-  }
     top.on('updatemlframe', update => {
       window._emit('updatemlframe', update);
     });
+  } */
   return window;
 };
 const _parseDocument = (s, options, window) => {
