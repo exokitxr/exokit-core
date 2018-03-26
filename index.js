@@ -1862,9 +1862,9 @@ class HTMLWindowElement extends HTMLElement {
     this._emit('message', new MessageEvent(data));
   }
 
-  _emit(type, event) {
+  _emit(type) {
     if (!this[disabledEventsSymbol][type]) {
-      super._emit(type, event);
+      super._emit.apply(this, arguments);
     }
   }
 
