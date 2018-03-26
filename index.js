@@ -33,6 +33,7 @@ const elementSymbol = Symbol();
 const computedStyleSymbol = Symbol();
 const disabledEventsSymbol = Symbol();
 const pointerLockElementSymbol = Symbol();
+const vrDisplaysSymbol = Symbol();
 let nativeBindings = false;
 
 const btoa = s => new Buffer(s, 'binary').toString('base64');
@@ -2663,6 +2664,8 @@ const rightGamepad = new Gamepad('right', 1);
 /* let vrMode = null;
 let vrTexture = null;
 let vrTextures = []; */
+const _getVrDisplay = window => window[vrDisplaysSymbol] ? window[vrDisplaysSymbol].vrDisplay : window.top[vrDisplaysSymbol].vrDisplay;
+const _getMlDisplay = window => window[vrDisplaysSymbol] ? window[vrDisplaysSymbol].mlDisplay : window.top[vrDisplaysSymbol].mlDisplay;
 
 const _makeWindow = (options = {}, parent = null, top = null) => {
   const _normalizeUrl = src => {
@@ -2709,8 +2712,6 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     }
   });
 
-  const vrDisplay = new VRDisplay(window, 0);
-  const mlDisplay = new MLDisplay(window, 2);
   window.navigator = {
     userAgent: 'exokit',
     mediaDevices: {
@@ -2725,10 +2726,10 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     getVRDisplays: () => {
       const result = [];
       if (nativeMl !== null && nativeMl.IsPresent()) {
-        result.push(mlDisplay);
+        result.push(_getMlDisplay(window));
       }
       if (nativeVr.VR_IsHmdPresent()) {
-        result.push(vrDisplay);
+        result.push(_getVrDisplay(window));
       }
       return Promise.resolve(result);
     },
@@ -2974,6 +2975,12 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
 
   if (!parent) {
     window.tickAnimationFrame = tickAnimationFrame;
+    
+    window[vrDisplaysSymbol] = {
+      vrDisplay: new VRDisplay(window, 0),
+      mlDisplay: new MLDisplay(window, 2),
+    };
+    
     window.updateVrFrame = update => {
       window._emit('updatevrframe', update);
     };
@@ -3011,11 +3018,11 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       nativeMl.OnPresentChange(isPresent => {
         if (isPresent && !lastPresent) {
           const e = new Event('vrdisplayconnect');
-          e.display = mlDisplay;
+          e.display = _getMlDisplay(window);
           window.dispatchEvent(e);
         } else if (!isPresent && lastPresent) {
           const e = new Event('vrdisplaydisconnect');
-          e.display = mlDisplay;
+          e.display = _getMlDisplay(window);
           window.dispatchEvent(e);
         }
         lastPresent = isPresent;
