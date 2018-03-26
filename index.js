@@ -687,7 +687,9 @@ class MRDisplay {
         this.isPresenting = true;
 
         process.nextTick(() => {
-          this[windowSymbol]._emit('vrdisplaypresentchange');
+          const e = new Event('vrdisplaypresentchange');
+          e.display = this;
+          this[windowSymbol].dispatchEvent(e);
         });
       });
   }
@@ -703,7 +705,9 @@ class MRDisplay {
         this._rafs.length = 0;
 
         process.nextTick(() => {
-          this[windowSymbol]._emit('vrdisplaypresentchange');
+          const e = new Event('vrdisplaypresentchange');
+          e.display = this;
+          this[windowSymbol].dispatchEvent(e);
         });
       });
   }
@@ -854,7 +858,9 @@ class MLDisplay extends MRDisplay {
         this.isPresenting = true;
 
         process.nextTick(() => {
-          this[windowSymbol]._emit('vrdisplaypresentchange');
+          const e = new Event('vrdisplaypresentchange');
+          e.display = this;
+          this[windowSymbol].dispatchEvent(e);
         });
       });
   }
@@ -870,7 +876,9 @@ class MLDisplay extends MRDisplay {
         this._rafs.length = 0;
 
         process.nextTick(() => {
-          this[windowSymbol]._emit('vrdisplaypresentchange');
+          const e = new Event('vrdisplaypresentchange');
+          e.display = this;
+          this[windowSymbol].dispatchEvent(e);
         });
       });
   }
