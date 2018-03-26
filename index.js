@@ -540,6 +540,7 @@ class Screen {
   set availHeight(availHeight) {}
 }
 let nativeVr = null;
+let nativeMl = null;
 class VRFrameData {
   constructor() {
     this.leftProjectionMatrix = new Float32Array(16);
@@ -816,6 +817,81 @@ class ARDisplay extends MRDisplay {
 
     frameData.leftProjectionMatrix.set(this._projectionMatrix);
     frameData.rightProjectionMatrix.set(this._projectionMatrix);
+  }
+}
+class MLDisplay extends MRDisplay {
+  constructor(window, displayId) {
+    super('ML', window, displayId);
+
+    this._transformArray = new Float32Array(7 * 2);
+    this._projectionArray = new Float32Array(16 * 2);
+    // this._viewportArray = new Float32Array(4);
+
+    /* const _resize = () => {
+      this._width = window.innerWidth / 2;
+      this._height = window.innerHeight;
+    };
+    window.on('resize', _resize); */
+    const _updatemlframe = (transformArray, projectionArray, viewportArray) => {
+      // console.log('update ml frame', transformArray.slice(0, 7));
+      this._transformArray.set(transformArray);
+      this._projectionArray.set(projectionArray);
+      // this._viewportArray.set(viewportArray);
+      this._width = viewportArray[2];
+      this._height = viewportArray[3];
+    };
+    window.top.on('updatemlframe', _updatemlframe);
+
+    this._cleanups.push(() => {
+      // window.removeListener('resize', _resize);
+      window.top.removeListener('updatemlframe', _updatemlframe);
+    });
+  }
+
+  requestPresent(layers) {
+    return (nativeMl !== null ? nativeMl.requestPresent(layers) : Promise.resolve())
+      .then(() => {
+        this.isPresenting = true;
+
+        process.nextTick(() => {
+          this[windowSymbol]._emit('vrdisplaypresentchange');
+        });
+      });
+  }
+
+  exitPresent() {
+    return (nativeMl !== null ? nativeMl.exitPresent() : Promise.resolve())
+      .then(() => {
+        this.isPresenting = false;
+
+        for (let i = 0; i < this._rafs.length; i++) {
+          this.cancelAnimationFrame(this._rafs[i]);
+        }
+        this._rafs.length = 0;
+
+        process.nextTick(() => {
+          this[windowSymbol]._emit('vrdisplaypresentchange');
+        });
+      });
+  }
+
+  getFrameData(frameData) {
+    localVector.set(this._transformArray[0], this._transformArray[1], this._transformArray[2]);
+    localQuaternion.set(this._transformArray[3], this._transformArray[4], this._transformArray[5], this._transformArray[6]);
+    localVector2.set(1, 1, 1);
+    localMatrix.getInverse(localMatrix.compose(localVector, localQuaternion, localVector2));
+
+    frameData.pose.set(localVector, localQuaternion);
+    localMatrix.toArray(frameData.leftViewMatrix);
+
+    localVector.set(this._transformArray[7], this._transformArray[8], this._transformArray[9]);
+    localQuaternion.set(this._transformArray[10], this._transformArray[11], this._transformArray[12], this._transformArray[13]);
+    localVector2.set(1, 1, 1);
+    localMatrix.getInverse(localMatrix.compose(localVector, localQuaternion, localVector2));
+    localMatrix.toArray(frameData.rightViewMatrix);
+
+    frameData.leftProjectionMatrix.set(this._projectionArray.slice(0, 16));
+    frameData.rightProjectionMatrix.set(this._projectionArray.slice(16, 32));
   }
 }
 class AudioNode {
@@ -1602,7 +1678,7 @@ class HTMLElement extends Node {
     }
     this.appendChild(new Text(textContent));
   }
-  
+
   get onclick() {
     return _elementGetter(this, 'click');
   }
@@ -2623,7 +2699,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       loading = true;
     }
   });
-  
+
   window.navigator = {
     userAgent: 'exokit',
     mediaDevices: {
@@ -2647,6 +2723,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         vrDisplays = [new VRDisplay(window, 0)];
       } else if (newVrMode === 'ar') {
         vrDisplays = [new ARDisplay(window, 1)];
+      } else if (newVrMode === 'ml') {
+        vrDisplays = [new MLDisplay(window, 2)];
       }
       vrMode = newVrMode;
     },
@@ -2882,7 +2960,10 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     window.updateArFrame = (viewMatrix, projectionMatrix) => {
       window._emit('updatearframe', viewMatrix, projectionMatrix);
     };
-    
+    window.updateMlFrame = (transformArray, projectionArray, viewportArray) => {
+      window._emit('updatemlframe', transformArray, projectionArray, viewportArray);
+    };
+
     window.on('updatevrframe', update => {
       const {
         gamepads,
@@ -2911,6 +2992,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       window._emit('updatearframe', update);
     });
   }
+    top.on('updatemlframe', update => {
+      window._emit('updatemlframe', update);
+    });
   return window;
 };
 const _parseDocument = (s, options, window) => {
@@ -3422,6 +3506,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   }; */
 
   nativeVr = bindings.nativeVr;
+  nativeMl = bindings.nativeMl;
 };
 module.exports = exokit;
 
