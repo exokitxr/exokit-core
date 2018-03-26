@@ -33,7 +33,7 @@ const elementSymbol = Symbol();
 const computedStyleSymbol = Symbol();
 const disabledEventsSymbol = Symbol();
 const pointerLockElementSymbol = Symbol();
-const vrDisplaysSymbol = Symbol();
+const mrDisplaysSymbol = Symbol();
 let nativeBindings = false;
 
 const btoa = s => new Buffer(s, 'binary').toString('base64');
@@ -2664,8 +2664,8 @@ const rightGamepad = new Gamepad('right', 1);
 /* let vrMode = null;
 let vrTexture = null;
 let vrTextures = []; */
-const _getVrDisplay = window => window[vrDisplaysSymbol] ? window[vrDisplaysSymbol].vrDisplay : window.top[vrDisplaysSymbol].vrDisplay;
-const _getMlDisplay = window => window[vrDisplaysSymbol] ? window[vrDisplaysSymbol].mlDisplay : window.top[vrDisplaysSymbol].mlDisplay;
+const _getVrDisplay = window => window[mrDisplaysSymbol] ? window[mrDisplaysSymbol].vrDisplay : window.top[mrDisplaysSymbol].vrDisplay;
+const _getMlDisplay = window => window[mrDisplaysSymbol] ? window[mrDisplaysSymbol].mlDisplay : window.top[mrDisplaysSymbol].mlDisplay;
 
 const _makeWindow = (options = {}, parent = null, top = null) => {
   const _normalizeUrl = src => {
@@ -2976,7 +2976,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   if (!parent) {
     window.tickAnimationFrame = tickAnimationFrame;
     
-    window[vrDisplaysSymbol] = {
+    window[mrDisplaysSymbol] = {
       vrDisplay: new VRDisplay(window, 0),
       mlDisplay: new MLDisplay(window, 2),
     };
