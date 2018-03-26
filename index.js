@@ -2654,6 +2654,7 @@ const rightGamepad = new Gamepad('right', 1);
 let vrMode = null;
 let vrTexture = null;
 let vrTextures = [];
+let tweakable = {};
 
 const _makeWindow = (options = {}, parent = null, top = null) => {
   const _normalizeUrl = src => {
@@ -2674,6 +2675,19 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.document = null;
   window.location = new Location(options.url);
   window.history = new History(window.location.href);
+  window.setTweakable = (name, value, props = {}) => {
+    return tweakable[name] = {value, props};
+  }
+  window.getTweakable = (name, prop) => {
+    let o = tweakable[name];
+    if (o != null) {
+      if (prop != null) {
+        return o[prop];
+      }
+      return o.value;
+    }
+    return o;
+  }
   window.history.on('popstate', (u, state) => {
     window.location.set(u);
 
