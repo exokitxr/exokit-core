@@ -787,7 +787,7 @@ class VRDisplay extends MRDisplay {
     frameData.copy(this._frameData);
   }
 }
-class ARDisplay extends MRDisplay {
+/* class ARDisplay extends MRDisplay {
   constructor(window, displayId) {
     super('AR', window, displayId);
 
@@ -822,7 +822,7 @@ class ARDisplay extends MRDisplay {
     frameData.leftProjectionMatrix.set(this._projectionMatrix);
     frameData.rightProjectionMatrix.set(this._projectionMatrix);
   }
-}
+} */
 class MLDisplay extends MRDisplay {
   constructor(window, displayId) {
     super('ML', window, displayId);
@@ -2730,8 +2730,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
 
       if (newVrMode === 'vr') {
         vrDisplays = [new VRDisplay(window, 0)];
-      } else if (newVrMode === 'ar') {
-        vrDisplays = [new ARDisplay(window, 1)];
+      /* } else if (newVrMode === 'ar') {
+        display = new ARDisplay(window, 1); */
       } else if (newVrMode === 'ml') {
         vrDisplays = [new MLDisplay(window, 2)];
       }
@@ -2966,9 +2966,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     window.updateVrFrame = update => {
       window._emit('updatevrframe', update);
     };
-    window.updateArFrame = (viewMatrix, projectionMatrix) => {
+    /* window.updateArFrame = (viewMatrix, projectionMatrix) => {
       window._emit('updatearframe', viewMatrix, projectionMatrix);
-    };
+    }; */
     window.updateMlFrame = (transformArray, projectionArray, viewportArray) => {
       window._emit('updatemlframe', transformArray, projectionArray, viewportArray);
     };
