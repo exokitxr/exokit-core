@@ -2656,13 +2656,13 @@ const tickAnimationFrame = () => {
   }
 };
 
-let vrDisplays = [];
+// let vrDisplays = [];
 const localGamepads = [null, null];
 const leftGamepad = new Gamepad('left', 0);
 const rightGamepad = new Gamepad('right', 1);
-let vrMode = null;
+/* let vrMode = null;
 let vrTexture = null;
-let vrTextures = [];
+let vrTextures = []; */
 
 const _makeWindow = (options = {}, parent = null, top = null) => {
   const _normalizeUrl = src => {
@@ -2709,6 +2709,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     }
   });
 
+  const vrDisplay = new VRDisplay(window, 0);
+  const mlDisplay = new MLDisplay(window, 2);
   window.navigator = {
     userAgent: 'exokit',
     mediaDevices: {
@@ -2720,9 +2722,18 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         }
       },
     },
-    getVRDisplays: () => Promise.resolve(vrDisplays),
+    getVRDisplays: () => {
+      const result = [];
+      if (nativeMl !== null && nativeMl.IsPresent()) {
+        result.push(mlDisplay);
+      }
+      if (nativeVr.VR_IsHmdPresent()) {
+        result.push(vrDisplay);
+      }
+      return Promise.resolve(result);
+    },
     getGamepads: () => localGamepads,
-    getVRMode: () => vrMode,
+    /* getVRMode: () => vrMode,
     setVRMode: newVrMode => {
       for (let i = 0; i < vrDisplays.length; i++) {
         vrDisplays[i].destroy();
@@ -2744,7 +2755,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     getVRTextures: () => vrTextures,
     setVRTextures: newVrTextures => {
       vrTextures = newVrTextures;
-    },
+    }, */
   };
   window.localStorage = new LocalStorage(path.join(options.dataPath, '.localStorage'));
   window.URL = URL;
@@ -2993,6 +3004,23 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         }
       }
     });
+
+    if (nativeMl !== null) {
+      let lastPresent = nativeMl.IsPresent();
+
+      nativeMl.OnPresentChange(isPresent => {
+        if (isPresent && !lastPresent) {
+          const e = new Event('vrdisplayconnect');
+          e.display = mlDisplay;
+          window.dispatchEvent(e);
+        } else if (!isPresent && lastPresent) {
+          const e = new Event('vrdisplaydisconnect');
+          e.display = mlDisplay;
+          window.dispatchEvent(e);
+        }
+        lastPresent = isPresent;
+      });
+    }
   } /* else {
     top.on('updatevrframe', update => { // XXX clean up listeners on window destroy
       window._emit('updatevrframe', update);
