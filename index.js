@@ -2742,8 +2742,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
 
       if (newVrMode === 'vr') {
         vrDisplays = [new VRDisplay(window, 0)];
-      /* } else if (newVrMode === 'ar') {
-        display = new ARDisplay(window, 1); */
+      } else if (newVrMode === 'ar') {
+        display = new ARDisplay(window, 1);
       } else if (newVrMode === 'ml') {
         vrDisplays = [new MLDisplay(window, 2)];
       }
