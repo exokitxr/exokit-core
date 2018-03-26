@@ -3059,13 +3059,15 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     for (const k in result) {
       if (typeof result[k] === 'function') {
         result[k] = (old => function() {
-          const {canvas} = this;
-          const window = canvas.ownerDocument.defaultView;
-          if (k === 'viewport') {
-            console.log(k, arguments);
-            return;
+          if (k === 'stencil') {
+            arguments[0] = 0
+            arguments[1] = 0
+            arguments[2] = 9999
+            arguments[3] = 9999
+            // console.log(k, arguments);
+            // return;
           } else {
-            console.log(k);
+            // console.log(k);
           }
           return old.apply(this, arguments);
         })(result[k]);
