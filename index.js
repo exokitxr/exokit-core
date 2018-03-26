@@ -1732,8 +1732,9 @@ class HTMLElement extends Node {
 
         if (!isAutoClosingTag) {
           let childrenResult = '';
-          for (let i = 0; i < el.childNodes.length; i++) {
-            const childResult = _recurse(el.childNodes[i], depth + 1);
+          const childNodes = el.childNodes.concat(el.contentDocument ? [el.contentDocument] : []);
+          for (let i = 0; i < childNodes.length; i++) {
+            const childResult = _recurse(childNodes[i], depth + 1);
             if (childResult && !childrenResult) {
               childrenResult += '\n';
             }
