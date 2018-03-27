@@ -854,7 +854,7 @@ class MLDisplay extends MRDisplay {
   }
 
   requestPresent(layers) {
-    return (nativeMl !== null ? nativeMl.requestPresent(layers) : Promise.resolve())
+    return (nativeMl ? nativeMl.requestPresent(layers) : Promise.resolve())
       .then(() => {
         this.isPresenting = true;
 
@@ -867,7 +867,7 @@ class MLDisplay extends MRDisplay {
   }
 
   exitPresent() {
-    return (nativeMl !== null ? nativeMl.exitPresent() : Promise.resolve())
+    return (nativeMl ? nativeMl.exitPresent() : Promise.resolve())
       .then(() => {
         this.isPresenting = false;
 
@@ -2725,7 +2725,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     },
     getVRDisplays: () => {
       const result = [];
-      if (nativeMl !== null && nativeMl.IsPresent()) {
+      if (nativeMl && nativeMl.IsPresent()) {
         result.push(_getMlDisplay(window));
       }
       if (nativeVr.VR_IsHmdPresent()) {
@@ -3012,7 +3012,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       }
     });
 
-    if (nativeMl !== null) {
+    if (nativeMl) {
       let lastPresent = nativeMl.IsPresent();
 
       nativeMl.OnPresentChange(isPresent => {
