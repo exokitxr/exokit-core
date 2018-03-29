@@ -614,7 +614,7 @@ class Gamepad {
   copy(gamepad) {
     this.connected = gamepad.connected;
     for (let i = 0; i < this.buttons.length; i++) {
-      this.buttons[i].set(gamepad.buttons[i]);
+      this.buttons[i].copy(gamepad.buttons[i]);
     }
     this.hasPosition = gamepad.hasPosition;
     this.hasOrientation = gamepad.hasOrientation;
