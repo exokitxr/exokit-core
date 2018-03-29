@@ -588,6 +588,29 @@ class GamepadButton {
     this.touched = button.touched;
   }
 }
+class GamepadPose {
+  constructor() {
+    this.hasPosition = true;
+    this.hasOrientation = true;
+    this.position = new Float32Array(3);
+    this.linearVelocity = new Float32Array(3);
+    this.linearAcceleration = new Float32Array(3);
+    this.orientation = Float32Array.from([0, 0, 0, 1]);
+    this.angularVelocity = new Float32Array(3);
+    this.angularAcceleration = new Float32Array(3);
+  }
+
+  copy(pose) {
+    this.hasPosition = pose.hasPosition;
+    this.hasOrientation = pose.hasOrientation;
+    this.position.set(pose.position);
+    this.linearVelocity.set(pose.linearVelocity);
+    this.linearAcceleration.set(pose.linearAcceleration);
+    this.orientation.set(pose.orientation);
+    this.angularVelocity.set(pose.angularVelocity);
+    this.angularAcceleration.set(pose.angularAcceleration);
+  }
+}
 class Gamepad {
   constructor(hand, index) {
     this.hand = hand;
@@ -600,14 +623,7 @@ class Gamepad {
       new GamepadButton(),
       new GamepadButton(),
     ];
-    this.hasPosition = true;
-    this.hasOrientation = true;
-    this.position = new Float32Array(3);
-    this.linearVelocity = new Float32Array(3);
-    this.linearAcceleration = new Float32Array(3);
-    this.orientation = Float32Array.from([0, 0, 0, 1]);
-    this.angularVelocity = new Float32Array(3);
-    this.angularAcceleration = new Float32Array(3);
+    this.pose = new GamepadPose();
     this.axes = new Float32Array(2);
   }
 
@@ -616,14 +632,7 @@ class Gamepad {
     for (let i = 0; i < this.buttons.length; i++) {
       this.buttons[i].copy(gamepad.buttons[i]);
     }
-    this.hasPosition = gamepad.hasPosition;
-    this.hasOrientation = gamepad.hasOrientation;
-    this.position.set(gamepad.position);
-    this.linearVelocity.set(gamepad.linearVelocity);
-    this.linearAcceleration.set(gamepad.linearAcceleration);
-    this.orientation.set(gamepad.orientation);
-    this.angularVelocity.set(gamepad.angularVelocity);
-    this.angularAcceleration.set(gamepad.angularAcceleration);
+    this.pose.copy(gamepad.pose);
     this.axes.set(gamepad.axes);
   }
 }
