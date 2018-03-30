@@ -2984,12 +2984,12 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
 
   if (!parent) {
     window.tickAnimationFrame = tickAnimationFrame;
-    
+
     window[mrDisplaysSymbol] = {
       vrDisplay: new VRDisplay(window, 0),
       mlDisplay: new MLDisplay(window, 2),
     };
-    
+
     window.updateVrFrame = update => {
       window._emit('updatevrframe', update);
     };
