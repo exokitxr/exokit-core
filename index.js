@@ -674,7 +674,7 @@ class MRDisplay {
       maxLayers: 1,
     };
     this.depthNear = 0.1;
-    this.depthFar = 1000.0;
+    this.depthFar = 10000.0;
     this.stageParameters = new VRStageParameters();
 
     this._width = window.innerWidth / 2;
