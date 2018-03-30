@@ -542,6 +542,7 @@ class Screen {
 }
 let nativeVr = null;
 let nativeMl = null;
+const maxNumPlanes = 32;
 class VRFrameData {
   constructor() {
     this.leftProjectionMatrix = new Float32Array(16);
@@ -549,6 +550,10 @@ class VRFrameData {
     this.rightProjectionMatrix = new Float32Array(16);
     this.rightViewMatrix = new Float32Array(16);
     this.pose = new VRPose();
+
+    // non-standard
+    this.planes = new Float32Array(maxNumPlanes * (3 + 4 + 2));
+    this.numPlanes = 0;
   }
 
   copy(frameData) {
@@ -557,6 +562,10 @@ class VRFrameData {
     this.rightProjectionMatrix.set(frameData.rightProjectionMatrix);
     this.rightViewMatrix.set(frameData.rightViewMatrix);
     this.pose.copy(frameData.pose);
+
+    // non-standard
+    this.planes.set(frameData.planes);
+    this.numPlanes = frameData.numPlanes;
   }
 }
 class VRPose {
@@ -840,17 +849,21 @@ class MLDisplay extends MRDisplay {
     this._transformArray = new Float32Array(7 * 2);
     this._projectionArray = new Float32Array(16 * 2);
     // this._viewportArray = new Float32Array(4);
+    this._planesArray = new Float32Array(maxNumPlanes * (3 + 4 + 2));
+    this._numPlanes = 0;
 
     /* const _resize = () => {
       this._width = window.innerWidth / 2;
       this._height = window.innerHeight;
     };
     window.on('resize', _resize); */
-    const _updatemlframe = (transformArray, projectionArray, viewportArray) => {
-      // console.log('update ml frame', transformArray.slice(0, 7));
+    const _updatemlframe = (transformArray, projectionArray, viewportArray, planesArray, numPlanes) => {
       this._transformArray.set(transformArray);
       this._projectionArray.set(projectionArray);
       // this._viewportArray.set(viewportArray);
+      this._planesArray.set(planesArray);
+      this._numPlanes = numPlanes;
+
       this._width = viewportArray[2];
       this._height = viewportArray[3];
     };
@@ -910,6 +923,11 @@ class MLDisplay extends MRDisplay {
 
     frameData.leftProjectionMatrix.set(this._projectionArray.slice(0, 16));
     frameData.rightProjectionMatrix.set(this._projectionArray.slice(16, 32));
+
+    if (frameData.planes) {
+      frameData.planes.set(this._planesArray);
+      frameData.numPlanes = this._numPlanes;
+    }
   }
 }
 class AudioNode {
@@ -2996,8 +3014,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     /* window.updateArFrame = (viewMatrix, projectionMatrix) => {
       window._emit('updatearframe', viewMatrix, projectionMatrix);
     }; */
-    window.updateMlFrame = (transformArray, projectionArray, viewportArray) => {
-      window._emit('updatemlframe', transformArray, projectionArray, viewportArray);
+    window.updateMlFrame = (transformArray, projectionArray, viewportArray, planesArray, numPlanes) => {
+      window._emit('updatemlframe', transformArray, projectionArray, viewportArray, planesArray, numPlanes);
     };
 
     window.on('updatevrframe', update => {
