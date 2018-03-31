@@ -1430,8 +1430,8 @@ class Element extends Node {
     this.childNodes.push(childNode);
     childNode.parentNode = this;
 
-    childNode._emit('parent');
     this._emit('children', [childNode], [], this.childNodes[this.childNodes.length - 2] || null, null);
+    this.ownerDocument._emit('domchange');
   }
   removeChild(childNode) {
     const index = this.childNodes.indexOf(childNode);
@@ -1439,8 +1439,8 @@ class Element extends Node {
       this.childNodes.splice(index, 1);
       childNode.parentNode = null;
 
-      childNode._emit('parent');
       this._emit('children', [], [childNode], this.childNodes[index - 1] || null, this.childNodes[index] || null);
+      this.ownerDocument._emit('domchange');
     }
   }
   insertBefore(childNode, nextSibling) {
@@ -1449,8 +1449,8 @@ class Element extends Node {
       this.childNodes.splice(index, 0, childNode);
       childNode.parentNode = this;
 
-      childNode._emit('parent');
       this._emit('children', [childNode], [], this.childNodes[index - 1] || null, this.childNodes[index + 1] || null);
+      this.ownerDocument._emit('domchange');
     }
   }
   insertAfter(childNode, nextSibling) {
@@ -1459,8 +1459,8 @@ class Element extends Node {
       this.childNodes.splice(index + 1, 0, childNode);
       childNode.parentNode = this;
 
-      childNode._emit('parent');
       this._emit('children', [childNode], [], this.childNodes[index] || null, this.childNodes[index + 2] || null);
+      this.ownerDocument._emit('domchange');
     }
   }
 
@@ -1672,17 +1672,12 @@ class Element extends Node {
     this.childNodes = newChildNodes;
 
     if (oldChildNodes.length > 0) {
-      for (let i = 0; i < oldChildNodes.length; i++) {
-        oldChildNodes[i]._emit('parent');
-      }
       this._emit('children', [], oldChildNodes, null, null);
     }
     if (newChildNodes.length > 0) {
-      for (let i = 0; i < newChildNodes.length; i++) {
-        newChildNodes[i]._emit('parent');
-      }
       this._emit('children', newChildNodes, [], null, null);
     }
+    this.ownerDocument._emit('domchange');
 
     _promiseSerial(newChildNodes.map(childNode => () => _runHtml(childNode, this.ownerDocument.defaultView)))
       .catch(err => {
