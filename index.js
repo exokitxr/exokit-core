@@ -2225,6 +2225,10 @@ class HTMLMediaElement extends HTMLSrcableElement {
     return false;
   }
   set autoplay(autoplay) {}
+  
+  canPlayType(type) {
+    return ''; // XXX
+  }
 
   get HAVE_NOTHING() {
     return HTMLMediaElement.HAVE_NOTHING;
