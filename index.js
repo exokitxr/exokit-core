@@ -680,6 +680,10 @@ class MRDisplay {
 
     this._width = window.innerWidth / 2;
     this._height = window.innerHeight;
+    this._leftOffset = 0;
+    this._leftFov = 90;
+    this._rightOffset = 0;
+    this._rightFov = 90;
     this._cleanups = [];
     this._rafs = [];
   }
@@ -695,9 +699,12 @@ class MRDisplay {
   }
 
   getEyeParameters(eye) {
+    const leftEye = eye === 'left';
     return {
       renderWidth: this._width,
       renderHeight: this._height,
+      offset: leftEye ? this._leftOffset : this._rightOffset,
+      fieldOfView: leftEye ? this._leftFov : this._rightFov,
     };
   }
 
@@ -773,6 +780,10 @@ class VRDisplay extends MRDisplay {
         depthFar,
         renderWidth,
         renderHeight,
+        leftOffset,
+        leftFov,
+        rightOffset,
+        rightFov,
         frameData,
         stageParameters,
       } = update;
@@ -788,6 +799,18 @@ class VRDisplay extends MRDisplay {
       }
       if (renderHeight !== undefined) {
         this._height = renderHeight;
+      }
+      if (leftOffset !== undefined) {
+        this._leftOffset = leftOffset;
+      }
+      if (leftFov !== undefined) {
+        this._leftFov = leftOffset;
+      }
+      if (rightOffset !== undefined) {
+        this._rightOffset = rightOffset;
+      }
+      if (rightFov !== undefined) {
+        this._rightFov = rightFov;
       }
       if (frameData !== undefined) {
         this._frameData.copy(frameData);
