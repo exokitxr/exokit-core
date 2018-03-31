@@ -846,6 +846,12 @@ class VRDisplay extends MRDisplay {
 class MLDisplay extends MRDisplay {
   constructor(window, displayId) {
     super('ML', window, displayId);
+    
+    new THREE.Matrix4().compose(
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Quaternion(),
+      new THREE.Vector3(1, 1, 1)
+    ).toArray(this.stageParameters.sittingToStandingTransform);
 
     this._transformArray = new Float32Array(7 * 2);
     this._projectionArray = new Float32Array(16 * 2);
