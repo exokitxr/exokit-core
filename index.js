@@ -1311,7 +1311,7 @@ const autoClosingTags = {
   track: true,
   window: true,
 };
-class HTMLElement extends Node {
+class Element extends Node {
   constructor(tagName = 'DIV', attrs = [], value = '', location = null) {
     super();
 
@@ -1325,20 +1325,11 @@ class HTMLElement extends Node {
     this._children = null;
     this._innerHTML = '';
     this._classList = null;
-    this._style = null;
     this._dataset = null;
-    this[computedStyleSymbol] = null;
 
     this.on('attribute', (name, value) => {
       if (name === 'class' && this._classList) {
         this._classList.reset(value);
-      } else if (name === 'style') {
-        if (this._style) {
-          this._style.reset();
-        }
-        if (this[computedStyleSymbol]) {
-          this[computedStyleSymbol] = null;
-        }
       }
     });
   }
@@ -1614,43 +1605,6 @@ class HTMLElement extends Node {
   }
   set clientHeight(clientHeight) {}
 
-  get offsetWidth() {
-    return this.clientWidth;
-  }
-  set offsetWidth(offsetWidth) {}
-  get offsetHeight() {
-    return this.clientHeight;
-  }
-  set offsetHeight(offsetHeight) {}
-
-  get offsetTop() {
-    return 0;
-  }
-  set offsetTop(offsetTop) {}
-  get offsetLeft() {
-    return 0;
-  }
-  set offsetLeft(offsetLeft) {}
-
-  get offsetParent() {
-    const body = this.ownerDocument.body;
-    for (let el = this; el; el = el.parentNode) {
-      if (el.parentNode === body) {
-        return body;
-      }
-    }
-    return null;
-  }
-  set offsetParent(offsetParent) {}
-
-  get style() {
-    if (!this._style) {
-      this._style = _makeStyleProxy(this);
-    }
-    return this._style;
-  }
-  set style(style) {}
-
   get dataset() {
     if (!this._dataset) {
       this._dataset = _makeDataset(this);
@@ -1852,6 +1806,63 @@ class HTMLElement extends Node {
       }
     }
   }
+}
+class HTMLElement extends Element {
+  constructor(tagName = 'DIV', attrs = [], value = '', location = null) {
+    super(tagName, attrs, value, location);
+
+    this._style = null;
+    this[computedStyleSymbol] = null;
+
+    this.on('attribute', (name, value) => {
+      if (name === 'class' && this._classList) {
+        this._classList.reset(value);
+      } else if (name === 'style') {
+        if (this._style) {
+          this._style.reset();
+        }
+        if (this[computedStyleSymbol]) {
+          this[computedStyleSymbol] = null;
+        }
+      }
+    });
+  }
+
+  get offsetWidth() {
+    return this.clientWidth;
+  }
+  set offsetWidth(offsetWidth) {}
+  get offsetHeight() {
+    return this.clientHeight;
+  }
+  set offsetHeight(offsetHeight) {}
+  get offsetTop() {
+    return 0;
+  }
+  set offsetTop(offsetTop) {}
+  get offsetLeft() {
+    return 0;
+  }
+  set offsetLeft(offsetLeft) {}
+
+  get offsetParent() {
+    const body = this.ownerDocument.body;
+    for (let el = this; el; el = el.parentNode) {
+      if (el.parentNode === body) {
+        return body;
+      }
+    }
+    return null;
+  }
+  set offsetParent(offsetParent) {}
+
+  get style() {
+    if (!this._style) {
+      this._style = _makeStyleProxy(this);
+    }
+    return this._style;
+  }
+  set style(style) {}
 }
 class HTMLAnchorElement extends HTMLElement {
   constructor(attrs = [], value = '', location = null) {
@@ -2821,6 +2832,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     CANVAS: HTMLCanvasElement,
   };
   window[optionsSymbol] = options;
+  window.Element = Element;
   window.HTMLElement = HTMLElement;
   window.HTMLAnchorElement = HTMLAnchorElement;
   window.HTMLStyleElement = HTMLStyleElement;
