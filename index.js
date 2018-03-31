@@ -846,7 +846,7 @@ class VRDisplay extends MRDisplay {
 class MLDisplay extends MRDisplay {
   constructor(window, displayId) {
     super('ML', window, displayId);
-    
+
     new THREE.Matrix4().compose(
       new THREE.Vector3(0, 0, 0),
       new THREE.Quaternion(),
