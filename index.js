@@ -1367,6 +1367,9 @@ class Element extends Node {
     const oldValue = this.attributes[name];
     this.attributes[name] = value;
   }
+  setAttributeNS(namespace, name, value) {
+    this.setAttribute(name, value);
+  }
   hasAttribute(name) {
     return name in this.attributes;
   }
