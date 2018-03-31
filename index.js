@@ -681,9 +681,9 @@ class MRDisplay {
     this._width = window.innerWidth / 2;
     this._height = window.innerHeight;
     this._leftOffset = 0;
-    this._leftFov = 90;
+    this._leftFov = Float32Array.from([45, 45, 45, 45]);
     this._rightOffset = 0;
-    this._rightFov = 90;
+    this._rightFov = Float32Array.from([45, 45, 45, 45]);
     this._cleanups = [];
     this._rafs = [];
   }
@@ -700,11 +700,17 @@ class MRDisplay {
 
   getEyeParameters(eye) {
     const leftEye = eye === 'left';
+    const _fovArrayToVRFieldOfView = fovArray => ({
+      leftDegrees: fovArray[0],
+      rightDegrees: fovArray[1],
+      upDegrees: fovArray[2],
+      downDegrees: fovArray[3],
+    });
     return {
       renderWidth: this._width,
       renderHeight: this._height,
       offset: leftEye ? this._leftOffset : this._rightOffset,
-      fieldOfView: leftEye ? this._leftFov : this._rightFov,
+      fieldOfView: _fovArrayToVRFieldOfView(leftEye ? this._leftFov : this._rightFov),
     };
   }
 
