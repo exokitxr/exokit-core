@@ -955,6 +955,21 @@ class AudioListener extends AudioNode {
     this.upY = new AudioParam();
     this.upZ = new AudioParam();
   }
+  
+  setPosition(x, y, z) {
+    this.positionX.value = x;
+    this.positionY.value = y;
+    this.positionZ.value = z;
+  }
+
+  setOrientation(fx, fy, fz, ux, uy, uz) {
+    this.forwardX.value = fx;
+    this.forwardY.value = fy;
+    this.forwardZ.value = fz;
+    this.upX.value = ux;
+    this.upY.value = uy;
+    this.upZ.value = uz;
+  }
 }
 class AudioParam {
   constructor() {
