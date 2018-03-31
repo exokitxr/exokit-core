@@ -3035,7 +3035,12 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       if (src instanceof Blob) {
         super('data:application/javascript,' + src.buffer.toString('utf8'), workerOptions);
       } else {
-        super(_normalizeUrl(src), workerOptions);
+        const blob = urls.get(src);
+        const normalizedSrc = blob ?
+          'data:application/octet-stream;base64,' + blob.buffer.toString('base64')
+        :
+          _normalizeUrl(src);
+        super(normalizedSrc, workerOptions);
       }
     }
   };
