@@ -542,7 +542,8 @@ class Screen {
 }
 let nativeVr = null;
 let nativeMl = null;
-const maxNumPlanes = 32;
+const maxNumPlanes = 32 * 3;
+const planeEntrySize = 3 + 4 + 2 + 1;
 class VRFrameData {
   constructor() {
     this.leftProjectionMatrix = new Float32Array(16);
@@ -552,7 +553,7 @@ class VRFrameData {
     this.pose = new VRPose();
 
     // non-standard
-    this.planes = new Float32Array(maxNumPlanes * (3 + 4 + 2));
+    this.planes = new Float32Array(maxNumPlanes * planeEntrySize);
     this.numPlanes = 0;
   }
 
@@ -849,7 +850,7 @@ class MLDisplay extends MRDisplay {
     this._transformArray = new Float32Array(7 * 2);
     this._projectionArray = new Float32Array(16 * 2);
     // this._viewportArray = new Float32Array(4);
-    this._planesArray = new Float32Array(maxNumPlanes * (3 + 4 + 2));
+    this._planesArray = new Float32Array(maxNumPlanes * planeEntrySize);
     this._numPlanes = 0;
 
     /* const _resize = () => {
