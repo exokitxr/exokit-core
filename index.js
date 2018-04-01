@@ -3059,6 +3059,12 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   };
   window.requestAnimationFrame = requestAnimationFrame;
   window.cancelAnimationFrame = cancelAnimationFrame;
+  window.Boolean = Boolean;
+  window.Number = Number;
+  window.String = String;
+  window.Object = Object;
+  window.Array = Array;
+  window.Symbol = Symbol;
   window.ArrayBuffer = ArrayBuffer;
   window.Int8Array = Int8Array;
   window.Uint8Array = Uint8Array;
