@@ -14,7 +14,7 @@ const windowEval = require('window-eval-native');
 const fetch = require('window-fetch');
 const {XMLHttpRequest} = require('window-xhr');
 const XHRUtils = require('window-xhr/lib/utils');
-const {Response, Blob} = fetch;
+const {Request, Response, Blob} = fetch;
 const WebSocket = require('ws/lib/websocket');
 const {LocalStorage} = require('node-localstorage');
 const createMemoryHistory = require('history/createMemoryHistory').default;
@@ -3044,6 +3044,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       }
     }
   };
+  window.Request = Request;
+  window.Response = Response;
   window.Blob = Blob;
   window.AudioContext = AudioContext;
   window.AudioNode = AudioNode;
