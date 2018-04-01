@@ -2948,14 +2948,18 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.TextEncoder = TextEncoder;
   window.TextDecoder = TextDecoder;
   window.fetch = (url, options) => {
-    const blob = urls.get(url);
-    if (blob) {
-      return Promise.resolve(new Response(blob));
-    } else {
-      url = _normalizeUrl(url);
-      if (redirectUrls[url]) {
-        url = redirectUrls[url];
+    if (typeof url === 'string') {
+      const blob = urls.get(url);
+      if (blob) {
+        return Promise.resolve(new Response(blob));
+      } else {
+        url = _normalizeUrl(url);
+        if (redirectUrls[url]) {
+          url = redirectUrls[url];
+        }
+        return fetch(url, options);
       }
+    } else {
       return fetch(url, options);
     }
   };
