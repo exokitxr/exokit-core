@@ -889,6 +889,17 @@ class VRDisplay extends MRDisplay {
     frameData.rightProjectionMatrix.set(this._projectionMatrix);
   }
 } */
+class MLMesh {
+  constructor() {
+    this.positions = new Float32Array(9);
+    this.normals = Float32Array.from([
+      0, 1, 0,
+      0, 1, 0,
+      0, 1, 0,
+    ]);
+    this.indices = Uint32Array.from([0, 1, 2]);
+  }
+}
 class MLDisplay extends MRDisplay {
   constructor(window, displayId) {
     super('ML', window, displayId);
@@ -904,6 +915,7 @@ class MLDisplay extends MRDisplay {
     // this._viewportArray = new Float32Array(4);
     this._planesArray = new Float32Array(maxNumPlanes * planeEntrySize);
     this._numPlanes = 0;
+    this.mesh = [null, null, null];
 
     /* const _resize = () => {
       this._width = window.innerWidth / 2;
@@ -916,6 +928,9 @@ class MLDisplay extends MRDisplay {
       // this._viewportArray.set(update.viewportArray);
       this._planesArray.set(update.planesArray);
       this._numPlanes = update.numPlanes;
+      for (let i = 0; i < 3; i++) {
+        this.mesh[i] = update.meshArray[i];
+      }
 
       this._width = update.viewportArray[2];
       this._height = update.viewportArray[3];
