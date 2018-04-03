@@ -3077,7 +3077,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.Uint8ClampedArray = Uint8ClampedArray;
   window.Int16Array = Int16Array;
   window.Uint16Array = Uint16Array;
-  window.Uint32Array = Int32Array;
+  window.Int32Array = Int32Array;
+  window.Uint32Array = Uint32Array;
   window.Float32Array = Float32Array;
   window.Float64Array = Float64Array;
   window.DataView = DataView;
