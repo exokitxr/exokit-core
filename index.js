@@ -621,6 +621,17 @@ class GamepadPose {
     this.angularAcceleration.set(pose.angularAcceleration);
   }
 }
+class GamepadGesture {
+  constructor() {
+    this.position = new Float32Array(3);
+    this.gesture = null;
+  }
+
+  copy(gesture) {
+    this.position.set(gesture.position);
+    this.gesture = gesture.gesture;
+  }
+}
 class Gamepad {
   constructor(hand, index) {
     this.hand = hand;
@@ -635,6 +646,9 @@ class Gamepad {
     ];
     this.pose = new GamepadPose();
     this.axes = new Float32Array(2);
+    
+    // non-standard
+    this.gesture = new GamepadGesture();
   }
 
   copy(gamepad) {
@@ -644,6 +658,9 @@ class Gamepad {
     }
     this.pose.copy(gamepad.pose);
     this.axes.set(gamepad.axes);
+    
+    // non-standard
+    this.gesture.copy(gamepad.gesture);
   }
 }
 class VRStageParameters {
@@ -893,15 +910,15 @@ class MLDisplay extends MRDisplay {
       this._height = window.innerHeight;
     };
     window.on('resize', _resize); */
-    const _updatemlframe = (transformArray, projectionArray, viewportArray, planesArray, numPlanes) => {
-      this._transformArray.set(transformArray);
-      this._projectionArray.set(projectionArray);
-      // this._viewportArray.set(viewportArray);
-      this._planesArray.set(planesArray);
-      this._numPlanes = numPlanes;
+    const _updatemlframe = update => {
+      this._transformArray.set(update.transformArray);
+      this._projectionArray.set(update.projectionArray);
+      // this._viewportArray.set(update.viewportArray);
+      this._planesArray.set(update.planesArray);
+      this._numPlanes = update.numPlanes;
 
-      this._width = viewportArray[2];
-      this._height = viewportArray[3];
+      this._width = update.viewportArray[2];
+      this._height = update.viewportArray[3];
     };
     window.top.on('updatemlframe', _updatemlframe);
 
@@ -3097,14 +3114,31 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     /* window.updateArFrame = (viewMatrix, projectionMatrix) => {
       window._emit('updatearframe', viewMatrix, projectionMatrix);
     }; */
-    window.updateMlFrame = (transformArray, projectionArray, viewportArray, planesArray, numPlanes) => {
-      window._emit('updatemlframe', transformArray, projectionArray, viewportArray, planesArray, numPlanes);
+    window.updateMlFrame = update => {
+      window._emit('updatemlframe', update);
     };
 
     window.on('updatevrframe', update => {
-      const {
-        gamepads,
-      } = update;
+      const {gamepads} = update;
+
+      if (gamepads !== undefined) {
+        if (gamepads[0]) {
+          localGamepads[0] = leftGamepad;
+          localGamepads[0].copy(gamepads[0]);
+        } else {
+          localGamepads[0] = null;
+        }
+        if (gamepads[1]) {
+          localGamepads[1] = rightGamepad;
+          localGamepads[1].copy(gamepads[1]);
+        } else {
+          localGamepads[1] = null;
+        }
+      }
+    });
+    
+    window.on('updatemlframe', update => {
+      const {gamepads} = update;
 
       if (gamepads !== undefined) {
         if (gamepads[0]) {
