@@ -932,7 +932,7 @@ class MLDisplay extends MRDisplay {
         this.mesh[i] = update.meshArray[i];
       }
 
-      this._width = update.viewportArray[2];
+      this._width = update.viewportArray[2] / 2;
       this._height = update.viewportArray[3];
     };
     window.top.on('updatemlframe', _updatemlframe);
