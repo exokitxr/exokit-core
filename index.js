@@ -910,8 +910,22 @@ class MLDisplay extends MRDisplay {
       new THREE.Vector3(1, 1, 1)
     ).toArray(this.stageParameters.sittingToStandingTransform);
 
-    this._transformArray = new Float32Array(7 * 2);
-    this._projectionArray = new Float32Array(16 * 2);
+    this._transformArray = Float32Array.from([
+      0, 0, 0,
+      0, 0, 0, 1,
+      0, 0, 0,
+      0, 0, 0, 1,
+    ]);
+    this._projectionArray = Float32Array.from([
+      2.1445069205095586, 0, 0, 0,
+      0, 2.1445069205095586, 0, 0,
+      0, 0, -1.00010000500025, -1,
+      0, 0, -0.200010000500025, 0,
+      2.1445069205095586, 0, 0, 0,
+      0, 2.1445069205095586, 0, 0,
+      0, 0, -1.00010000500025, -1,
+      0, 0, -0.200010000500025, 0,
+    ]);
     // this._viewportArray = new Float32Array(4);
     this._planesArray = new Float32Array(maxNumPlanes * planeEntrySize);
     this._numPlanes = 0;
