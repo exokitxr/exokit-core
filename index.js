@@ -3201,8 +3201,11 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         lastPresent = isPresent;
       });
     }
-  } /* else {
-    top.on('updatevrframe', update => { // XXX clean up listeners on window destroy
+  } else {
+    top.on('vrdisplaypresentchange', e => {
+      window._emit('vrdisplaypresentchange', e);
+    });
+    /* top.on('updatevrframe', update => { // XXX clean up listeners on window destroy
       window._emit('updatevrframe', update);
     });
     top.on('updatearframe', update => {
@@ -3210,8 +3213,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     });
     top.on('updatemlframe', update => {
       window._emit('updatemlframe', update);
-    });
-  } */
+    }); */
+  }
   return window;
 };
 const _parseDocument = (s, options, window) => {
