@@ -385,6 +385,7 @@ class MutationObserver {
     });
   }
 }
+let Image = null;
 class ImageData {
   constructor(width, height) {
     this.width = width;
@@ -3067,18 +3068,60 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     }
   })(XMLHttpRequest);
   window.WebSocket = WebSocket;
+  window.Request = Request;
+  window.Response = Response;
+  window.Blob = Blob;
+  window.AudioContext = AudioContext;
+  window.AudioNode = AudioNode;
+  window.AudioDestinationNode = AudioDestinationNode;
+  window.AudioParam = AudioParam;
+  window.AudioListener = AudioListener;
+  window.GainNode = GainNode;
+  window.AnalyserNode = AnalyserNode;
+  window.PannerNode = PannerNode;
+  window.StereoPannerNode = StereoPannerNode;
+  window.createImageBitmap = function(src, x, y, w, h, options) {
+    let image;
+    if (src.constructor.name === 'HTMLImageElement') {
+      image = src.image;
+    } else if (src.constructor.name === 'Blob') {
+      image = new Image();
+      // console.log('load blob', src.buffer.byteLength);
+      try {
+        image.load(src.buffer);
+      } catch (err) {
+        return Promise.reject(new Error('failed to load image'));
+      }
+    } else {
+      return Promise.reject(new Error('invalid arguments'));
+    }
+
+    x = x || 0;
+    y = y || 0;
+    w = w || image.width;
+    h = h || image.height;
+    const flipY = !!options && options.imageOrientation === 'flipY';
+    const imageBitmap = new ImageBitmap(
+      image,
+      x,
+      y,
+      w,
+      h,
+      flipY,
+    );
+    return Promise.resolve(imageBitmap);
+  };
   window.Worker = class Worker extends nativeWorker {
     constructor(src, workerOptions = {}) {
       workerOptions.baseUrl = options.baseUrl;
       if (nativeBindings) {
         workerOptions.startScript = '\
-          const nativeBindings = requireNative("nativeBindings");\n\
-          global.ImageBitmap = nativeBindings.nativeImageBitmap;\n\
-          global.createImageBitmap = function() {\n\
-            return Promise.resolve(ImageBitmap.createImageBitmap.apply(ImageBitmap, arguments));\n\
-          };\n\
+          const bindings = requireNative("nativeBindings");\n\
+          global.Image = bindings.nativeImage;\n\
+          global.ImageBitmap = bindings.nativeImageBitmap;\n\
+          global.createImageBitmap = ${window.createImageBitmap.toString()};\n\
           const smiggles = require("smiggles");\n\
-          smiggles.bind({ImageBitmap: nativeBindings.nativeImageBitmap});\n\
+          smiggles.bind({ImageBitmap: bindings.nativeImageBitmap});\n\
         ';
       }
 
@@ -3093,21 +3136,6 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         super(normalizedSrc, workerOptions);
       }
     }
-  };
-  window.Request = Request;
-  window.Response = Response;
-  window.Blob = Blob;
-  window.AudioContext = AudioContext;
-  window.AudioNode = AudioNode;
-  window.AudioDestinationNode = AudioDestinationNode;
-  window.AudioParam = AudioParam;
-  window.AudioListener = AudioListener;
-  window.GainNode = GainNode;
-  window.AnalyserNode = AnalyserNode;
-  window.PannerNode = PannerNode;
-  window.StereoPannerNode = StereoPannerNode;
-  window.createImageBitmap = function() {
-    return Promise.resolve(ImageBitmap.createImageBitmap.apply(ImageBitmap, arguments));
   };
   window.requestAnimationFrame = requestAnimationFrame;
   window.cancelAnimationFrame = cancelAnimationFrame;
@@ -3352,6 +3380,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
     ImageBitmap: bindings.nativeImageBitmap,
   });
 
+  Image = bindings.nativeImage;
   ImageData = bindings.nativeImageData;
   ImageBitmap = bindings.nativeImageBitmap;
   Path2D = bindings.nativePath2D;
