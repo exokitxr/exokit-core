@@ -331,27 +331,31 @@ class MutationObserver {
   }
 
   bind(element) {
-    element.traverse(el => {
-      const _attribute = (name, value) => this.handleAttribute(el, name, value);
-      el.on('attribute', _attribute);
-      const _children = (addedNodes, removedNodes, previousSibling, nextSibling) => this.handleChildren(el, addedNodes, removedNodes, previousSibling, nextSibling);
-      el.on('children', _children);
+    if (element.childNodes) {
+      element.traverse(el => {
+        const _attribute = (name, value) => this.handleAttribute(el, name, value);
+        el.on('attribute', _attribute);
+        const _children = (addedNodes, removedNodes, previousSibling, nextSibling) => this.handleChildren(el, addedNodes, removedNodes, previousSibling, nextSibling);
+        el.on('children', _children);
 
-      this.bindings.set(el, [
-        _attribute,
-        _children,
-      ]);
-    });
+        this.bindings.set(el, [
+          _attribute,
+          _children,
+        ]);
+      });
+    }
   }
 
   unbind(element) {
-    element.traverse(el => {
-      const bindings = this.bindings.get(el);
-      for (let i = 0; i < bindings.length; i++) {
-        el.removeListener(bindings[i]);
-      }
-      this.bindings.remove(el);
-    });
+    if (element.childNodes) {
+      element.traverse(el => {
+        const bindings = this.bindings.get(el);
+        for (let i = 0; i < bindings.length; i++) {
+          el.removeListener(bindings[i]);
+        }
+        this.bindings.remove(el);
+      });
+    }
   }
 
   flush() {
