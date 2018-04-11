@@ -10,7 +10,7 @@ const {performance} = require('perf_hooks');
 const parseIntStrict = require('parse-int');
 const parse5 = require('parse5');
 
-const windowEval = require('window-eval-native');
+const windowEval = require('vm-one');
 const fetch = require('window-fetch');
 const {XMLHttpRequest} = require('window-xhr');
 const XHRUtils = require('window-xhr/lib/utils');
@@ -2020,7 +2020,7 @@ class HTMLWindowElement extends HTMLElement {
     return this[disabledEventsSymbol]['load'] !== undefined ? this[disabledEventsSymbol]['load'] : _elementGetter(this, 'load');
   }
   set onload(onload) {
-    if (windowEval.isParsing(this)) {
+    if (windowEval.isCompiling(this)) {
       this[disabledEventsSymbol]['load'] = onload;
     } else {
       if (this[disabledEventsSymbol]['load'] !== undefined) {
@@ -2035,7 +2035,7 @@ class HTMLWindowElement extends HTMLElement {
     return this[disabledEventsSymbol]['error'] !== undefined ? this[disabledEventsSymbol]['error'] : _elementGetter(this, 'error');
   }
   set onerror(onerror) {
-    if (windowEval.isParsing(this)) {
+    if (windowEval.isCompiling(this)) {
       this[disabledEventsSymbol]['error'] = onerror;
     } else {
       if (this[disabledEventsSymbol]['error'] !== undefined) {
