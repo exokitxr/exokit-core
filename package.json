@@ -11,7 +11,7 @@
     "parse5": "^4.0.0",
     "selector-lite": "^0.1.1",
     "text-encoding": "^0.6.4",
-    "vm-one": "0.0.6",
+    "vm-one": "0.0.7",
     "window-classlist": "0.0.1",
     "window-fetch": "0.0.6",
     "window-xhr": "0.0.1",
