@@ -3065,7 +3065,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     DataView,
 
     postMessage(data) {
-      this._emit('message', new MessageEvent(data));
+      window._emit('message', new MessageEvent(data));
     },
     
     /*
@@ -3083,53 +3083,53 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     },
 
     _emit(type) {
-      if (!this[disabledEventsSymbol][type]) {
-        Node.prototype._emit.apply(this, arguments);
+      if (!window[disabledEventsSymbol][type]) {
+        Node.prototype._emit.apply(window, arguments);
       }
     },
 
     get onload() {
-      return this[disabledEventsSymbol]['load'] !== undefined ? this[disabledEventsSymbol]['load'] : _elementGetter(this, 'load');
+      return window[disabledEventsSymbol]['load'] !== undefined ? window[disabledEventsSymbol]['load'] : _elementGetter(window, 'load');
     },
     set onload(onload) {
-      if (windowEval.isCompiling(this)) {
+      if (windowEval.isCompiling(window)) {
         this[disabledEventsSymbol]['load'] = onload;
       } else {
-        if (this[disabledEventsSymbol]['load'] !== undefined) {
+        if (window[disabledEventsSymbol]['load'] !== undefined) {
           this[disabledEventsSymbol]['load'] = onload;
         } else {
-          _elementSetter(this, 'load', onload);
+          _elementSetter(window, 'load', onload);
         }
       }
     },
 
     get onerror() {
-      return this[disabledEventsSymbol]['error'] !== undefined ? this[disabledEventsSymbol]['error'] : _elementGetter(this, 'error');
+      return window[disabledEventsSymbol]['error'] !== undefined ? window[disabledEventsSymbol]['error'] : _elementGetter(window, 'error');
     },
     set onerror(onerror) {
-      if (windowEval.isCompiling(this)) {
-        this[disabledEventsSymbol]['error'] = onerror;
+      if (windowEval.isCompiling(window)) {
+        window[disabledEventsSymbol]['error'] = onerror;
       } else {
-        if (this[disabledEventsSymbol]['error'] !== undefined) {
-          this[disabledEventsSymbol]['error'] = onerror;
+        if (window[disabledEventsSymbol]['error'] !== undefined) {
+          window[disabledEventsSymbol]['error'] = onerror;
         } else {
-          _elementSetter(this, 'error', onerror);
+          _elementSetter(window, 'error', onerror);
         }
       }
     },
 
     get onmessage() {
-      return _elementGetter(this, 'message');
+      return _elementGetter(window, 'message');
     },
     set onmessage(onmessage) {
-      _elementSetter(this, 'message', onmessage);
+      _elementSetter(window, 'message', onmessage);
     },
 
     get onpopstate() {
-      return _elementGetter(this, 'popstate');
+      return _elementGetter(window, 'popstate');
     },
     set onpopstate(onpopstate) {
-      _elementSetter(this, 'popstate', onpopstate);
+      _elementSetter(window, 'popstate', onpopstate);
     },
   };
   
