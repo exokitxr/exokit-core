@@ -1988,78 +1988,6 @@ class HTMLLoadableElement extends HTMLElement {
     _elementSetter(this, 'error', onerror);
   }
 }
-class HTMLWindowElement extends HTMLElement {
-  constructor() {
-    super('WINDOW');
-
-    /* Treat function onload() as a special case that disables automatic event attach for onload, because this is how browsers work. E.g.
-    <!doctype html><html><head><script>
-      function onload() {
-        console.log ('onload'); // NOT called; presence of top-level function onload() makes all the difference
-      }
-      window.onload = onload;
-    </script></head></html>
-    */
-    this[disabledEventsSymbol] = {
-      load: undefined,
-      error: undefined,
-    };
-  }
-
-  postMessage(data) {
-    this._emit('message', new MessageEvent(data));
-  }
-
-  _emit(type) {
-    if (!this[disabledEventsSymbol][type]) {
-      super._emit.apply(this, arguments);
-    }
-  }
-
-  get onload() {
-    return this[disabledEventsSymbol]['load'] !== undefined ? this[disabledEventsSymbol]['load'] : _elementGetter(this, 'load');
-  }
-  set onload(onload) {
-    if (windowEval.isCompiling(this)) {
-      this[disabledEventsSymbol]['load'] = onload;
-    } else {
-      if (this[disabledEventsSymbol]['load'] !== undefined) {
-        this[disabledEventsSymbol]['load'] = onload;
-      } else {
-        _elementSetter(this, 'load', onload);
-      }
-    }
-  }
-
-  get onerror() {
-    return this[disabledEventsSymbol]['error'] !== undefined ? this[disabledEventsSymbol]['error'] : _elementGetter(this, 'error');
-  }
-  set onerror(onerror) {
-    if (windowEval.isCompiling(this)) {
-      this[disabledEventsSymbol]['error'] = onerror;
-    } else {
-      if (this[disabledEventsSymbol]['error'] !== undefined) {
-        this[disabledEventsSymbol]['error'] = onerror;
-      } else {
-        _elementSetter(this, 'error', onerror);
-      }
-    }
-  }
-
-  get onmessage() {
-    return _elementGetter(this, 'message');
-  }
-  set onmessage(onmessage) {
-    _elementSetter(this, 'message', onmessage);
-  }
-
-  get onpopstate() {
-    return _elementGetter(this, 'popstate');
-  }
-  set onpopstate(onpopstate) {
-    _elementSetter(this, 'popstate', onpopstate);
-  }
-}
 class HTMLDocumentElement extends HTMLLoadableElement {
   constructor() {
     super('DOCUMENT');
@@ -2816,45 +2744,17 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     }
     return src;
   };
+  
+  const HTMLImageElementBound = (Old => class HTMLImageElement extends Old {
+    constructor() {
+      super(...arguments);
 
-  const window = new HTMLWindowElement();
-  window.window = window;
-  window.self = window;
-  window.parent = parent || window;
-  window.top = top || window;
-  window.innerWidth = 1280;
-  window.innerHeight = 1024;
-  window.devicePixelRatio = 1;
-  window.document = null;
-  window.location = new Location(options.url);
-  window.history = new History(window.location.href);
-  window.history.on('popstate', (u, state) => {
-    window.location.set(u);
-
-    const event = new Event('popstate');
-    event.state = state;
-    window.dispatchEvent(event);
-  });
-  let loading = false;
-  window.location.on('update', href => {
-    if (!loading) {
-      exokit.load(href)
-        .then(newWindow => {
-          window._emit('beforeunload');
-          window._emit('unload');
-          window._emit('navigate', newWindow);
-        })
-        .catch(err => {
-          loading = false;
-          window._emit('error', {
-            error: err,
-          });
-        });
-      loading = true;
+      this.ownerDocument = window.document; // need to set owner document here because HTMLImageElement can be manually constructed via new Image()
     }
-  });
-
-  window.navigator = {
+  })(HTMLImageElement);
+  const location = new Location(options.url);
+  const history = new History(location.href);
+  const navigator = {
     userAgent: 'exokit',
     mediaDevices: {
       getUserMedia(constraints) {
@@ -2900,266 +2800,381 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       vrTextures = newVrTextures;
     }, */
   };
-  window.localStorage = new LocalStorage(path.join(options.dataPath, '.localStorage'));
-  window.URL = URL;
-  window.console = console;
-  window.setTimeout = setTimeout;
-  window.clearTimeout = clearTimeout;
-  window.setInterval = setInterval;
-  window.clearInterval = clearInterval;
-  window.performance = performance;
-  const HTMLImageElementBound = (Old => class HTMLImageElement extends Old {
-    constructor() {
-      super(...arguments);
+  const localStorage = new LocalStorage(path.join(options.dataPath, '.localStorage'));
 
-      this.ownerDocument = window.document; // need to set owner document here because HTMLImageElement can be manually constructed via new Image()
-    }
-  })(HTMLImageElement);
-  window[htmlTagsSymbol] = {
-    DOCUMENT: HTMLDocumentElement,
-    BODY: HTMLBodyElement,
-    A: HTMLAnchorElement,
-    STYLE: HTMLStyleElement,
-    SCRIPT: HTMLScriptElement,
-    IMG: HTMLImageElementBound,
-    AUDIO: HTMLAudioElement,
-    VIDEO: HTMLVideoElement,
-    SOURCE: HTMLSourceElement,
-    IFRAME: HTMLIframeElement,
-    CANVAS: HTMLCanvasElement,
-  };
-  window[optionsSymbol] = options;
-  window.Element = Element;
-  window.HTMLElement = HTMLElement;
-  window.HTMLAnchorElement = HTMLAnchorElement;
-  window.HTMLStyleElement = HTMLStyleElement;
-  window.HTMLScriptElement = HTMLScriptElement;
-  window.HTMLImageElement = HTMLImageElementBound;
-  window.HTMLAudioElement = HTMLAudioElement;
-  window.HTMLVideoElement = HTMLVideoElement;
-  window.HTMLIframeElement = HTMLIframeElement;
-  window.HTMLCanvasElement = HTMLCanvasElement;
-  window.getComputedStyle = el => {
-    let styleSpec = el[computedStyleSymbol];
-    if (!styleSpec || styleSpec.epoch !== styleEpoch) {
-      const style = el.style.clone();
-      const styleEls = el.ownerDocument.documentElement.getElementsByTagName('style');
-      for (let i = 0; i < styleEls.length; i++) {
-        const {stylesheet} = styleEls[i];
-        if (stylesheet) {
-          const {rules} = stylesheet;
-          for (let j = 0; j < rules.length; j++) {
-            const rule = rules[j];
-            const {selectors} = rule;
-            if (selectors && selectors.some(selector => el.matches(selector))) {
-              const {declarations} = rule;
-              for (let k = 0; k < declarations.length; k++) {
-                const {property, value} = declarations[k];
-                style[property] = value;
+  const window = {
+    innerWidth: 1280,
+    innerHeight: 1024,
+    devicePixelRatio: 1,
+    document: null,
+    location,
+    history,
+    navigator,
+    localStorage,
+    URL,
+    console,
+    setTimeout,
+    clearTimeout,
+    setInterval,
+    clearInterval,
+    performance,
+    [htmlTagsSymbol]: {
+      DOCUMENT: HTMLDocumentElement,
+      BODY: HTMLBodyElement,
+      A: HTMLAnchorElement,
+      STYLE: HTMLStyleElement,
+      SCRIPT: HTMLScriptElement,
+      IMG: HTMLImageElementBound,
+      AUDIO: HTMLAudioElement,
+      VIDEO: HTMLVideoElement,
+      SOURCE: HTMLSourceElement,
+      IFRAME: HTMLIframeElement,
+      CANVAS: HTMLCanvasElement,
+    },
+    [optionsSymbol]: options,
+    Element,
+    HTMLElement,
+    HTMLAnchorElement,
+    HTMLStyleElement,
+    HTMLScriptElement,
+    HTMLImageElement: HTMLImageElementBound,
+    HTMLAudioElement,
+    HTMLVideoElement,
+    HTMLIframeElement,
+    HTMLCanvasElement,
+    getComputedStyle: el => {
+      let styleSpec = el[computedStyleSymbol];
+      if (!styleSpec || styleSpec.epoch !== styleEpoch) {
+        const style = el.style.clone();
+        const styleEls = el.ownerDocument.documentElement.getElementsByTagName('style');
+        for (let i = 0; i < styleEls.length; i++) {
+          const {stylesheet} = styleEls[i];
+          if (stylesheet) {
+            const {rules} = stylesheet;
+            for (let j = 0; j < rules.length; j++) {
+              const rule = rules[j];
+              const {selectors} = rule;
+              if (selectors && selectors.some(selector => el.matches(selector))) {
+                const {declarations} = rule;
+                for (let k = 0; k < declarations.length; k++) {
+                  const {property, value} = declarations[k];
+                  style[property] = value;
+                }
               }
             }
           }
         }
+        styleSpec = {
+          style,
+          styleEpoch,
+        };
+        el[computedStyleSymbol] = styleSpec;
       }
-      styleSpec = {
-        style,
-        styleEpoch,
-      };
-      el[computedStyleSymbol] = styleSpec;
-    }
-    return styleSpec.style;
-  };
-  window.Event = Event;
-  window.KeyboardEvent = KeyboardEvent;
-  window.MouseEvent = MouseEvent;
-  window.WheelEvent = WheelEvent;
-  window.MessageEvent = MessageEvent;
-  window.CustomEvent = CustomEvent;
-  window.MutationObserver = MutationObserver;
-  window.Node = Node;
-  window.Text = Text;
-  window.Comment = Comment;
-  window.Image = HTMLImageElementBound;
-  window.ImageData = ImageData;
-  window.ImageBitmap = ImageBitmap;
-  window.Path2D = Path2D;
-  window.CanvasGradient = CanvasGradient;
-  window.CanvasRenderingContext2D = CanvasRenderingContext2D;
-  window.WebGLRenderingContext = WebGLRenderingContext;
-  window.MediaRecorder = MediaRecorder;
-  window.screen = new Screen(window);
-  window.Screen = Screen;
-  window.Gamepad = Gamepad;
-  window.VRStageParameters = VRStageParameters;
-  window.VRDisplay = VRDisplay;
-  // window.ARDisplay = ARDisplay;
-  window.VRFrameData = VRFrameData;
-  window.btoa = btoa;
-  window.atob = atob;
-  window.TextEncoder = TextEncoder;
-  window.TextDecoder = TextDecoder;
-  window.fetch = (url, options) => {
-    if (typeof url === 'string') {
-      const blob = urls.get(url);
-      if (blob) {
-        return Promise.resolve(new Response(blob));
-      } else {
-        url = _normalizeUrl(url);
-        if (redirectUrls[url]) {
-          url = redirectUrls[url];
+      return styleSpec.style;
+    },
+    Event,
+    KeyboardEvent,
+    MouseEvent,
+    WheelEvent,
+    MessageEvent,
+    CustomEvent,
+    MutationObserver,
+    Node,
+    Text,
+    Comment,
+    Image: HTMLImageElementBound,
+    ImageData,
+    ImageBitmap,
+    Path2D,
+    CanvasGradient,
+    CanvasRenderingContext2D,
+    WebGLRenderingContext,
+    MediaRecorder,
+    screen: null,
+    Screen,
+    Gamepad,
+    VRStageParameters,
+    VRDisplay,
+    // ARDisplay,
+    VRFrameData,
+    btoa,
+    atob,
+    TextEncoder,
+    TextDecoder,
+    fetch: (url, options) => {
+      if (typeof url === 'string') {
+        const blob = urls.get(url);
+        if (blob) {
+          return Promise.resolve(new Response(blob));
+        } else {
+          url = _normalizeUrl(url);
+          if (redirectUrls[url]) {
+            url = redirectUrls[url];
+          }
+          return fetch(url, options);
         }
+      } else {
         return fetch(url, options);
       }
-    } else {
-      return fetch(url, options);
-    }
-  };
-  window.redirect = (url1, url2) => {
-    redirectUrls[url1] = url2;
-  };
-  window.XMLHttpRequest = (Old => class XMLHttpRequest extends Old {
-    open() {
-      const blob = urls.get(url);
-      if (blob) {
-        this._properties._responseFn = cb => {
-          process.nextTick(() => {
-            const {buffer} = blob;
-            const response = new stream.PassThrough();
-            response.statusCode = 200;
-            response.headers = {
-              'content-length': buffer.length + '',
-            };
-            cb(response);
-          });
-        };
-      } else {
-        arguments[1] = _normalizeUrl(arguments[1]);
-        if (redirectUrls[arguments[1]]) {
-          arguments[1] = redirectUrls[arguments[1]];
-        }
-        const match = arguments[1].match(/^file:\/\/(.*)$/);
-        if (match) {
-          const p = match[1];
+    },
+    redirect: (url1, url2) => {
+      redirectUrls[url1] = url2;
+    },
+    XMLHttpRequest: (Old => class XMLHttpRequest extends Old {
+      open() {
+        const blob = urls.get(url);
+        if (blob) {
           this._properties._responseFn = cb => {
-            fs.lstat(p, (err, stats) => {
-              if (!err) {
-                const response = fs.createReadStream(p);
-                response.statusCode = 200;
-                response.headers = {
-                  'content-length': stats.size + '',
-                };
-                cb(response);
-              } else if (err.code === 'ENOENT') {
-                const response = new stream.PassThrough();
-                response.statusCode = 404;
-                response.headers = {};
-                response.end('file not found: ' + p);
-                cb(response);
-              } else {
-                const response = new stream.PassThrough();
-                response.statusCode = 500;
-                response.headers = {};
-                response.end(err.stack);
-                cb(response);
-              }
+            process.nextTick(() => {
+              const {buffer} = blob;
+              const response = new stream.PassThrough();
+              response.statusCode = 200;
+              response.headers = {
+                'content-length': buffer.length + '',
+              };
+              cb(response);
             });
           };
-          arguments[1] = 'http://127.0.0.1/'; // needed to pass protocol check, will not be fetched
+        } else {
+          arguments[1] = _normalizeUrl(arguments[1]);
+          if (redirectUrls[arguments[1]]) {
+            arguments[1] = redirectUrls[arguments[1]];
+          }
+          const match = arguments[1].match(/^file:\/\/(.*)$/);
+          if (match) {
+            const p = match[1];
+            this._properties._responseFn = cb => {
+              fs.lstat(p, (err, stats) => {
+                if (!err) {
+                  const response = fs.createReadStream(p);
+                  response.statusCode = 200;
+                  response.headers = {
+                    'content-length': stats.size + '',
+                  };
+                  cb(response);
+                } else if (err.code === 'ENOENT') {
+                  const response = new stream.PassThrough();
+                  response.statusCode = 404;
+                  response.headers = {};
+                  response.end('file not found: ' + p);
+                  cb(response);
+                } else {
+                  const response = new stream.PassThrough();
+                  response.statusCode = 500;
+                  response.headers = {};
+                  response.end(err.stack);
+                  cb(response);
+                }
+              });
+            };
+            arguments[1] = 'http://127.0.0.1/'; // needed to pass protocol check, will not be fetched
+          }
+        }
+
+        return Old.prototype.open.apply(this, arguments);
+      }
+    })(XMLHttpRequest),
+    WebSocket,
+    Request,
+    Response,
+    Blob,
+    AudioContext,
+    AudioNode,
+    AudioDestinationNode,
+    AudioParam,
+    AudioListener,
+    GainNode,
+    AnalyserNode,
+    PannerNode,
+    StereoPannerNode,
+    createImageBitmap: function(src, x, y, w, h, options) {
+      let image;
+      if (src.constructor.name === 'HTMLImageElement') {
+        image = src.image;
+      } else if (src.constructor.name === 'Blob') {
+        image = new Image();
+        // console.log('load blob', src.buffer.byteLength);
+        try {
+          image.load(src.buffer);
+        } catch (err) {
+          return Promise.reject(new Error('failed to load image'));
+        }
+      } else {
+        return Promise.reject(new Error('invalid arguments'));
+      }
+
+      x = x || 0;
+      y = y || 0;
+      w = w || image.width;
+      h = h || image.height;
+      const flipY = !!options && options.imageOrientation === 'flipY';
+      const imageBitmap = new ImageBitmap(
+        image,
+        x,
+        y,
+        w,
+        h,
+        flipY,
+      );
+      return Promise.resolve(imageBitmap);
+    },
+    Worker: class Worker extends nativeWorker {
+      constructor(src, workerOptions = {}) {
+        workerOptions.baseUrl = options.baseUrl;
+        if (nativeBindings) {
+          workerOptions.startScript = '\
+            const bindings = requireNative("nativeBindings");\n\
+            global.Image = bindings.nativeImage;\n\
+            global.ImageBitmap = bindings.nativeImageBitmap;\n\
+            global.createImageBitmap = ${window.createImageBitmap.toString()};\n\
+            const smiggles = require("smiggles");\n\
+            smiggles.bind({ImageBitmap: bindings.nativeImageBitmap});\n\
+          ';
+        }
+
+        if (src instanceof Blob) {
+          super('data:application/javascript,' + src.buffer.toString('utf8'), workerOptions);
+        } else {
+          const blob = urls.get(src);
+          const normalizedSrc = blob ?
+            'data:application/octet-stream;base64,' + blob.buffer.toString('base64')
+          :
+            _normalizeUrl(src);
+          super(normalizedSrc, workerOptions);
         }
       }
+    },
+    requestAnimationFrame,
+    cancelAnimationFrame,
+    Boolean,
+    Number,
+    String,
+    Object,
+    Array,
+    Symbol,
+    ArrayBuffer,
+    Int8Array,
+    Uint8Array,
+    Uint8ClampedArray,
+    Int16Array,
+    Uint16Array,
+    Int32Array,
+    Uint32Array,
+    Float32Array,
+    Float64Array,
+    DataView,
+    
+    on: EventEmitter.prototype.on,
+    emit: EventEmitter.prototype.emit,
+    removeListener: EventEmitter.prototype.removeListener,
+    
+    addEventListener: HTMLElement.prototype.addEventListener,
+    removeEventListener: HTMLElement.prototype.removeEventListener,
+    dispatchEvent: HTMLElement.prototype.dispatchEvent,
 
-      return Old.prototype.open.apply(this, arguments);
-    }
-  })(XMLHttpRequest);
-  window.WebSocket = WebSocket;
-  window.Request = Request;
-  window.Response = Response;
-  window.Blob = Blob;
-  window.AudioContext = AudioContext;
-  window.AudioNode = AudioNode;
-  window.AudioDestinationNode = AudioDestinationNode;
-  window.AudioParam = AudioParam;
-  window.AudioListener = AudioListener;
-  window.GainNode = GainNode;
-  window.AnalyserNode = AnalyserNode;
-  window.PannerNode = PannerNode;
-  window.StereoPannerNode = StereoPannerNode;
-  window.createImageBitmap = function(src, x, y, w, h, options) {
-    let image;
-    if (src.constructor.name === 'HTMLImageElement') {
-      image = src.image;
-    } else if (src.constructor.name === 'Blob') {
-      image = new Image();
-      // console.log('load blob', src.buffer.byteLength);
-      try {
-        image.load(src.buffer);
-      } catch (err) {
-        return Promise.reject(new Error('failed to load image'));
+    postMessage(data) {
+      this._emit('message', new MessageEvent(data));
+    },
+    
+    /*
+      Treat function onload() as a special case that disables automatic event attach for onload, because this is how browsers work. E.g.
+        <!doctype html><html><head><script>
+          function onload() {
+            console.log ('onload'); // NOT called; presence of top-level function onload() makes all the difference
+          }
+          window.onload = onload;
+        </script></head></html>
+    */
+    [disabledEventsSymbol]: {
+      load: undefined,
+      error: undefined,
+    },
+
+    _emit(type) {
+      if (!this[disabledEventsSymbol][type]) {
+        Node.prototype._emit.apply(this, arguments);
       }
-    } else {
-      return Promise.reject(new Error('invalid arguments'));
-    }
+    },
 
-    x = x || 0;
-    y = y || 0;
-    w = w || image.width;
-    h = h || image.height;
-    const flipY = !!options && options.imageOrientation === 'flipY';
-    const imageBitmap = new ImageBitmap(
-      image,
-      x,
-      y,
-      w,
-      h,
-      flipY,
-    );
-    return Promise.resolve(imageBitmap);
-  };
-  window.Worker = class Worker extends nativeWorker {
-    constructor(src, workerOptions = {}) {
-      workerOptions.baseUrl = options.baseUrl;
-      if (nativeBindings) {
-        workerOptions.startScript = '\
-          const bindings = requireNative("nativeBindings");\n\
-          global.Image = bindings.nativeImage;\n\
-          global.ImageBitmap = bindings.nativeImageBitmap;\n\
-          global.createImageBitmap = ${window.createImageBitmap.toString()};\n\
-          const smiggles = require("smiggles");\n\
-          smiggles.bind({ImageBitmap: bindings.nativeImageBitmap});\n\
-        ';
-      }
-
-      if (src instanceof Blob) {
-        super('data:application/javascript,' + src.buffer.toString('utf8'), workerOptions);
+    get onload() {
+      return this[disabledEventsSymbol]['load'] !== undefined ? this[disabledEventsSymbol]['load'] : _elementGetter(this, 'load');
+    },
+    set onload(onload) {
+      if (windowEval.isCompiling(this)) {
+        this[disabledEventsSymbol]['load'] = onload;
       } else {
-        const blob = urls.get(src);
-        const normalizedSrc = blob ?
-          'data:application/octet-stream;base64,' + blob.buffer.toString('base64')
-        :
-          _normalizeUrl(src);
-        super(normalizedSrc, workerOptions);
+        if (this[disabledEventsSymbol]['load'] !== undefined) {
+          this[disabledEventsSymbol]['load'] = onload;
+        } else {
+          _elementSetter(this, 'load', onload);
+        }
       }
-    }
+    },
+
+    get onerror() {
+      return this[disabledEventsSymbol]['error'] !== undefined ? this[disabledEventsSymbol]['error'] : _elementGetter(this, 'error');
+    },
+    set onerror(onerror) {
+      if (windowEval.isCompiling(this)) {
+        this[disabledEventsSymbol]['error'] = onerror;
+      } else {
+        if (this[disabledEventsSymbol]['error'] !== undefined) {
+          this[disabledEventsSymbol]['error'] = onerror;
+        } else {
+          _elementSetter(this, 'error', onerror);
+        }
+      }
+    },
+
+    get onmessage() {
+      return _elementGetter(this, 'message');
+    },
+    set onmessage(onmessage) {
+      _elementSetter(this, 'message', onmessage);
+    },
+
+    get onpopstate() {
+      return _elementGetter(this, 'popstate');
+    },
+    set onpopstate(onpopstate) {
+      _elementSetter(this, 'popstate', onpopstate);
+    },
   };
-  window.requestAnimationFrame = requestAnimationFrame;
-  window.cancelAnimationFrame = cancelAnimationFrame;
-  window.Boolean = Boolean;
-  window.Number = Number;
-  window.String = String;
-  window.Object = Object;
-  window.Array = Array;
-  window.Symbol = Symbol;
-  window.ArrayBuffer = ArrayBuffer;
-  window.Int8Array = Int8Array;
-  window.Uint8Array = Uint8Array;
-  window.Uint8ClampedArray = Uint8ClampedArray;
-  window.Int16Array = Int16Array;
-  window.Uint16Array = Uint16Array;
-  window.Int32Array = Int32Array;
-  window.Uint32Array = Uint32Array;
-  window.Float32Array = Float32Array;
-  window.Float64Array = Float64Array;
-  window.DataView = DataView;
+  
+  EventEmitter.call(window);
+  
+  window.window = window;
+  window.self = window;
+  window.parent = parent || window;
+  window.top = top || window;
+  
+  window.screen = new Screen(window);
+  
+  window.history.on('popstate', (u, state) => {
+    window.location.set(u);
+
+    const event = new Event('popstate');
+    event.state = state;
+    window.dispatchEvent(event);
+  });
+  let loading = false;
+  window.location.on('update', href => {
+    if (!loading) {
+      exokit.load(href)
+        .then(newWindow => {
+          window._emit('beforeunload');
+          window._emit('unload');
+          window._emit('navigate', newWindow);
+        })
+        .catch(err => {
+          loading = false;
+          window._emit('error', {
+            error: err,
+          });
+        });
+      loading = true;
+    }
+  });
 
   if (!parent) {
     window.tickAnimationFrame = tickAnimationFrame;
