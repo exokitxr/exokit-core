@@ -3063,14 +3063,6 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     Float32Array,
     Float64Array,
     DataView,
-    
-    on: EventEmitter.prototype.on,
-    emit: EventEmitter.prototype.emit,
-    removeListener: EventEmitter.prototype.removeListener,
-    
-    addEventListener: HTMLElement.prototype.addEventListener,
-    removeEventListener: HTMLElement.prototype.removeEventListener,
-    dispatchEvent: HTMLElement.prototype.dispatchEvent,
 
     postMessage(data) {
       this._emit('message', new MessageEvent(data));
@@ -3141,7 +3133,14 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     },
   };
   
+  for (const k in EventEmitter.prototype) {
+    window[k] = EventEmitter.prototype[k];
+  }
   EventEmitter.call(window);
+  
+  window.addEventListener = Element.prototype.addEventListener.bind(window);
+  window.removeEventListener = Element.prototype.removeEventListener.bind(window);
+  window.dispatchEvent = Element.prototype.dispatchEvent.bind(window);
   
   window.window = window;
   window.self = window;
