@@ -3306,7 +3306,7 @@ const _parseDocument = (s, options, window) => {
       case 'HTMLEvents':
         return new Event();
       default:
-        throw new Error('invalid arguments');
+        throw new Error('invalid createEvent type: ' + type);
     }
   };
   document.styleSheets = [];
