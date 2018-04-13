@@ -2755,7 +2755,10 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   const location = new Location(options.url);
   const history = new History(location.href);
   const navigator = {
-    userAgent: 'exokit',
+    userAgent: 'Exokit',
+    appCodeName: 'Mozilla',
+    appName: 'Netscape',
+    appVersion: '5.0',
     mediaDevices: {
       getUserMedia(constraints) {
         if (constraints.audio) {
