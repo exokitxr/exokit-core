@@ -1545,6 +1545,17 @@ class Element extends Node {
   }
   set lastElementChild(lastElementChild) {}
 
+  get childElementCount() {
+    let result = 0;
+    for (let i = 0; i < this.childNodes.length; i++) {
+      if (this.childNodes[i].nodeType === Node.ELEMENT_NODE) {
+        result++;
+      }
+    }
+    return result;
+  }
+  set childElementCount(childElementCount) {}
+
   get id() {
     return this.getAttribute('id') || '';
   }
