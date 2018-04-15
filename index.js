@@ -768,9 +768,9 @@ class MRDisplay {
   }
 
   requestAnimationFrame(fn) {
-    const animationFrame = this[windowSymbol].requestAnimationFrame(() => {
+    const animationFrame = this[windowSymbol].requestAnimationFrame(timestamp => {
       this._rafs.splice(animationFrame, 1);
-      fn();
+      fn(timestamp);
     });
     this._rafs.push(animationFrame);
     return animationFrame;
