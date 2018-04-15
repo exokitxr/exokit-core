@@ -2715,17 +2715,7 @@ const _runJavascript = (jsString, window, filename = 'script', lineOffset = 0, c
   }
 };
 
-const rafCbs = [];
-const requestAnimationFrame = fn => {
-  rafCbs.push(fn);
-  return fn;
-};
-const cancelAnimationFrame = fn => {
-  const index = rafCbs.indexOf(fn);
-  if (index !== -1) {
-    rafCbs.splice(index, 1);
-  }
-};
+let rafCbs = [];
 const tickAnimationFrame = () => {
   if (rafCbs.length > 0) {
     const localRafCbs = rafCbs.slice();
@@ -3059,8 +3049,17 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         }
       }
     },
-    requestAnimationFrame,
-    cancelAnimationFrame,
+    requestAnimationFrame: fn => {
+      fn[windowSymbol] = window;
+      rafCbs.push(fn);
+      return fn;
+    },
+    cancelAnimationFrame: fn => {
+      const index = rafCbs.indexOf(fn);
+      if (index !== -1) {
+        rafCbs.splice(index, 1);
+      }
+    },
     Boolean,
     Number,
     String,
@@ -3179,6 +3178,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
           window._emit('beforeunload');
           window._emit('unload');
           window._emit('navigate', newWindow);
+          
+          rafCbs = rafCbs.filter(fn => fn[windowSymbol] !== window);
         })
         .catch(err => {
           loading = false;
