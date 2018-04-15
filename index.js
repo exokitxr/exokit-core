@@ -3315,6 +3315,8 @@ const _parseDocument = (s, options, window) => {
       case 'MouseEvent':
       case 'MouseEvents':
         return new MouseEvent();
+      case 'Event':
+      case 'Events':
       case 'HTMLEvents':
         return new Event();
       default:
