@@ -1659,7 +1659,9 @@ class Element extends Node {
   }
 
   cloneNode(deep = false) {
-    const el = new this.constructor(this.attrs, this.value);
+    const el = new this.constructor();
+    el.attrs = this.attrs;
+    el.value = this.value;
     if (deep) {
       el.childNodes = this.childNodes.map(childNode => childNode.cloneNode(true));
     }
