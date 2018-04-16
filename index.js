@@ -2819,7 +2819,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         return Promise.reject(new Error('failed to load image'));
       }
     } else {
-      return Promise.reject(new Error('invalid arguments'));
+      return Promise.reject(new Error('invalid arguments. Unknown constructor type: ' + src.constructor.name));
     }
 
     x = x || 0;
