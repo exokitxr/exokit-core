@@ -2342,8 +2342,8 @@ class HTMLAudioElement extends HTMLMediaElement {
         this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
 
         process.nextTick(() => { // XXX
-          this._emit('canplay');
-          this._emit('canplaythrough');
+          this.dispatchEvent(new Event('canplay', {target: this}));
+          this.dispatchEvent(new Event('canplaythrough', {target: this}));
         });
       }
     });
@@ -2381,8 +2381,8 @@ class HTMLVideoElement extends HTMLMediaElement {
         this.readyState = HTMLMediaElement.HAVE_ENOUGH_DATA;
 
         process.nextTick(() => { // XXX
-          this._emit('canplay');
-          this._emit('canplaythrough');
+          this.dispatchEvent(new Event('canplay', {target: this}));
+          this.dispatchEvent(new Event('canplaythrough', {target: this}));
         });
       }
     });
