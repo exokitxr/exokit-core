@@ -35,6 +35,7 @@ const disabledEventsSymbol = Symbol();
 const pointerLockElementSymbol = Symbol();
 const mrDisplaysSymbol = Symbol();
 let nativeBindings = false;
+let args = {};
 
 const btoa = s => new Buffer(s, 'binary').toString('base64');
 const atob = s => new Buffer(s, 'base64').toString('binary');
@@ -3388,6 +3389,9 @@ exokit.load = (src, options = {}) => fetch(src)
     });
   });
 exokit.THREE = THREE;
+exokit.setArgs = newArgs => {
+  args = newArgs;
+};
 exokit.setNativeBindingsModule = nativeBindingsModule => {
   nativeBindings = true;
 
@@ -3406,18 +3410,20 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   CanvasGradient = bindings.nativeCanvasGradient;
   CanvasRenderingContext2D = bindings.nativeCanvasRenderingContext2D;
   WebGLRenderingContext = bindings.nativeGl;
-  /* WebGLRenderingContext = function WebGLRenderingContext() {
-    const result = Reflect.construct(bindings.nativeGl, arguments);
-    for (const k in result) {
-      if (typeof result[k] === 'function') {
-        result[k] = (old => function() {
-          console.log(k, arguments);
-          return old.apply(this, arguments);
-        })(result[k]);
+  if (args.frame) {
+    WebGLRenderingContext = function WebGLRenderingContext() {
+      const result = Reflect.construct(bindings.nativeGl, arguments);
+      for (const k in result) {
+        if (typeof result[k] === 'function') {
+          result[k] = (old => function() {
+            console.log(k, arguments);
+            return old.apply(this, arguments);
+          })(result[k]);
+        }
       }
-    }
-    return result;
-  }; */
+      return result;
+    };
+  }
 
   HTMLImageElement = class extends HTMLSrcableElement {
     constructor(attrs = [], value = '') {
