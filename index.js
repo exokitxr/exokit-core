@@ -3060,23 +3060,6 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         rafCbs.splice(index, 1);
       }
     },
-    Boolean,
-    Number,
-    String,
-    Object,
-    Array,
-    Symbol,
-    ArrayBuffer,
-    Int8Array,
-    Uint8Array,
-    Uint8ClampedArray,
-    Int16Array,
-    Uint16Array,
-    Int32Array,
-    Uint32Array,
-    Float32Array,
-    Float64Array,
-    DataView,
 
     postMessage(data) {
       window._emit('message', new MessageEvent(data));
