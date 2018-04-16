@@ -2786,7 +2786,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         }
       },
     },
-    getVRDisplays: () => {
+    getVRDisplaysSync() {
       const result = [];
       if (nativeMl && nativeMl.IsPresent()) {
         result.push(_getMlDisplay(window));
@@ -2794,7 +2794,10 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       if (nativeVr.VR_IsHmdPresent()) {
         result.push(_getVrDisplay(window));
       }
-      return Promise.resolve(result);
+      return result;
+    },
+    getVRDisplays() {
+      return Promise.resolve(this.getVRDisplaysSync());
     },
     getGamepads: () => localGamepads,
     /* getVRMode: () => vrMode,
