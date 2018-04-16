@@ -1622,6 +1622,7 @@ class Element extends Node {
 
   dispatchEvent(event) {
     event.currentTarget = this;
+    event.target = this;
     this._emit(event.type, event);
     event.currentTarget = null;
 
