@@ -3410,13 +3410,17 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
   CanvasGradient = bindings.nativeCanvasGradient;
   CanvasRenderingContext2D = bindings.nativeCanvasRenderingContext2D;
   WebGLRenderingContext = bindings.nativeGl;
-  if (args.frame) {
+  if (args.frame || args.minimalFrame) {
     WebGLRenderingContext = function WebGLRenderingContext() {
       const result = Reflect.construct(bindings.nativeGl, arguments);
       for (const k in result) {
         if (typeof result[k] === 'function') {
           result[k] = (old => function() {
-            console.log(k, arguments);
+            if (args.frame) {
+              console.log(k, arguments);
+            } else if (args.minimalFrame) {
+              console.log(k);
+            }
             return old.apply(this, arguments);
           })(result[k]);
         }
