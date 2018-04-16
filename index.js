@@ -652,7 +652,7 @@ class Gamepad {
     ];
     this.pose = new GamepadPose();
     this.axes = new Float32Array(2);
-    
+
     // non-standard
     this.gesture = new GamepadGesture();
   }
@@ -664,7 +664,7 @@ class Gamepad {
     }
     this.pose.copy(gamepad.pose);
     this.axes.set(gamepad.axes);
-    
+
     // non-standard
     this.gesture.copy(gamepad.gesture);
   }
@@ -1036,7 +1036,7 @@ class AudioListener extends AudioNode {
     this.upY = new AudioParam();
     this.upZ = new AudioParam();
   }
-  
+
   setPosition(x, y, z) {
     this.positionX.value = x;
     this.positionY.value = y;
@@ -2256,7 +2256,7 @@ class HTMLMediaElement extends HTMLSrcableElement {
     return false;
   }
   set autoplay(autoplay) {}
-  
+
   canPlayType(type) {
     return ''; // XXX
   }
@@ -2521,7 +2521,7 @@ class HTMLTemplateElement extends HTMLElement {
   constructor(attrs = [], value = '', location = null) {
     super('TEMPLATE', attrs, value, location);
   }
-  
+
   get content() {
     const wrapperEl = this.ownerDocument.createElement('div');
     wrapperEl.childNodes = this.childNodes;
@@ -2759,7 +2759,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     }
     return src;
   };
-  
+
   const HTMLImageElementBound = (Old => class HTMLImageElement extends Old {
     constructor() {
       super(...arguments);
@@ -2850,7 +2850,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     );
     return Promise.resolve(imageBitmap);
   }
-  
+
   const window = {
     innerWidth: 1280,
     innerHeight: 1024,
@@ -3080,7 +3080,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     postMessage(data) {
       window._emit('message', new MessageEvent(data));
     },
-    
+
     /*
       Treat function onload() as a special case that disables automatic event attach for onload, because this is how browsers work. E.g.
         <!doctype html><html><head><script>
@@ -3145,23 +3145,23 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       _elementSetter(window, 'popstate', onpopstate);
     },
   };
-  
+
   for (const k in EventEmitter.prototype) {
     window[k] = EventEmitter.prototype[k];
   }
   EventEmitter.call(window);
-  
+
   window.addEventListener = Element.prototype.addEventListener.bind(window);
   window.removeEventListener = Element.prototype.removeEventListener.bind(window);
   window.dispatchEvent = Element.prototype.dispatchEvent.bind(window);
-  
+
   window.window = window;
   window.self = window;
   window.parent = parent || window;
   window.top = top || window;
-  
+
   window.screen = new Screen(window);
-  
+
   window.history.on('popstate', (u, state) => {
     window.location.set(u);
 
@@ -3177,7 +3177,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
           window._emit('beforeunload');
           window._emit('unload');
           window._emit('navigate', newWindow);
-          
+
           rafCbs = rafCbs.filter(fn => fn[windowSymbol] !== window);
         })
         .catch(err => {
@@ -3226,7 +3226,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         }
       }
     });
-    
+
     window.on('updatemlframe', update => {
       const {gamepads} = update;
 
