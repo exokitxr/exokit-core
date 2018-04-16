@@ -4,6 +4,7 @@ const stream = require('stream');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
+const dgram = require('dgram');
 const {URL} = url;
 const {performance} = require('perf_hooks');
 
@@ -2869,6 +2870,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     setInterval,
     clearInterval,
     performance,
+    dgram, // XXX non-standard
     scrollTo(x = 0, y = 0) {
       this.scrollX = x;
       this.scrollY = y;
