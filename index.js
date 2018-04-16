@@ -2517,6 +2517,18 @@ class MediaRecorder extends EventEmitter {
 
   requestData() {}
 }
+class HTMLTemplateElement extends HTMLElement {
+  constructor(attrs = [], value = '', location = null) {
+    super('TEMPLATE', attrs, value, location);
+  }
+  
+  get content() {
+    const wrapperEl = this.ownerDocument.createElement('div');
+    wrapperEl.childNodes = this.childNodes;
+    return wrapperEl;
+  }
+  set content(content) {}
+}
 class Text extends Node {
   constructor(value) {
     super();
@@ -2867,6 +2879,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       SOURCE: HTMLSourceElement,
       IFRAME: HTMLIframeElement,
       CANVAS: HTMLCanvasElement,
+      TEMPLATE: HTMLTemplateElement,
     },
     [optionsSymbol]: options,
     Element,
@@ -2879,6 +2892,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     HTMLVideoElement,
     HTMLIframeElement,
     HTMLCanvasElement,
+    HTMLTemplateElement,
     getComputedStyle: el => {
       let styleSpec = el[computedStyleSymbol];
       if (!styleSpec || styleSpec.epoch !== styleEpoch) {
