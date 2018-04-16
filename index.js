@@ -2869,6 +2869,12 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     setInterval,
     clearInterval,
     performance,
+    scrollTo(x = 0, y = 0) {
+      this.scrollX = x;
+      this.scrollY = y;
+    },
+    scrollX: 0,
+    scrollY: 0,
     [htmlTagsSymbol]: {
       DOCUMENT: HTMLDocumentElement,
       BODY: HTMLBodyElement,
