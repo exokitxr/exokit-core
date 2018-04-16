@@ -3322,6 +3322,7 @@ const _parseDocument = (s, options, window) => {
         throw new Error('invalid createEvent type: ' + type);
     }
   };
+  document.importNode = (el, deep) => el.cloneNode(deep);
   document.styleSheets = [];
   document.activeElement = body;
   document.open = () => {
