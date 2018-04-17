@@ -1622,14 +1622,18 @@ class Element extends Node {
   }
 
   dispatchEvent(event) {
-    event.currentTarget = this;
     event.target = this;
-    this._emit(event.type, event);
-    event.currentTarget = null;
 
-    if (!event.propagationStopped && this.parentNode) {
-      this.parentNode.dispatchEvent(event);
-    }
+    const _recurse = (node, event) => {
+      event.currentTarget = this;
+      node._emit(event.type, event);
+      event.currentTarget = null;
+
+      if (!event.propagationStopped && this.parentNode) {
+        _recurse(node.parentNode, event);
+      }
+    };
+    _recurse(this, event);
   }
 
   getBoundingClientRect() {
