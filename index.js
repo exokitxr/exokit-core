@@ -1629,7 +1629,7 @@ class Element extends Node {
       node._emit(event.type, event);
       event.currentTarget = null;
 
-      if (!event.propagationStopped && this.parentNode) {
+      if (!event.propagationStopped && node.parentNode) {
         _recurse(node.parentNode, event);
       }
     };
