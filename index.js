@@ -2597,6 +2597,31 @@ class Comment extends Node {
   }
 }
 
+class DataTransfer {
+  constructor() {
+    this.items = [];
+    this.files = [];
+  }
+}
+
+class DataTransferItem {
+  constructor(kind = 'string', type = 'text/plain', data = null) {
+    this.kind = kind;
+    this.type = type;
+    this.data = data;
+  }
+  
+  getAsFile() {
+    return new Blob([this.data], {
+      type: this.type,
+    });
+  }
+  
+  getAsString() {
+    return this.data;
+  }
+}
+
 const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
   if (node.nodeName === '#text') {
     const text = new Text(node.value);
@@ -2959,6 +2984,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     CanvasRenderingContext2D,
     WebGLRenderingContext,
     MediaRecorder,
+    DataTransfer,
+    DataTransferItem,
     screen: null,
     Screen,
     Gamepad,
@@ -3353,6 +3380,13 @@ const _parseDocument = (s, options, window) => {
     }).childNodes.map(childNode => _fromAST(childNode, window, document.body, document));
     for (let i = 0; i < childNodes.length; i++) {
       document.body.appendChild(childNodes[i]);
+    }
+  };
+  document.execCommand = command => {
+    if (command === 'copy') {
+      // nothing
+    } else if (command === 'paste') {
+      document.dispatchEvent(new Event('paste'));
     }
   };
   document[pointerLockElementSymbol] = null;
