@@ -3408,17 +3408,28 @@ exokit.load = (src, options = {}) => fetch(src)
     }
   })
   .then(htmlString => {
-    const parsedUrl = url.parse(src, {
-      locationInfo: true,
-    });
+    const baseUrl = (() => {
+      if (options.baseUrl) {
+        return options.baseUrl;
+      } else {
+        if (/^file:\/\/(.*)$/.test(src)) {
+          return src;
+        } else {
+          const parsedUrl = url.parse(src, {
+            locationInfo: true,
+          });
+          return url.format({
+            protocol: parsedUrl.protocol || 'http:',
+            host: parsedUrl.host || '127.0.0.1',
+            pathname: parsedUrl.pathname,
+            search: parsedUrl.search,
+          });
+        }
+      }
+    })();
     return exokit(htmlString, {
       url: options.url || src,
-      baseUrl: options.baseUrl || url.format({
-        protocol: parsedUrl.protocol || 'http:',
-        host: parsedUrl.host || '127.0.0.1',
-        pathname: parsedUrl.pathname,
-        search: parsedUrl.search,
-      }),
+      baseUrl,
       dataPath: options.dataPath,
     });
   });
