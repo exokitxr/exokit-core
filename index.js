@@ -2762,7 +2762,8 @@ const _getMlDisplay = window => window[mrDisplaysSymbol] ? window[mrDisplaysSymb
 const _makeWindow = (options = {}, parent = null, top = null) => {
   const _normalizeUrl = src => {
     if (!/^[a-z]+:\/\//i.test(src)) {
-      src = new URL(src, options.baseUrl).href;
+      src = new URL(src, options.baseUrl).href
+        .replace(/^(file:\/\/)\/([a-z]:.*)$/i, '$1$2');
     }
     return src;
   };
