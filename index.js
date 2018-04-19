@@ -2039,6 +2039,15 @@ class Document extends HTMLLoadableElement {
     }
   }
 }
+class DocumentFragment extends HTMLElement {
+  constructor() {
+    super('DOCUMENTFRAGMENT');
+  }
+  
+  get nodeType() {
+    return Node.DOCUMENT_FRAGMENT_NODE;
+  }
+}
 class HTMLBodyElement extends HTMLElement {
   constructor() {
     super('BODY');
@@ -2930,6 +2939,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       TEMPLATE: HTMLTemplateElement,
     },
     [optionsSymbol]: options,
+    DocumentFragment,
     Element,
     HTMLElement,
     HTMLAnchorElement,
@@ -3374,7 +3384,11 @@ const _parseDocument = (s, options, window) => {
     return element;
   };
   document.createElementNS = (namespace, tagName) => document.createElement(tagName);
-  document.createDocumentFragment = () => document.createElement();
+  document.createDocumentFragment = () => {
+    const documentFragment = new DocumentFragment();
+    documentFragment.ownerDocument = document;
+    return documentFragment;
+  };
   document.createTextNode = text => new Text(text);
   document.createComment = comment => new Comment(comment);
   document.createEvent = type => {
