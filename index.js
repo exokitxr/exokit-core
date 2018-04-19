@@ -2013,6 +2013,11 @@ class HTMLDocumentElement extends HTMLLoadableElement {
   constructor() {
     super('DOCUMENT');
   }
+  
+  get nodeType() {
+    return Node.DOCUMENT_NODE;
+  }
+  set nodeType(nodeType) {}
 
   get pointerLockElement() {
     if (this.defaultView.top === this.defaultView) {
