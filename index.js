@@ -1486,6 +1486,8 @@ class Element extends Node {
 
     this._emit('children', [childNode], [], this.childNodes[this.childNodes.length - 2] || null, null);
     this.ownerDocument._emit('domchange');
+    
+    return childNode;
   }
   removeChild(childNode) {
     const index = this.childNodes.indexOf(childNode);
@@ -1495,6 +1497,10 @@ class Element extends Node {
 
       this._emit('children', [], [childNode], this.childNodes[index - 1] || null, this.childNodes[index] || null);
       this.ownerDocument._emit('domchange');
+      
+      return childNode;
+    } else {
+      throw new Error('The node to be removed is not a child of this node.');
     }
   }
   insertBefore(childNode, nextSibling) {
