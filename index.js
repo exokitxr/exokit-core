@@ -2617,6 +2617,29 @@ class Comment extends Node {
   }
 }
 
+class DocumentType {}
+class DOMImplementation {
+  constructor(window) {
+    this._window = window;
+  }
+  
+  createDocument() {
+    throw new Error('not implemented');
+  }
+  
+  createDocumentType() {
+    return new DocumentType();
+  }
+  
+  createHTMLDocument() {
+    return _parseDocument('', this._window[optionsSymbol], this._window);
+  }
+  
+  hasFeature() {
+    return false;
+  }
+}
+
 class DataTransfer {
   constructor() {
     this.items = [];
@@ -3022,6 +3045,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     WebGLRenderingContext,
     MediaRecorder,
     Document,
+    DocumentType,
+    DOMImplementation,
     DataTransfer,
     DataTransferItem,
     screen: null,
@@ -3415,6 +3440,7 @@ const _parseDocument = (s, options, window) => {
   };
   document.importNode = (el, deep) => el.cloneNode(deep);
   document.styleSheets = [];
+  document.implementation = new DOMImplementation(window);
   document.activeElement = body;
   document.open = () => {
     document.innerHTML = '';
