@@ -1114,6 +1114,7 @@ class Node extends EventEmitter {
     super();
 
     this.parentNode = null;
+    this.childNodes = [];
     this.ownerDocument = null;
   }
 
@@ -1185,6 +1186,16 @@ class Node extends EventEmitter {
     }
   }
   set previousElementSibling(previousElementSibling) {}
+  
+  cloneNode(deep = false) {
+    const el = new this.constructor();
+    el.attrs = this.attrs;
+    el.value = this.value;
+    if (deep) {
+      el.childNodes = this.childNodes.map(childNode => childNode.cloneNode(true));
+    }
+    return el;
+  }
 
   _emit() { // need to call this instead of EventEmitter.prototype.emit because some frameworks override HTMLElement.prototype.emit()
     return EventEmitter.prototype.emit.apply(this, arguments);
@@ -1418,7 +1429,6 @@ class Element extends Node {
     this.value = value;
     this.location = location;
 
-    this.childNodes = [];
     this._attributes = null;
     this._children = null;
     this._innerHTML = '';
@@ -1668,16 +1678,6 @@ class Element extends Node {
 
   click() {
     this.dispatchEvent(new MouseEvent('click'));
-  }
-
-  cloneNode(deep = false) {
-    const el = new this.constructor();
-    el.attrs = this.attrs;
-    el.value = this.value;
-    if (deep) {
-      el.childNodes = this.childNodes.map(childNode => childNode.cloneNode(true));
-    }
-    return el;
   }
 
   addEventListener(event, listener) {
