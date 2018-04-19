@@ -3021,6 +3021,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     CanvasRenderingContext2D,
     WebGLRenderingContext,
     MediaRecorder,
+    Document,
     DataTransfer,
     DataTransferItem,
     screen: null,
