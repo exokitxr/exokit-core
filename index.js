@@ -11,7 +11,7 @@ const {performance} = require('perf_hooks');
 const parseIntStrict = require('parse-int');
 const parse5 = require('parse5');
 
-const windowEval = require('vm-one');
+const vmOne = require('vm-one');
 const fetch = require('window-fetch');
 const {XMLHttpRequest} = require('window-xhr');
 const XHRUtils = require('window-xhr/lib/utils');
@@ -28,6 +28,7 @@ const {TextEncoder, TextDecoder} = require('text-encoding');
 const THREE = require('./lib/three-min.js');
 
 const windowSymbol = Symbol();
+const vmSymbol = Symbol();
 const htmlTagsSymbol = Symbol();
 const optionsSymbol = Symbol();
 const elementSymbol = Symbol();
@@ -2755,7 +2756,7 @@ const _runHtml = (element, window) => {
 };
 const _runJavascript = (jsString, window, filename = 'script', lineOffset = 0, colOffset = 0) => {
   try {
-    windowEval(jsString, window, filename, lineOffset, colOffset);
+    window[vmSymbol].run(jsString, filename, lineOffset, colOffset);
   } catch (err) {
     console.warn(err.stack);
   }
@@ -2887,7 +2888,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     return Promise.resolve(imageBitmap);
   }
 
-  const window = {
+  let window = {
     innerWidth: 1280,
     innerHeight: 1024,
     devicePixelRatio: 1,
@@ -2966,6 +2967,23 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       }
       return styleSpec.style;
     },
+    Boolean,
+    Number,
+    String,
+    Object,
+    Array,
+    Symbol,
+    Buffer,
+    ArrayBuffer,
+    Int8Array,
+    Uint8Array,
+    Uint8ClampedArray,
+    Int16Array,
+    Uint16Array,
+    Int32Array,
+    Uint32Array,
+    Float32Array,
+    Float64Array,
     Event,
     KeyboardEvent,
     MouseEvent,
@@ -3150,7 +3168,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       return window[disabledEventsSymbol]['load'] !== undefined ? window[disabledEventsSymbol]['load'] : _elementGetter(window, 'load');
     },
     set onload(onload) {
-      if (windowEval.isCompiling(window)) {
+      if (vmOne.isCompiling()) {
         this[disabledEventsSymbol]['load'] = onload;
       } else {
         if (window[disabledEventsSymbol]['load'] !== undefined) {
@@ -3165,7 +3183,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       return window[disabledEventsSymbol]['error'] !== undefined ? window[disabledEventsSymbol]['error'] : _elementGetter(window, 'error');
     },
     set onerror(onerror) {
-      if (windowEval.isCompiling(window)) {
+      if (vmOne.isCompiling()) {
         window[disabledEventsSymbol]['error'] = onerror;
       } else {
         if (window[disabledEventsSymbol]['error'] !== undefined) {
@@ -3190,6 +3208,10 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       _elementSetter(window, 'popstate', onpopstate);
     },
   };
+
+  const vmo = vmOne.make(window);
+  window = vmo.getGlobal();
+  window[vmSymbol] = vmo;
 
   for (const k in EventEmitter.prototype) {
     window[k] = EventEmitter.prototype[k];
