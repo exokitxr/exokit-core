@@ -2610,13 +2610,13 @@ class DataTransferItem {
     this.type = type;
     this.data = data;
   }
-  
+
   getAsFile() {
     return new Blob([this.data], {
       type: this.type,
     });
   }
-  
+
   getAsString() {
     return this.data;
   }
