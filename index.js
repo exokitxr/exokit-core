@@ -2009,7 +2009,7 @@ class HTMLLoadableElement extends HTMLElement {
     _elementSetter(this, 'error', onerror);
   }
 }
-class HTMLDocumentElement extends HTMLLoadableElement {
+class Document extends HTMLLoadableElement {
   constructor() {
     super('DOCUMENT');
   }
@@ -2916,7 +2916,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     scrollX: 0,
     scrollY: 0,
     [htmlTagsSymbol]: {
-      DOCUMENT: HTMLDocumentElement,
+      DOCUMENT: Document,
       BODY: HTMLBodyElement,
       A: HTMLAnchorElement,
       STYLE: HTMLStyleElement,
