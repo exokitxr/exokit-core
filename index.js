@@ -2623,7 +2623,6 @@ class DataTransfer {
     this.files = [];
   }
 }
-
 class DataTransferItem {
   constructor(kind = 'string', type = 'text/plain', data = null) {
     this.kind = kind;
