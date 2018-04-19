@@ -14,7 +14,7 @@
     "vm-one": "0.0.7",
     "window-classlist": "0.0.1",
     "window-fetch": "0.0.6",
-    "window-xhr": "0.0.7",
+    "window-xhr": "0.0.8",
     "ws": "^4.0.0"
   },
   "devDependencies": {
