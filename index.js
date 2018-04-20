@@ -3505,9 +3505,7 @@ const _parseDocument = (s, options, window) => {
   document.readyState = null;
   document.head = head;
   document.body = body;
-  document.location = url.parse(options.url, {
-    locationInfo: true,
-  });
+  document.location = window.location;
   document.createElement = tagName => {
     tagName = tagName.toUpperCase();
     const HTMLElementTemplate = window[htmlTagsSymbol][tagName];
