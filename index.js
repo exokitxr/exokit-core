@@ -1999,8 +1999,99 @@ class HTMLAnchorElement extends HTMLElement {
   get href() {
     return this.getAttribute('href') || '';
   }
-  set href(value) {
-    this.setAttribute('href', value);
+  set href(href) {
+    href = href + '';
+    this.setAttribute('href', href);
+  }
+  get hash() {
+    return new url.URL(this.href).hash;
+  }
+  set hash(hash) {
+    hash = hash + '';
+    const u = new url.URL(this.href);
+    u.hash = hash;
+    this.href = u.href;
+  }
+  get host() {
+    return new url.URL(this.href).host;
+  }
+  set host(host) {
+    host = host + '';
+    const u = new url.URL(this.href);
+    u.host = host;
+    this.href = u.href;
+  }
+  get hostname() {
+    return new url.URL(this.href).hostname;
+  }
+  set hostname(hostname) {
+    hostname = hostname + '';
+    const u = new url.URL(this.href);
+    u.hostname = hostname;
+    this.href = u.href;
+  }
+  get password() {
+    return new url.URL(this.href).password;
+  }
+  set password(password) {
+    password = password + '';
+    const u = new url.URL(this.href);
+    u.password = password;
+    this.href = u.href;
+  }
+  get origin() {
+    return new url.URL(this.href).origin;
+  }
+  set origin(origin) {
+    origin = origin + '';
+    const u = new url.URL(this.href);
+    u.origin = origin;
+    this.href = u.href;
+  }
+  get pathname() {
+    return new url.URL(this.href).pathname;
+  }
+  set pathname(pathname) {
+    pathname = pathname + '';
+    const u = new url.URL(this.href);
+    u.pathname = pathname;
+    this.href = u.href;
+  }
+  get port() {
+    return new url.URL(this.href).port;
+  }
+  set port(port) {
+    port = port + '';
+    const u = new url.URL(this.href);
+    u.port = port;
+    this.href = u.href;
+  }
+  get protocol() {
+    return new url.URL(this.href).protocol;
+  }
+  set protocol(protocol) {
+    protocol = protocol + '';
+    const u = new url.URL(this.href);
+    u.protocol = protocol;
+    this.href = u.href;
+  }
+  get search() {
+    return new url.URL(this.href).search;
+  }
+  set search(search) {
+    search = search + '';
+    const u = new url.URL(this.href);
+    u.search = search;
+    this.href = u.href;
+  }
+  get username() {
+    return new url.URL(this.href).username;
+  }
+  set username(username) {
+    username = username + '';
+    const u = new url.URL(this.href);
+    u.username = username;
+    this.href = u.href;
   }
 }
 class HTMLLoadableElement extends HTMLElement {
