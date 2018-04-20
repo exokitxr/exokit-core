@@ -334,7 +334,7 @@ class MutationObserver {
   }
 
   bind(element) {
-    if (element.childNodes) {
+    if (element.traverse) {
       element.traverse(el => {
         const _attribute = (name, value) => this.handleAttribute(el, name, value);
         el.on('attribute', _attribute);
@@ -350,7 +350,7 @@ class MutationObserver {
   }
 
   unbind(element) {
-    if (element.childNodes) {
+    if (element.traverse) {
       element.traverse(el => {
         const bindings = this.bindings.get(el);
         for (let i = 0; i < bindings.length; i++) {
