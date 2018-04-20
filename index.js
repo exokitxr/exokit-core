@@ -81,28 +81,28 @@ class Location extends EventEmitter {
     this._url = new url.URL(u);
   }
   // triggers navigation
-  get href() { return this._url.href; }
+  get href() { return this._url.href || ''; }
   set href(href) { this._url.href = href; this.update(); }
-  get protocol() { return this._url.protocol; }
+  get protocol() { return this._url.protocol || ''; }
   set protocol(protocol) { this._url.protocol = protocol; this.update(); }
-  get host() { return this._url.host; }
+  get host() { return this._url.host || ''; }
   set host(host) { this._url.host = host; this.update(); }
-  get hostname() { return this._url.hostname; }
+  get hostname() { return this._url.hostname || ''; }
   set hostname(hostname) { this._url.hostname = hostname; this.update(); }
-  get port() { return this._url.port; }
+  get port() { return this._url.port || ''; }
   set port(port) { this._url.port = port; this.update(); }
-  get pathname() { return this._url.pathname; }
+  get pathname() { return this._url.pathname || ''; }
   set pathname(pathname) { this._url.pathname = pathname; this.update(); }
-  get search() { return this._url.search; }
+  get search() { return this._url.search || ''; }
   set search(search) { this._url.search = search; this.update(); }
   // does not trigger navigation
-  get hash() { return this._url.hash; }
+  get hash() { return this._url.hash || ''; }
   set hash(hash) { this._url.hash = hash; }
-  get username() { return this._url.username; }
+  get username() { return this._url.username || ''; }
   set username(username) { this._url.username = username; }
-  get password() { return this._url.password; }
+  get password() { return this._url.password || ''; }
   set password(password) { this._url.password = password; }
-  get origin() { return this._url.origin; }
+  get origin() { return this._url.origin || ''; }
   set origin(origin) {} // read only
   // conversions
   toString() {
