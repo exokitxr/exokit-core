@@ -1195,6 +1195,18 @@ class Node extends EventEmitter {
     }
   }
   set previousElementSibling(previousElementSibling) {}
+  
+  contains(el) {
+    for (;;) {
+      if (el === this) {
+        return true;
+      } else if (el.parentNode) {
+        el = el.parentNode;
+      } else {
+        return false;
+      }
+    }
+  }
 
   cloneNode(deep = false) {
     const el = new this.constructor();
