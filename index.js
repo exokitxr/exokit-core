@@ -1325,6 +1325,33 @@ const _makeChildrenProxy = el => {
     },
   });
 };
+const _makeHtmlCollectionProxy = (el, query) => new Proxy(el, {
+  get(target, prop) {
+    const propN = parseIntStrict(prop);
+    if (propN !== undefined) {
+      return el.querySelectorAll(query)[propN];
+    } else if (prop === 'length') {
+      return el.querySelectorAll(query).length;
+    } else {
+      return undefined;
+    }
+  },
+  set(target, prop, value) {
+    return true;
+  },
+  deleteProperty(target, prop) {
+    return true;
+  },
+  has(target, prop) {
+    if (typeof prop === 'number') {
+      return el.querySelectorAll(query)[prop] !== undefined;
+    } else if (prop === 'length') {
+      return true;
+    } else {
+      return false;
+    }
+  },
+});
 const _cssText = style => {
   let styleString = '';
   for (const k in style) {
@@ -3645,6 +3672,7 @@ const documentElement = html || (document.childNodes.length > 0 ? document.child
     }
   };
   document.importNode = (el, deep) => el.cloneNode(deep);
+  document.scripts = _makeHtmlCollectionProxy(document.documentElement, 'script');
   document.styleSheets = [];
   document.implementation = new DOMImplementation(window);
   document.activeElement = body;
