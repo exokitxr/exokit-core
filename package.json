@@ -1,6 +1,6 @@
 {
   "name": "exokit-core",
-  "version": "0.0.231",
+  "version": "0.0.232",
   "main": "index.js",
   "dependencies": {
     "@rgrove/parse-xml": "^1.1.1",
