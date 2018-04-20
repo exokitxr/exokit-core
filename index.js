@@ -3704,7 +3704,6 @@ const documentElement = html || (document.childNodes.length > 0 ? document.child
   };
   document.hidden = false;
   document[pointerLockElementSymbol] = null;
-  window.document = document;
 
   if (window.top === window) {
     document.addEventListener('pointerlockchange', () => {
