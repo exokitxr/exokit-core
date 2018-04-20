@@ -2005,7 +2005,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.setAttribute('href', href);
   }
   get hash() {
-    return new url.URL(this.href).hash;
+    return new url.URL(this.href).hash || '';
   }
   set hash(hash) {
     hash = hash + '';
@@ -2014,7 +2014,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get host() {
-    return new url.URL(this.href).host;
+    return new url.URL(this.href).host || '';
   }
   set host(host) {
     host = host + '';
@@ -2023,7 +2023,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get hostname() {
-    return new url.URL(this.href).hostname;
+    return new url.URL(this.href).hostname || '';
   }
   set hostname(hostname) {
     hostname = hostname + '';
@@ -2032,7 +2032,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get password() {
-    return new url.URL(this.href).password;
+    return new url.URL(this.href).password || '';
   }
   set password(password) {
     password = password + '';
@@ -2041,7 +2041,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get origin() {
-    return new url.URL(this.href).origin;
+    return new url.URL(this.href).origin || '';
   }
   set origin(origin) {
     origin = origin + '';
@@ -2050,7 +2050,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get pathname() {
-    return new url.URL(this.href).pathname;
+    return new url.URL(this.href).pathname || '';
   }
   set pathname(pathname) {
     pathname = pathname + '';
@@ -2059,7 +2059,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get port() {
-    return new url.URL(this.href).port;
+    return new url.URL(this.href).port || '';
   }
   set port(port) {
     port = port + '';
@@ -2068,7 +2068,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get protocol() {
-    return new url.URL(this.href).protocol;
+    return new url.URL(this.href).protocol || '';
   }
   set protocol(protocol) {
     protocol = protocol + '';
@@ -2077,7 +2077,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get search() {
-    return new url.URL(this.href).search;
+    return new url.URL(this.href).search || '';
   }
   set search(search) {
     search = search + '';
@@ -2086,7 +2086,7 @@ class HTMLAnchorElement extends HTMLElement {
     this.href = u.href;
   }
   get username() {
-    return new url.URL(this.href).username;
+    return new url.URL(this.href).username || '';
   }
   set username(username) {
     username = username + '';
