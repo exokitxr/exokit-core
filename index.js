@@ -2266,7 +2266,7 @@ class HTMLStyleElement extends HTMLLoadableElement {
     let running = false;
     const srcAttr = this.attributes.src;
     if (srcAttr) {
-      this.src = srcAttr.value;
+      this._emit('attribute', 'src', srcAttr.value);
       running = true;
     }
     if (this.childNodes.length > 0) {
@@ -2354,7 +2354,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
       let running = false;
       const srcAttr = this.attributes.src;
       if (srcAttr) {
-        this.src = srcAttr.value;
+        this._emit('attribute', 'src', srcAttr.value);
         running = true;
       }
       if (this.childNodes.length > 0) {
@@ -2382,7 +2382,7 @@ class HTMLSrcableElement extends HTMLLoadableElement {
   run() {
     const srcAttr = this.attributes.src;
     if (srcAttr) {
-      this.src = srcAttr.value;
+      this._emit('attribute', 'src', srcAttr.value);
       return true;
     } else {
       return false;
@@ -4092,7 +4092,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       let sources;
       const srcAttr = this.attributes.src;
       if (srcAttr) {
-        this.src = srcAttr.value;
+        this._emit('attribute', 'src', srcAttr.value);
         running = true;
       } else if (sources = this.childNodes.filter(childNode => childNode.nodeType === Node.ELEMENT_NODE && childNode.matches('source'))) {
         for (let i = 0; i < sources.length; i++) {
