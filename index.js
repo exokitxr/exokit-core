@@ -3562,6 +3562,7 @@ const _parseDocument = (s, options, window) => {
       document.dispatchEvent(new Event('paste'));
     }
   };
+  document.hidden = false;
   document[pointerLockElementSymbol] = null;
   window.document = document;
 
