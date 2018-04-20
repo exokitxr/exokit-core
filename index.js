@@ -4,6 +4,7 @@ const stream = require('stream');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
+const os = require('os');
 const dgram = require('dgram');
 const {URL} = url;
 const {performance} = require('perf_hooks');
@@ -2944,6 +2945,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   const history = new History(location.href);
   const navigator = {
     userAgent: 'Exokit',
+    platform: os.platform(),
     appCodeName: 'Mozilla',
     appName: 'Netscape',
     appVersion: '5.0',
