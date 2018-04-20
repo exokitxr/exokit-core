@@ -1247,8 +1247,7 @@ const _makeAttributesProxy = el => new Proxy(el.attrs, {
     } else if (prop === 'length') {
       return target.length;
     } else {
-      const attr = target.find(attr => attr.name === prop);
-      return attr && attr.value;
+      return target.find(attr => attr.name === prop);
     }
   },
   set(target, prop, value) {
@@ -1478,10 +1477,10 @@ class Element extends Node {
   set children(children) {}
 
   getAttribute(name) {
-    return this.attributes[name];
+    const attr = this.attributes[name];
+    return attr && attr.value;
   }
   setAttribute(name, value) {
-    const oldValue = this.attributes[name];
     this.attributes[name] = value;
   }
   setAttributeNS(namespace, name, value) {
@@ -2233,8 +2232,9 @@ class HTMLStyleElement extends HTMLLoadableElement {
 
   run() {
     let running = false;
-    if (this.attributes.src) {
-      this.src = this.attributes.src;
+    const srcAttr = this.attributes.src;
+    if (srcAttr) {
+      this.src = srcAttr.value;
       running = true;
     }
     if (this.childNodes.length > 0) {
@@ -2320,8 +2320,9 @@ class HTMLScriptElement extends HTMLLoadableElement {
   run() {
     if (this.isRunnable()) {
       let running = false;
-      if (this.attributes.src) {
-        this.src = this.attributes.src;
+      const srcAttr = this.attributes.src;
+      if (srcAttr) {
+        this.src = srcAttr.value;
         running = true;
       }
       if (this.childNodes.length > 0) {
@@ -2347,8 +2348,9 @@ class HTMLSrcableElement extends HTMLLoadableElement {
   }
 
   run() {
-    if (this.attributes.src) {
-      this.src = this.attributes.src;
+    const srcAttr = this.attributes.src;
+    if (srcAttr) {
+      this.src = srcAttr.value;
       return true;
     } else {
       return false;
@@ -2870,7 +2872,8 @@ const _runHtml = (element, window) => {
         }
       } else if (el instanceof window.HTMLScriptElement) {
         if (el.run()) {
-          if (!el.attributes.async) {
+          const asyncAttr = el.attributes.async;
+          if (!(asyncAttr && asyncAttr.value)) {
             try {
               await _loadPromise(el);
             } catch(err) {
@@ -4047,8 +4050,9 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
       let running = false;
 
       let sources;
-      if (this.attributes.src) {
-        this.src = this.attributes.src;
+      const srcAttr = this.attributes.src;
+      if (srcAttr) {
+        this.src = srcAttr.value;
         running = true;
       } else if (sources = this.childNodes.filter(childNode => childNode.nodeType === Node.ELEMENT_NODE && childNode.matches('source'))) {
         for (let i = 0; i < sources.length; i++) {
@@ -4061,11 +4065,15 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           }
         }
       }
-      if (this.attributes.loop || this.attributes.loop === '') {
-        this.loop = this.attributes.loop;
+      const loopAttr = this.attributes.loop;
+      const loopAttrValue = loopAttr && loopAttr.value;
+      if (loopAttrValue || loopAttrValue === '') {
+        this.loop = loopAttrValue;
       }
-      if (this.attributes.autoplay || this.attributes.autoplay === '') {
-        this.autoplay = this.attributes.autoplay;
+      const autoplayAttr = this.attributes.loop;
+      const autoplayAttrValue = autoplayAttr && autoplayAttr.value;
+      if (autoplayAttrValue || autoplayAttrValue === '') {
+        this.autoplay = autoplayAttrValue;
       }
 
       return running;
