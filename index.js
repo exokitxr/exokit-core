@@ -2338,6 +2338,19 @@ class HTMLScriptElement extends HTMLLoadableElement {
     type = type + '';
     this.setAttribute('type', type);
   }
+  
+  get text() {
+    let result = '';
+    this.traverse(el => {
+      if (el.nodeType === Node.TEXT_NODE) {
+        result += el.value;
+      }
+    });
+    return result;
+  }
+  set text(text) {
+    this.textContent = text;
+  }
 
   set innerHTML(innerHTML) {
     innerHTML = innerHTML + '';
