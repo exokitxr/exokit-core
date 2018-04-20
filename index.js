@@ -1440,6 +1440,22 @@ const autoClosingTags = {
   track: true,
   window: true,
 };
+const _defineId = (window, id, el) => {
+  let value;
+  Object.defineProperty(window, id, {
+    get() {
+      if (value !== undefined) {
+        return value;
+      } else if (el.ownerDocument.documentElement.contains(el) && el.getAttribute('id') === id) {
+        return el;
+      }
+    },
+    set(newValue) {
+      value = newValue;
+    },
+    configurable: true,
+  });
+};
 class Element extends Node {
   constructor(tagName = 'DIV', attrs = [], value = '', location = null) {
     super();
@@ -1456,7 +1472,11 @@ class Element extends Node {
     this._dataset = null;
 
     this.on('attribute', (name, value) => {
-      if (name === 'class' && this._classList) {
+      if (name === 'id') {
+        if (this.ownerDocument.defaultView[value] === undefined) {
+          _defineId(this.ownerDocument.defaultView, value, this);
+        }
+      } else if (name === 'class' && this._classList) {
         this._classList.reset(value);
       }
     });
@@ -2867,6 +2887,11 @@ const _loadPromise = el => new Promise((accept, reject) => {
 const _runHtml = (element, window) => {
   if (element instanceof HTMLElement) {
     return element.traverseAsync(async el => {
+      const {id} = el;
+      if (id) {
+        el._emit('attribute', 'id', id);
+      }
+      
       if (el instanceof window.HTMLStyleElement) {
         if (el.run()) {
           if (el.childNodes.length > 0) {
