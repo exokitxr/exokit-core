@@ -26,6 +26,7 @@ he.encode.options.useNamedReferences = true;
 const selector = require('selector-lite');
 const css = require('css');
 const {TextEncoder, TextDecoder} = require('text-encoding');
+const parseXml = require('@rgrove/parse-xml');
 const THREE = require('./lib/three-min.js');
 
 const windowSymbol = Symbol();
@@ -3132,6 +3133,48 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     }
     return styleSpec.style;
   };
+  window.DOMParser = class DOMParser {
+    parseFromString(htmlString, type) {
+      const _recurse = node => {
+        let nodeName = null;
+        let value = null;
+        if (node.type === 'text') {
+          nodeName = '#text';
+          value = node.text;
+        } else if (node.type === 'comment') {
+          nodeName = '#comment';
+          value = node.content;
+        }
+        
+        const tagName = node.name || null;
+        
+        const attrs = [];
+        if (node.attributes) {
+          for (const name in node.attributes) {
+            attrs.push({
+              name,
+              value: node.attributes[name],
+            });
+          }
+        }
+        
+        const childNodes = node.children ? node.children.map(childNode => _recurse(childNode)) : [];
+        
+        return {
+          nodeName,
+          tagName,
+          attrs,
+          value,
+          childNodes,
+        };
+      };
+      const xmlAst = parseXml(htmlString, {
+        // preserveComments: true,
+      });
+      const htmlAst = _recurse(xmlAst);
+      return _parseDocumentAst(htmlAst, window[optionsSymbol], window);
+    }
+  };
   window.Boolean = Boolean;
   window.Number = Number;
   window.String = String;
@@ -3492,16 +3535,20 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   return window;
 };
 const _parseDocument = (s, options, window) => {
-  const documentAst = parse5.parse(s, {
+  const ast = parse5.parse(s, {
     locationInfo: true,
   });
-  documentAst.tagName = 'document';
-  const document = _fromAST(documentAst, window);
-  const html = document.childNodes.find(element => element.tagName === 'HTML');
-  const head = html.childNodes.find(element => element.tagName === 'HEAD');
-  const body = html.childNodes.find(element => element.tagName === 'BODY');
+  ast.tagName = 'document';
+  return _parseDocumentAst(ast, options,window);
+};
+const _parseDocumentAst = (ast, options, window) => {
+  const document = _fromAST(ast, window);
+  const html = document.childNodes.find(el => el.tagName === 'HTML');
+const documentElement = html || (document.childNodes.length > 0 ? document.childNodes[0] : null);
+  const head = html ? html.childNodes.find(el => el.tagName === 'HEAD') : null;
+  const body = html ? html.childNodes.find(el => el.tagName === 'BODY') : null;
 
-  document.documentElement = html;
+  document.documentElement = documentElement;
   document.readyState = null;
   document.head = head;
   document.body = body;
