@@ -103,6 +103,10 @@ class Location extends EventEmitter {
   set password(password) { this._url.password = password; }
   get origin() { return this._url.origin; }
   set origin(origin) {} // read only
+  // conversions
+  toString() {
+    return this.href;
+  }
   // helpers
   set(u) {
     this._url.href = u;
