@@ -1754,7 +1754,7 @@ class Element extends Node {
     const oldChildNodes = this.childNodes;
     const newChildNodes = parse5.parseFragment(innerHTML, {
       locationInfo: true,
-    }).childNodes.map(childNode => _fromAST(childNode, this.ownerDocument.defaultView, this, this.ownerDocument));
+    }).childNodes.map(childNode => _fromAST(childNode, this.ownerDocument.defaultView, this, this.ownerDocument, true));
     this.childNodes = newChildNodes;
 
     if (oldChildNodes.length > 0) {
@@ -2766,7 +2766,7 @@ class DataTransferItem {
   }
 }
 
-const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
+const _fromAST = (node, window, parentNode, ownerDocument, uppercase) => {
   if (node.nodeName === '#text') {
     const text = new Text(node.value);
     text.parentNode = parentNode;
@@ -2778,7 +2778,10 @@ const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
     comment.ownerDocument = ownerDocument;
     return comment;
   } else {
-    const tagName = node.tagName && node.tagName.toUpperCase();
+    let {tagName} = node;
+    if (tagName && uppercase) {
+      tagName = tagName.toUpperCase();
+    }
     const {attrs, value, __location} = node;
     const HTMLElementTemplate = window[htmlTagsSymbol][tagName];
     const location = __location ? {
@@ -2805,7 +2808,7 @@ const _fromAST = (node, window, parentNode = null, ownerDocument = null) => {
     }
     element.ownerDocument = ownerDocument;
     if (node.childNodes) {
-      element.childNodes = node.childNodes.map(childNode => _fromAST(childNode, window, element, ownerDocument));
+      element.childNodes = node.childNodes.map(childNode => _fromAST(childNode, window, element, ownerDocument, uppercase));
     }
     return element;
   }
@@ -3175,7 +3178,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
         // preserveComments: true,
       });
       const htmlAst = _recurse(xmlAst);
-      return _parseDocumentAst(htmlAst, window[optionsSymbol], window);
+      return _parseDocumentAst(htmlAst, window[optionsSymbol], window, false);
     }
   };
   window.Boolean = Boolean;
@@ -3542,10 +3545,10 @@ const _parseDocument = (s, options, window) => {
     locationInfo: true,
   });
   ast.tagName = 'document';
-  return _parseDocumentAst(ast, options,window);
+  return _parseDocumentAst(ast, options, window, true);
 };
-const _parseDocumentAst = (ast, options, window) => {
-  const document = _fromAST(ast, window);
+const _parseDocumentAst = (ast, options, window, uppercase) => {
+  const document = _fromAST(ast, window, null, null, uppercase);
   const html = document.childNodes.find(el => el.tagName === 'HTML');
 const documentElement = html || (document.childNodes.length > 0 ? document.childNodes[0] : null);
   const head = html ? html.childNodes.find(el => el.tagName === 'HEAD') : null;
@@ -3598,7 +3601,7 @@ const documentElement = html || (document.childNodes.length > 0 ? document.child
   document.write = htmlString => {
     const childNodes = parse5.parseFragment(htmlString, {
       locationInfo: true,
-    }).childNodes.map(childNode => _fromAST(childNode, window, document.body, document));
+    }).childNodes.map(childNode => _fromAST(childNode, window, document.body, document, true));
     for (let i = 0; i < childNodes.length; i++) {
       document.body.appendChild(childNodes[i]);
     }
