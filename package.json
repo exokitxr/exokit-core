@@ -37,11 +37,12 @@
   },
   "homepage": "https://github.com/webmixedreality/exokit-core#readme",
   "keywords": [
+    "exokit",
+    "browser",
     "exobrowser",
     "web",
-    "browser",
-    "program",
     "javascript",
+    "html",
     "dom"
   ]
 }
