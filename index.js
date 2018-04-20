@@ -1069,6 +1069,7 @@ class AnalyserNode extends AudioNode {}
 class PannerNode extends AudioNode {
   setPosition() {}
 }
+class AudioBuffer {}
 class StereoPannerNode extends AudioNode {}
 class AudioContext {
   constructor() {
@@ -1078,21 +1079,23 @@ class AudioContext {
   createMediaElementSource() {
     return new AudioNode();
   }
-
   createMediaStreamSource() {
     return new AudioNode();
   }
-
+  createBufferSource() {
+    return new AudioNode();
+  }
   createGain() {
     return new GainNode();
   }
-
   createAnalyser() {
     return new AnalyserNode();
   }
-
   createPanner() {
     return new PannerNode();
+  }
+  createBuffer() {
+    return new AudioBuffer();
   }
 }
 
