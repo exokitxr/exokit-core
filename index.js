@@ -2343,6 +2343,10 @@ class HTMLScriptElement extends HTMLLoadableElement {
     innerHTML = innerHTML + '';
     this._emit('innerHTML', innerHTML);
   }
+  
+  set textContent(textContent) {
+    this.innerHTML = textContent;
+  }
 
   isRunnable() {
     const {type} = this;
