@@ -1194,7 +1194,7 @@ class Node extends EventEmitter {
     }
   }
   set previousElementSibling(previousElementSibling) {}
-  
+
   cloneNode(deep = false) {
     const el = new this.constructor();
     el.attrs = this.attrs;
@@ -1504,7 +1504,7 @@ class Element extends Node {
 
     this._emit('children', [childNode], [], this.childNodes[this.childNodes.length - 2] || null, null);
     this.ownerDocument._emit('domchange');
-    
+
     return childNode;
   }
   removeChild(childNode) {
@@ -1515,7 +1515,7 @@ class Element extends Node {
 
       this._emit('children', [], [childNode], this.childNodes[index - 1] || null, this.childNodes[index] || null);
       this.ownerDocument._emit('domchange');
-      
+
       return childNode;
     } else {
       throw new Error('The node to be removed is not a child of this node.');
@@ -2118,7 +2118,7 @@ class Document extends HTMLLoadableElement {
   constructor() {
     super('DOCUMENT');
   }
-  
+
   get nodeType() {
     return Node.DOCUMENT_NODE;
   }
@@ -2148,7 +2148,7 @@ class DocumentFragment extends HTMLElement {
   constructor() {
     super('DOCUMENTFRAGMENT');
   }
-  
+
   get nodeType() {
     return Node.DOCUMENT_FRAGMENT_NODE;
   }
@@ -2721,19 +2721,19 @@ class DOMImplementation {
   constructor(window) {
     this._window = window;
   }
-  
+
   createDocument() {
     throw new Error('not implemented');
   }
-  
+
   createDocumentType() {
     return new DocumentType();
   }
-  
+
   createHTMLDocument() {
     return _parseDocument('', this._window[optionsSymbol], this._window);
   }
-  
+
   hasFeature() {
     return false;
   }
