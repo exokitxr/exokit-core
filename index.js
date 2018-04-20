@@ -1708,16 +1708,23 @@ class Element extends Node {
   dispatchEvent(event) {
     event.target = this;
 
-    const _recurse = (node, event) => {
+    const _emit = (node, event) => {
       event.currentTarget = this;
       node._emit(event.type, event);
       event.currentTarget = null;
+    };
+    const _recurse = (node, event) => {
+      _emit(node, event);
 
       if (!event.propagationStopped && node.parentNode) {
         _recurse(node.parentNode, event);
       }
     };
     _recurse(this, event);
+    
+    if (this.ownerDocument) {
+      _emit(this.ownerDocument.defaultView, event);
+    }
   }
 
   getBoundingClientRect() {
