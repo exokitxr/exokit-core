@@ -1195,7 +1195,7 @@ class Node extends EventEmitter {
     }
   }
   set previousElementSibling(previousElementSibling) {}
-  
+
   contains(el) {
     for (;;) {
       if (el === this) {
@@ -1721,7 +1721,7 @@ class Element extends Node {
       }
     };
     _recurse(this, event);
-    
+
     if (this.ownerDocument) {
       _emit(this.ownerDocument.defaultView, event);
     }
@@ -2372,7 +2372,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
     type = type + '';
     this.setAttribute('type', type);
   }
-  
+
   get text() {
     let result = '';
     this.traverse(el => {
@@ -2390,7 +2390,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
     innerHTML = innerHTML + '';
     this._emit('innerHTML', innerHTML);
   }
-  
+
   set textContent(textContent) {
     this.innerHTML = textContent;
   }
@@ -2942,7 +2942,7 @@ const _runHtml = (element, window) => {
       if (id) {
         el._emit('attribute', 'id', id);
       }
-      
+
       if (el instanceof window.HTMLStyleElement) {
         if (el.run()) {
           if (el.childNodes.length > 0) {
@@ -3239,9 +3239,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
           nodeName = '#comment';
           value = node.content;
         }
-        
+
         const tagName = node.name || null;
-        
+
         const attrs = [];
         if (node.attributes) {
           for (const name in node.attributes) {
@@ -3251,9 +3251,9 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
             });
           }
         }
-        
+
         const childNodes = node.children ? node.children.map(childNode => _recurse(childNode)) : [];
-        
+
         return {
           nodeName,
           tagName,
