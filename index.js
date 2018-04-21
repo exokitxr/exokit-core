@@ -3733,10 +3733,9 @@ const documentElement = html || (document.childNodes.length > 0 ? document.child
 
   return document;
 };
-const _parseWindow = (s, options, parent, top) => {
+const _makeWindowWithDocument = (s, options, parent, top) => {
   const window = _makeWindow(options, parent, top);
-  const document = _parseDocument(s, options, window);
-  window.document = document;
+  window.document = _parseDocument(s, options, window);
   return window;
 };
 
@@ -3744,7 +3743,7 @@ const exokit = (s = '', options = {}) => {
   options.url = options.url || 'http://127.0.0.1/';
   options.baseUrl = options.baseUrl || options.url;
   options.dataPath = options.dataPath || __dirname;
-  return _parseWindow(s, options);
+  return _makeWindowWithDocument(s, options);
 };
 exokit.load = (src, options = {}) => fetch(src)
   .then(res => {
