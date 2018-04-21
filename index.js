@@ -2635,8 +2635,13 @@ class HTMLIframeElement extends HTMLSrcableElement {
           })
           .then(htmlString => {
             const parentWindow = this.ownerDocument.defaultView;
-            this.contentWindow = _parseWindow('', parentWindow[optionsSymbol], parentWindow, parentWindow.top);
-            const contentDocument = _parseDocument(htmlString, this.contentWindow[optionsSymbol], this.contentWindow);
+
+            const contentWindow = _makeWindow(parentWindow[optionsSymbol], parentWindow, parentWindow.top);
+            const contentDocument = _parseDocument(htmlString, contentWindow[optionsSymbol], contentWindow);
+
+            contentWindow.document = contentDocument;
+
+            this.contentWindow = contentWindow;
             this.contentDocument = contentDocument;
 
             contentDocument.once('readystatechange', () => {
