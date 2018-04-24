@@ -3087,8 +3087,8 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.parent = parent || window;
   window.top = top || window;
 
-  window.innerWidth = 1280;
-  window.innerHeight = 1024;
+  window.innerWidth = defaultCanvasSize[0];
+  window.innerHeight = defaultCanvasSize[1];
   window.devicePixelRatio = 1;
   window.document = null;
   const location = new Location(options.url);
