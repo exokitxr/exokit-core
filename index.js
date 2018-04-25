@@ -30,7 +30,6 @@ const parseXml = require('@rgrove/parse-xml');
 const THREE = require('./lib/three-min.js');
 
 const windowSymbol = Symbol();
-const vmSymbol = Symbol();
 const htmlTagsSymbol = Symbol();
 const optionsSymbol = Symbol();
 const elementSymbol = Symbol();
@@ -2996,7 +2995,7 @@ const _runHtml = (element, window) => {
 };
 const _runJavascript = (jsString, window, filename = 'script', lineOffset = 0, colOffset = 0) => {
   try {
-    window[vmSymbol].run(jsString, filename, lineOffset, colOffset);
+    window.vm.run(jsString, filename, lineOffset, colOffset);
   } catch (err) {
     console.warn(err.stack);
   }
@@ -3075,7 +3074,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
 
   const vmo = vmOne.make();
   const window = vmo.getGlobal();
-  window[vmSymbol] = vmo;
+  window.vm = vmo;
 
   for (const k in EventEmitter.prototype) {
     window[k] = EventEmitter.prototype[k];
