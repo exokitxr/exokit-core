@@ -1075,6 +1075,8 @@ class AudioParam {
   }
 
   setValueAtTime() {}
+  exponentialRampToValueAtTime() {}
+}
 }
 class GainNode extends AudioNode {}
 class AnalyserNode extends AudioNode {}
