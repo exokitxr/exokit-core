@@ -1586,6 +1586,20 @@ class Element extends Node {
       throw new Error('The node to be removed is not a child of this node.');
     }
   }
+  replaceChild(newChild, oldChild) {
+    const index = this.childNodes.indexOf(oldChild);
+    if (index !== -1) {
+      this.childNodes.splice(index, 1, newChild);
+      oldChild.parentNode = null;
+
+      this._emit('children', [], [oldChild], this.childNodes[index - 1] || null, this.childNodes[index] || null);
+      this.ownerDocument._emit('domchange');
+
+      return oldChild;
+    } else {
+      throw new Error('The node to be replaced is not a child of this node.');
+    }
+  }
   insertBefore(childNode, nextSibling) {
     const index = this.childNodes.indexOf(nextSibling);
     if (index !== -1) {
