@@ -2745,11 +2745,36 @@ class HTMLTemplateElement extends HTMLElement {
   }
   set content(content) {}
 }
-class Text extends Node {
+class CharacterNode extends Node {
   constructor(value) {
     super();
 
     this.value = value;
+  }
+  
+  get data() {
+    return this.value;
+  }
+  set data(data) {
+    this.value = data;
+  }
+  get length() {
+    return this.value.length;
+  }
+  set length(length) {}
+  
+  get firstChild() {
+    return null;
+  }
+  set firstChild(firstChild) {}
+  get lastChild() {
+    return null;
+  }
+  set lastChild(lastChild) {}
+}
+class Text extends CharacterNode {
+  constructor(value) {
+    super(value);
   }
 
   get nodeType() {
@@ -2775,11 +2800,9 @@ class Text extends Node {
     return JSON.stringify(this.value);
   }
 }
-class Comment extends Node {
+class Comment extends CharacterNode {
   constructor(value) {
-    super();
-
-    this.value = value;
+    super(value);
   }
 
   get nodeType() {
@@ -2791,15 +2814,6 @@ class Comment extends Node {
     return '#comment';
   }
   set nodeName(nodeName) {}
-
-  get firstChild() {
-    return null;
-  }
-  set firstChild(firstChild) {}
-  get lastChild() {
-    return null;
-  }
-  set lastChild(lastChild) {}
 
   inspect() {
     return `<!--${this.value}-->`;
