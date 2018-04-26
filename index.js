@@ -3104,6 +3104,13 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       this.ownerDocument = window.document; // need to set owner document here because HTMLImageElement can be manually constructed via new Image()
     }
   })(HTMLImageElement);
+  const HTMLAudioElementBound = (Old => class HTMLAudioElement extends Old {
+    constructor() {
+      super(...arguments);
+
+      this.ownerDocument = window.document; // need to set owner document here because HTMLAudioElement can be manually constructed via new Audio()
+    }
+  })(HTMLAudioElement);
   function createImageBitmap(src, x, y, w, h, options) {
     let image;
     if (src.constructor.name === 'HTMLImageElement') {
@@ -3241,7 +3248,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     STYLE: HTMLStyleElement,
     SCRIPT: HTMLScriptElement,
     IMG: HTMLImageElementBound,
-    AUDIO: HTMLAudioElement,
+    AUDIO: HTMLAudioElementBound,
     VIDEO: HTMLVideoElement,
     SOURCE: HTMLSourceElement,
     IFRAME: HTMLIframeElement,
@@ -3256,7 +3263,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.HTMLStyleElement = HTMLStyleElement;
   window.HTMLScriptElement = HTMLScriptElement;
   window.HTMLImageElement = HTMLImageElementBound,
-  window.HTMLAudioElement = HTMLAudioElement;
+  window.HTMLAudioElement = HTMLAudioElementBound;
   window.HTMLVideoElement = HTMLVideoElement;
   window.HTMLIframeElement = HTMLIframeElement;
   window.HTMLCanvasElement = HTMLCanvasElement;
@@ -3370,6 +3377,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
   window.CanvasGradient = CanvasGradient;
   window.CanvasRenderingContext2D = CanvasRenderingContext2D;
   window.WebGLRenderingContext = WebGLRenderingContext;
+  window.Audio = HTMLAudioElementBound;
   window.MediaRecorder = MediaRecorder;
   window.Document = Document;
   window.DocumentType = DocumentType;
