@@ -1077,8 +1077,13 @@ class AudioParam {
   setValueAtTime() {}
   exponentialRampToValueAtTime() {}
 }
+class GainNode extends AudioNode {
+  constructor() {
+    super();
+    
+    this.gain = new AudioParam();
+  }
 }
-class GainNode extends AudioNode {}
 class AnalyserNode extends AudioNode {}
 class PannerNode extends AudioNode {
   setPosition() {}
