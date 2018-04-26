@@ -338,8 +338,8 @@ class MutationObserver {
     return oldQueue;
   }
 
-  bind(element) {
-    element.traverse(el => {
+  bind(el) {
+    el.traverse(el => {
       const _attribute = (name, value) => this.handleAttribute(el, name, value);
       el.on('attribute', _attribute);
       const _children = (addedNodes, removedNodes, previousSibling, nextSibling) => this.handleChildren(el, addedNodes, removedNodes, previousSibling, nextSibling);
@@ -352,8 +352,8 @@ class MutationObserver {
     });
   }
 
-  unbind(element) {
-    element.traverse(el => {
+  unbind(el) {
+    el.traverse(el => {
       const bindings = this.bindings.get(el);
       for (let i = 0; i < bindings.length; i++) {
         el.removeListener(bindings[i]);
