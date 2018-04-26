@@ -2748,6 +2748,15 @@ class CharacterNode extends Node {
     this.value = value;
   }
   
+  get textContent() {
+    return this.value;
+  }
+  set textContent(textContent) {
+    this.value = textContent;
+    
+    this._emit('value');
+  }
+  
   get data() {
     return this.value;
   }
