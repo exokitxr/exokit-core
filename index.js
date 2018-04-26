@@ -2274,10 +2274,10 @@ class HTMLStyleElement extends HTMLLoadableElement {
           .then(stylesheet => {
             this.stylesheet = stylesheet;
             styleEpoch++;
-            this._emit('load');
+            this.dispatchEvent(new Event('load', {target: this}));
           })
           .catch(err => {
-            this._emit('error', err);
+            this.dispatchEvent(new Event('error', {target: this}));
           });
       }
     });
@@ -2287,10 +2287,10 @@ class HTMLStyleElement extends HTMLLoadableElement {
         .then(stylesheet => {
           this.stylesheet = stylesheet;
           styleEpoch++;
-          this._emit('load');
+          this.dispatchEvent(new Event('load', {target: this}));
         })
         .catch(err => {
-          this._emit('error', err);
+          this.dispatchEvent(new Event('error', {target: this}));
         });
     });
   }
@@ -2354,12 +2354,12 @@ class HTMLScriptElement extends HTMLLoadableElement {
 
             this.readyState = 'complete';
 
-            this._emit('load');
+            this.dispatchEvent(new Event('load', {target: this}));
           })
           .catch(err => {
             this.readyState = 'complete';
 
-            this._emit('error', err);
+            this.dispatchEvent(new Event('error', {target: this}));
           });
       }
     });
@@ -2371,7 +2371,7 @@ class HTMLScriptElement extends HTMLLoadableElement {
         this.readyState = 'complete';
 
         process.nextTick(() => {
-          this._emit('load');
+          this.dispatchEvent(new Event('load', {target: this}));
         });
       }
     });
@@ -2534,7 +2534,7 @@ class HTMLImageElement extends HTMLSrcableElement {
     this.on('attribute', (name, value) => {
       if (name === 'src') {
         process.nextTick(() => { // XXX
-          this._emit('load');
+          this.dispatchEvent(new Event('load', {target: this}));
         });
       }
     });
@@ -2665,7 +2665,7 @@ class HTMLIframeElement extends HTMLSrcableElement {
             this.contentDocument = contentDocument;
 
             contentDocument.once('readystatechange', () => {
-              this._emit('load');
+              this.dispatchEvent(new Event('load', {target: this}));
             });
           })
           .catch(err => {
@@ -3906,10 +3906,10 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
           }
         })
         .then(() => {
-          this._emit('load');
+          this.dispatchEvent(new Event('load', {target: this}));
         })
         .catch(err => {
-          this._emit('error', err);
+          this.dispatchEvent(new Event('error', {target: this}));
         });
     }
 
