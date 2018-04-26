@@ -344,10 +344,13 @@ class MutationObserver {
       el.on('attribute', _attribute);
       const _children = (addedNodes, removedNodes, previousSibling, nextSibling) => this.handleChildren(el, addedNodes, removedNodes, previousSibling, nextSibling);
       el.on('children', _children);
+      const _value = () => this.handleValue(el);
+      el.on('value', _value);
 
       this.bindings.set(el, [
         _attribute,
         _children,
+        _value,
       ]);
     });
   }
@@ -387,6 +390,15 @@ class MutationObserver {
     for (let i = 0; i < removedNodes.length; i++) {
       this.unbind(removedNodes[i]);
     }
+
+    setImmediate(() => {
+      this.flush();
+    });
+  }
+  
+  handleValue(el) {
+    console.log('handle value');
+    this.queue.push(new MutationRecord('characterData', el, [], [], null, null, null, null, null));
 
     setImmediate(() => {
       this.flush();
@@ -2762,6 +2774,8 @@ class CharacterNode extends Node {
   }
   set data(data) {
     this.value = data;
+    
+    this._emit('value');
   }
   get length() {
     return this.value.length;
