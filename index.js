@@ -3395,6 +3395,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
       return Old.prototype.open.apply(this, arguments);
     }
   })(XMLHttpRequest),
+  window.Promise = Promise;
   window.WebSocket = WebSocket;
   window.Request = Request;
   window.Response = Response;
