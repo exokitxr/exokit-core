@@ -397,7 +397,6 @@ class MutationObserver {
   }
   
   handleValue(el) {
-    console.log('handle value');
     this.queue.push(new MutationRecord('characterData', el, [], [], null, null, null, null, null));
 
     setImmediate(() => {
