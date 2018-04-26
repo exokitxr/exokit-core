@@ -1081,6 +1081,17 @@ class AnalyserNode extends AudioNode {}
 class PannerNode extends AudioNode {
   setPosition() {}
 }
+class BiquadFilterNode extends AudioNode {
+  constructor() {
+    super();
+    
+    this.frequency = new AudioParam();
+    this.detune = new AudioParam();
+    this.Q = new AudioParam();
+    this.gain = new AudioParam();
+    this.type = '';
+  }
+}
 class AudioBuffer {}
 class StereoPannerNode extends AudioNode {}
 class AudioContext {
@@ -1105,6 +1116,9 @@ class AudioContext {
   }
   createPanner() {
     return new PannerNode();
+  }
+  createBiquadFilter() {
+    return new BiquadFilterNode();
   }
   createBuffer() {
     return new AudioBuffer();
