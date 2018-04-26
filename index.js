@@ -2769,7 +2769,7 @@ class CharacterNode extends Node {
   set lastChild(lastChild) {}
   
   traverse(fn) {
-    fn(ths);
+    fn(this);
   }
 }
 class Text extends CharacterNode {
