@@ -1105,6 +1105,16 @@ class AudioContext {
   constructor() {
     this.listener = new AudioListener();
   }
+  
+  suspend() {
+    return Promise.resolve();
+  }
+  resume() {
+    return Promise.resolve();
+  }
+  close() {
+    return Promise.resolve();
+  }
 
   createMediaElementSource() {
     return new AudioNode();
