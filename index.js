@@ -1105,15 +1105,27 @@ class StereoPannerNode extends AudioNode {}
 class AudioContext {
   constructor() {
     this.listener = new AudioListener();
+
+    this._startTime = 0;
+    this._startTimestamp = Date.now();
   }
-  
+
+  get currentTime() {
+    return this._startTime + (this._startTimestamp !== null ? (Date.now() - this._startTimestamp) : 0);
+  }
+  set currentTime(currentTime) {}
+
   suspend() {
+    this._startTime = this.currentTime;
+    this._startTimestamp = null;
     return Promise.resolve();
   }
   resume() {
+    this._startTimestamp = Date.now();
     return Promise.resolve();
   }
   close() {
+    this._startTimestamp = null;
     return Promise.resolve();
   }
 
@@ -2495,19 +2507,28 @@ class HTMLSrcableElement extends HTMLLoadableElement {
 class HTMLMediaElement extends HTMLSrcableElement {
   constructor(tagName = null, attrs = [], value = '', location = null) {
     super(tagName, attrs, value, location);
+
+    this._startTime = 0;
+    this._startTimestamp = null;
   }
 
-  play() {}
+  get currentTime() {
+    return this._startTime + (this._startTimestamp !== null ? (Date.now() - this._startTimestamp) : 0);
+  }
+  set currentTime(currentTime) {}
+
+  play() {
+    this._startTimestamp = Date.now();
+  }
   pause() {}
 
   get paused() {
     return true;
   }
-  set paused(paused) {}
-  get currentTime() {
-    return 0;
+  set paused(paused) {
+    this._startTime = this.currentTime;
+    this._startTimestamp = null;
   }
-  set currentTime(currentTime) {}
   get duration() {
     return 1;
   }
