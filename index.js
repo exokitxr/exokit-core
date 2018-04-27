@@ -1076,6 +1076,7 @@ class AudioParam {
 
   setValueAtTime() {}
   exponentialRampToValueAtTime() {}
+  cancelScheduledValues() {}
 }
 class GainNode extends AudioNode {
   constructor() {
