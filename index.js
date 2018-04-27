@@ -395,7 +395,7 @@ class MutationObserver {
       this.flush();
     });
   }
-  
+
   handleValue(el) {
     this.queue.push(new MutationRecord('characterData', el, [], [], null, null, null, null, null));
 
@@ -1080,7 +1080,7 @@ class AudioParam {
 class GainNode extends AudioNode {
   constructor() {
     super();
-    
+
     this.gain = new AudioParam();
   }
 }
@@ -1091,7 +1091,7 @@ class PannerNode extends AudioNode {
 class BiquadFilterNode extends AudioNode {
   constructor() {
     super();
-    
+
     this.frequency = new AudioParam();
     this.detune = new AudioParam();
     this.Q = new AudioParam();
@@ -2803,29 +2803,29 @@ class CharacterNode extends Node {
 
     this.value = value;
   }
-  
+
   get textContent() {
     return this.value;
   }
   set textContent(textContent) {
     this.value = textContent;
-    
+
     this._emit('value');
   }
-  
+
   get data() {
     return this.value;
   }
   set data(data) {
     this.value = data;
-    
+
     this._emit('value');
   }
   get length() {
     return this.value.length;
   }
   set length(length) {}
-  
+
   get firstChild() {
     return null;
   }
@@ -2834,7 +2834,7 @@ class CharacterNode extends Node {
     return null;
   }
   set lastChild(lastChild) {}
-  
+
   traverse(fn) {
     fn(this);
   }
