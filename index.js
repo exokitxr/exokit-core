@@ -4,8 +4,9 @@ const stream = require('stream');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const os = require('os');
 const dgram = require('dgram');
+const os = require('os');
+const util = require('util');
 const {URL} = url;
 const {performance} = require('perf_hooks');
 
@@ -1965,7 +1966,7 @@ class Element extends Node {
     }
   }
 
-  inspect() {
+  [util.inspect.custom]() {
     const _getIndent = depth => Array(depth*2 + 1).join(' ');
     const _recurse = (el, depth = 0) => {
       let result = '';
@@ -2885,7 +2886,7 @@ class Text extends CharacterNode {
   }
   set lastChild(lastChild) {}
 
-  inspect() {
+  [util.inspect.custom]() {
     return JSON.stringify(this.value);
   }
 }
@@ -2904,7 +2905,7 @@ class Comment extends CharacterNode {
   }
   set nodeName(nodeName) {}
 
-  inspect() {
+  [util.inspect.custom]() {
     return `<!--${this.value}-->`;
   }
 }
