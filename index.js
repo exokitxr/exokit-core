@@ -40,6 +40,7 @@ const pointerLockElementSymbol = Symbol();
 const mrDisplaysSymbol = Symbol();
 let nativeBindings = false;
 let args = {};
+let version = '';
 
 const btoa = s => new Buffer(s, 'binary').toString('base64');
 const atob = s => new Buffer(s, 'base64').toString('binary');
@@ -3899,6 +3900,9 @@ exokit.load = (src, options = {}) => fetch(src)
 exokit.THREE = THREE;
 exokit.setArgs = newArgs => {
   args = newArgs;
+};
+exokit.setVersion = newVersion => {
+  version = newVersion;
 };
 exokit.setNativeBindingsModule = nativeBindingsModule => {
   nativeBindings = true;
