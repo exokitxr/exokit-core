@@ -13,7 +13,6 @@ const {performance} = require('perf_hooks');
 const parseIntStrict = require('parse-int');
 const parse5 = require('parse5');
 
-const vmOne = require('vm-one');
 const fetch = require('window-fetch');
 const {XMLHttpRequest} = require('window-xhr');
 const XHRUtils = require('window-xhr/lib/utils');
@@ -434,6 +433,7 @@ class ImageBitmap {
 ImageBitmap.createImageBitmap = function() {
   return Reflect.construct(ImageBitmap, arguments);
 };
+let nativeVm = null;
 class nativeWorker {
   terminate() {}
 }
@@ -3184,7 +3184,7 @@ const _makeWindow = (options = {}, parent = null, top = null) => {
     return Promise.resolve(imageBitmap);
   }
 
-  const vmo = vmOne.make();
+  const vmo = nativeVm.make();
   const window = vmo.getGlobal();
   window.vm = vmo;
 
@@ -3909,6 +3909,7 @@ exokit.setNativeBindingsModule = nativeBindingsModule => {
 
   const bindings = require(nativeBindingsModule);
 
+  nativeVm = bindings.nativeVm;
   nativeWorker = bindings.nativeWorker;
   nativeWorker.setNativeRequire('nativeBindings', bindings.initFunctionAddress);
   nativeWorker.bind({

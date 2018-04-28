@@ -11,7 +11,6 @@
     "parse-int": "^1.0.2",
     "parse5": "^4.0.0",
     "text-encoding": "^0.6.4",
-    "vm-one": "0.0.8",
     "window-classlist": "0.0.1",
     "window-fetch": "0.0.6",
     "window-selector": "0.0.1",
